@@ -1,0 +1,29 @@
+{
+  "name": "carrion-userscripts",
+  "version": "0.0.0",
+  "description": "",
+  "homepage": "https://github.com/bbbonnibel/carrion-userscripts#readme",
+  "bugs": {
+    "url": "https://github.com/bbbonnibel/carrion-userscripts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbbonnibel/carrion-userscripts.git"
+  },
+  "license": "UNLICENSED",
+  "author": "",
+  "type": "commonjs",
+  "scripts": {
+    "build": "node ./build/build.js"
+  },
+  "dependencies": {
+    "@prettier/sync": "^0.6.1",
+    "@sass-fairy/list": "^1.2.4",
+    "@sass-fairy/string": "^1.3.1",
+    "autoprefixer": "^10.4.23",
+    "fs-extra": "^11.3.3",
+    "prettier": "^3.8.1",
+    "sass": "^1.97.3",
+    "yaml": "^2.8.2"
+  }
+}

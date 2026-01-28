@@ -1,0 +1,23 @@
+{
+  "files.eol": "\n",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.rulers": [80],
+  "files.exclude": {
+    "node_modules/": true
+  },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "scss.lint.emptyRules": "ignore",
+  "[html]": {
+    "editor.formatOnSave": true,
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true,
+  },
+  "[scss]": {
+    "editor.formatOnSave": true,
+  },
+}
