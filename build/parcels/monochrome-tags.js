@@ -1,9 +1,9 @@
-const common = require("./common");
+const common = require("../common");
 const fs = require("fs-extra");
 const path = require("path");
 
-const src = "./src/monochrome-tags";
-const dist = "./dist/monochrome-tags";
+const src = "src/monochrome-tags";
+const dist = "dist/monochrome-tags";
 const name = "monochrome-tags.user.js";
 
 async function build() {
