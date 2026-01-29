@@ -6,7 +6,8 @@ const PROFILE_CARD_SELECTOR =
 const TAG_SELECTOR = "span[title]";
 const DATA_ATTR = "data-nth-category";
 
-const INSERT_LABELS = false;
+const INSERT_CATEGORY_LABELS = false;
+const INSERT_CATEGORY_ICONS = false;
 
 let isCharacterPage = false;
 let isSearchPage = false;
@@ -40,8 +41,6 @@ function stripeTags() {
     .flat()
     .filter(Boolean);
 
-  console.log(tagRows);
-
   for (const row of tagRows) {
     const tags = [...row.getElementsByTagName("span")].filter((span) =>
       span.hasAttribute("title"),
@@ -62,17 +61,40 @@ function stripeTags() {
       if (firstInSection) {
         alternate = !alternate;
 
-        if (INSERT_LABELS) {
-          const label = document.createElement("span");
-          label.className = "tag-category-label";
-          label.textContent = title;
-          row.insertBefore(label, tag);
+        if (INSERT_CATEGORY_LABELS) {
+          row.classList.add("has-labels");
+          const label = createLabelElement(title);
+          tag.appendChild(label);
+        }
+
+        if (INSERT_CATEGORY_ICONS) {
+          const icon = createIconElement(title);
+          row.insertBefore(icon, tag);
         }
       }
 
       tag.setAttribute(DATA_ATTR, alternate ? "1" : "0");
     });
   }
+}
+
+function createLabelElement(text) {
+  const label = document.createElement("span");
+  label.className = "tag-category-label";
+  label.textContent = text;
+  return label;
+}
+
+function createIconElement(category) {
+  const icon = document.createElement("i");
+  icon.classList.add("tag-category-icon");
+  icon.classList.add("fas");
+  icon.classList.add(getIconClass(category));
+  return icon;
+}
+
+function getIconClass(category) {
+  return "fa-gear";
 }
 
 main();

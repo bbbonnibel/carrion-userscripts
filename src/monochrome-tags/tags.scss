@@ -14,11 +14,23 @@ $tags:
   --tag-padding: unset;
 }
 
+.tag-category-label {
+  align-self: center;
+  font-size: 75%;
+  line-height: 90%;
+}
+
+.tag-category-icon {
+  align-self: center;
+}
+
 %tag-list {
   span[title] {
     background: var(--tag-background) !important;
-    border: var(--tag-border) !important;
+    // border: var(--tag-border) !important;
     border-radius: var(--tag-border-radius) !important;
+    border-style: solid !important;
+    filter: grayscale(50%);
     padding: var(--tag-padding) !important;
   }
 }
@@ -28,8 +40,23 @@ $tags:
   --tag-border-radius: 4px;
   --tag-border: 2px solid color-mix(in hsl, currentColor, transparent 70%);
 
+  &.has-labels {
+    row-gap: 12px !important;
+  }
+
   [data-nth-category="1"] {
-    --tag-background: color-mix(in hsl, currentColor, transparent 95%);
+    // --tag-background: color-mix(in hsl, currentColor, transparent 95%);
+  }
+
+  span[title] {
+    position: relative;
+  }
+
+  .tag-category-label {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    transform: translateY(-3px);
   }
 
   @extend %tag-list;
@@ -37,6 +64,10 @@ $tags:
 
 %search-tag-list {
   @extend %tag-list;
+
+  .tag-category-label {
+    display: none;
+  }
 }
 
 // Search results
@@ -47,13 +78,6 @@ $tags:
 // Character profile
 #filtered-profile-content .card-body :nth-child(2) h3 + div {
   @extend %profile-tag-list;
-}
-
-.tag-category-label {
-  align-self: center;
-  font-size: 75%;
-  width: min-content;
-  line-height: 90%;
 }
 
 [title="Body Plan"] {
