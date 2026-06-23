@@ -1,5 +1,7 @@
 const location = document.location;
 
+const tagsCss = $import("./tags.scss");
+
 const SEARCH_CARD_SELECTOR = ".character-card .character-meta + div";
 const PROFILE_CARD_SELECTOR =
   "#filtered-profile-content .card-body :nth-child(2) h3 + div";
@@ -24,7 +26,7 @@ function main() {
   }
 
   const style = document.createElement("style");
-  style.innerHTML = `{{CSS}}`;
+  style.innerHTML = tagsCss;
   style.setAttribute("data-from", "monochrome-tags.user.js");
   document.head.appendChild(style);
 

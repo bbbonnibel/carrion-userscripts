@@ -1,0 +1,9 @@
+---
+name: Dashboard Re-sort
+namespace: bbbonnibel
+description: Provide new ways to sort the dashboard.
+author: bbbonnibel
+grant: none
+match:
+  - https://*.carrion.chat/dashboard
+run-at: document-start

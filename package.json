@@ -14,7 +14,7 @@
   "author": "",
   "type": "commonjs",
   "scripts": {
-    "build": "node ./build/build.js",
+    "build": "node ./build/main.js",
     "watch": "npx nodemon  --watch src --watch build --ext 'js,css,scss,yaml' --exec 'node' ./build/build.js"
   },
   "dependencies": {

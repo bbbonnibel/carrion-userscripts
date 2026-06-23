@@ -22,10 +22,29 @@ async function compileCss(sourcePath) {
   return css;
 }
 
-function compileHeader(folder) {
-  const filepath = path.join(folder, "header.yaml");
+function readYaml(filepath) {
+  if (!fs.existsSync(filepath)) {
+    throw Error(`Asked to read nonexistent yaml file: ${filepath}`);
+  }
   const file = fs.readFileSync(filepath, { encoding: "utf-8" });
   const y = yaml.parse(file);
+  return y;
+}
+
+/**
+ * @typedef {Object} CompileHeaderConfig
+ * @property {string} filepath The absolute filepath of the header file.
+ * @property {string} version The script's version.
+ * @property {string} downloadUrl The script's download URL.
+ */
+/**
+ *
+ * @param {CompileHeaderConfig} config
+ * @returns The compiled userscript header.
+ */
+function compileHeader(config) {
+  const { filepath, version, downloadUrl } = config;
+  const y = readYaml(filepath);
 
   let header = [];
 
@@ -39,17 +58,20 @@ function compileHeader(folder) {
     }
   }
 
+  header.push(`@version ${version}`);
+  header.push(`@downloadURL ${downloadUrl}`);
+  header.push(`@updateURL ${downloadUrl}`);
+
   header = ["==UserScript==", header, "==/UserScript=="]
     .flat()
     .map((i) => `// ${i}`.trim())
     .join("\n");
-
-  header += "\n\n\n";
 
   return header;
 }
 
 module.exports = {
   compileCss,
+  readYaml,
   compileHeader,
 };

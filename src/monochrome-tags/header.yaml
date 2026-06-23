@@ -2,12 +2,9 @@
 name: Monochrome Tags
 namespace: bbbonnibel
 description: Revise the appearance of character tags.
-version: 0.0.0
 author: bbbonnibel
 grant: none
 match:
   - https://*.carrion.chat/character/*
   # - https://*.carrion.chat/search/*
-downloadURL: https://bbbonnibel.github.io/carrion-userscripts/release/monochrome-tags/monochrome-tags.user.js
-updateURL: https://bbbonnibel.github.io/carrion-userscripts/release/monochrome-tags/monochrome-tags.user.js
 run-at: document-start
