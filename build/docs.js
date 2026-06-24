@@ -11,8 +11,6 @@ async function build() {
 
   const static = [
     "index.html",
-    "styles/bootstrap.min.css",
-    "styles/bootstrap.min.css.map",
   ]
   for (const filepath of static) {
     fs.copyFileSync(path.join(dir.DOCS, filepath), path.join(dir.DIST, filepath));
