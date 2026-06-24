@@ -28,7 +28,7 @@ async function build(folder) {
   const outname = config.out;
   const outFolder = path.join(DIST_SCRIPT, folder);
   const outFile = path.join(outFolder, outname);
-  const downloadUrl = path.join(PROJECT.releases, folder, outname);
+  const downloadUrl = `${PROJECT.releases}${folder}/${outname}`;
 
   process.stdout.write(` • Version ${version}\n`);
 
