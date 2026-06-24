@@ -6,6 +6,7 @@ const imports = require("./imports.js");
 const CWD = process.cwd();
 const SRC = path.join(CWD, "src");
 const DIST = path.join(CWD, "dist");
+const DIST_SCRIPT = path.join(DIST, "script");
 /**
  * @typedef {Object} ProjectFile
  * @prop {string} releases The URL for userscript releases.
@@ -23,7 +24,7 @@ async function build(folder) {
   const headerFile = config.header ?? "header.yaml";
   const mainFile = config.main ?? "main.js";
   const outname = config.out;
-  const outFolder = path.join(DIST, folder);
+  const outFolder = path.join(DIST_SCRIPT, folder);
   const outFile = path.join(outFolder, outname);
   const downloadUrl = path.join(PROJECT.releases, folder, outname);
 
@@ -42,8 +43,8 @@ async function build(folder) {
   script = await imports.resolveImports(script, mainFilePath);
   script = [header, script].join("\n\n\n");
 
-  fs.ensureDirSync(path.join(DIST, folder));
-  fs.writeFileSync(path.join(DIST, folder, outname), script);
+  fs.ensureDirSync(outFolder);
+  fs.writeFileSync(outFile, script);
 
   process.stdout.write(` ✓ Built ${folder}\n`);
 }
