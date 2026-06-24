@@ -1,4 +1,5 @@
 const sass = require("sass");
+const path = require("path");
 const autoprefixer = require("autoprefixer");
 const postcss = require("postcss");
 const prettier = require("@prettier/sync");
@@ -23,7 +24,7 @@ async function compileSassFile(sourcePath, config = {}) {
     style: "expanded",
   };
   if (config.allowNodeModules) {
-    sassOptions.loadPaths = ["node_modules"];
+    sassOptions.loadPaths = [path.join(process.cwd(), "node_modules")];
   }
 
   let { css } = sass.compile(sourcePath, sassOptions);

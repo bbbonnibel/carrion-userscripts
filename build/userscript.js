@@ -18,7 +18,7 @@ const PROJECT = yaml.readYamlFile(path.join(dir.CWD, "project.yaml"));
 const DIST_SCRIPT = path.join(dir.DIST, "script");
 
 async function build(folder) {
-  process.stdout.write(`Building ${folder}...\n`);
+  process.stdout.write(`Building ${folder}\n`);
 
   const config = yaml.readYamlFile(path.join(dir.SRC, folder, "build.yaml"));
   const version = config.version ?? "0.0.0";
@@ -29,7 +29,7 @@ async function build(folder) {
   const outFile = path.join(outFolder, outname);
   const downloadUrl = path.join(PROJECT.releases, folder, outname);
 
-  process.stdout.write(`Building version ${version}\n`);
+  process.stdout.write(` • Version ${version}\n`);
 
   const header = greasemonkey.compileHeader({
     filepath: path.join(dir.SRC, folder, headerFile),
@@ -55,8 +55,12 @@ async function build(folder) {
  * @param {string[]} folders Folders to build.
  */
 async function series(folders) {
+  process.stdout.write("Building all scripts.\n");
+  process.stdout.write("\n");
+
   for (const folder of folders) {
     await build(folder);
+    process.stdout.write("\n");
   }
 
   process.stdout.write(`✓✓ Built all scripts\n`);

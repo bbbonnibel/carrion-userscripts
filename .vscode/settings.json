@@ -13,6 +13,7 @@
   "scss.lint.emptyRules": "ignore",
   "[html]": {
     "editor.formatOnSave": true,
+    "editor.rulers": [100],
   },
   "[javascript]": {
     "editor.formatOnSave": true,

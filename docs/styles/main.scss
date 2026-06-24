@@ -1,0 +1,22 @@
+:root {
+  --color-white: #f2f2f2;
+  --color-black: #13131c;
+}
+
+html, body {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+h1 {
+  margin-top: 50px;
+}
+
+h2 {
+  margin-top: 30px;
+}
+
+h3 {
+  margin-top: 10px;
+  font-size: 18px;
+}
