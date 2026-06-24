@@ -1,33 +1,34 @@
 const path = require("node:path");
 const fs = require("fs-extra");
-const common = require("./common.js");
+const css = require("./lib/css");
 
 /**
  * Escape a string so that it can be injected into the script JS.
  * @param {string} content The file content string to escape.
+ * @returns The file content in backtick quotes.
  */
-function escapeFileContent(content) {
+function escapeImportString(content) {
   return "`" + content.replaceAll("`", "\\`") + "`";
 }
 
 /**
  * Resolve the contents of a specific import reference.
- * @param {string} filepath
+ * @param {string} filepath The filepath being imported.
  */
-async function resolveImport(filepath) {
+async function resolveImportReference(filepath) {
   console.log("Resolving import:", path.relative(process.cwd(), filepath));
   try {
     let content = "";
     if (filepath.endsWith(".scss")) {
       console.log("Resolving as a SCSS file");
-      content = await common.compileCss(filepath);
+      content = await css.compileSassFile(filepath);
     } else {
       console.log("Resolving as plaintext");
       content = fs.readFileSync(filepath, {
         encoding: "utf-8",
       });
     }
-    return escapeFileContent(content);
+    return escapeImportString(content);
   } catch (ex) {
     console.error("Failed to resolve file", filepath, "for reason:", ex);
     throw ex;
@@ -71,7 +72,7 @@ async function resolveImports(script, scriptFilePath) {
       );
     }
 
-    const contents = await resolveImport(filepath);
+    const contents = await resolveImportReference(filepath);
 
     script = script.replaceAll(importStatement, contents);
   } while (iter++ < 1_000_000);

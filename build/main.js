@@ -1,3 +1,3 @@
-const build = require("./build.js");
+const userscript = require("./userscript.js");
 
-build.series(["monochrome-tags", "dashboard-revised"]);
+userscript.series(["monochrome-tags", "dashboard-revised"]);
