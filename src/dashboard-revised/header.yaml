@@ -1,0 +1,10 @@
+---
+name: Dashboard Revised
+namespace: bbbonnibel
+description: Small revisions to the Carrion dashboard, like new display options.
+author: bbbonnibel
+grant: none
+match:
+  - https://*.carrion.chat/dashboard
+  - https://*.carrion.chat/dashboard/
+run-at: document-start

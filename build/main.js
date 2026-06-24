@@ -1,3 +1,3 @@
 const build = require("./build.js");
 
-build.series(["monochrome-tags", "dashboard-resort"]);
+build.series(["monochrome-tags", "dashboard-revised"]);
