@@ -49,7 +49,7 @@ const viewControls = template(`
 `);
 
 /** @type {HTMLDivElement} */
-const viewAsColumn = viewControls.querySelector(".drv-view-compact");
+const viewAsCompact = viewControls.querySelector(".drv-view-compact");
 /** @type {HTMLDivElement} */
 const viewAsGrid = viewControls.querySelector(".drv-view-standard");
 
@@ -71,13 +71,19 @@ const PAGE = (() => {
   };
 })();
 
-viewAsColumn.addEventListener("click", () => {
+viewAsCompact.addEventListener("click", () => {
   PAGE.characterGrid.classList.add("drv-as-compact");
+  viewAsCompact.classList.remove("inactive");
+  viewAsGrid.classList.add("inactive");
 });
 
 viewAsGrid.addEventListener("click", () => {
   PAGE.characterGrid.classList.remove("drv-as-compact");
+  viewAsGrid.classList.remove("inactive");
+  viewAsCompact.classList.add("inactive");
 });
+
+viewAsCompact.classList.add("inactive");
 
 function main() {
   PAGE.sortControls.insertAdjacentElement("afterend", viewControls);
