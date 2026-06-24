@@ -3,7 +3,9 @@ name: Dashboard Revised
 namespace: bbbonnibel
 description: Small revisions to the Carrion dashboard, like new display options.
 author: bbbonnibel
-grant: none
+grant:
+  - GM_getValue
+  - GM_setValue
 match:
   - https://*.carrion.chat/dashboard
   - https://*.carrion.chat/dashboard/

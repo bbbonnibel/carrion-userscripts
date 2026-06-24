@@ -24,6 +24,10 @@
 
 .drv-button.inactive {
   background: color-mix(#2a2a2a, #1a1a1a 75%);
+
+  .drv-icon {
+    opacity: 50%;
+  }
 }
 
 .drv-icon-view-compact,

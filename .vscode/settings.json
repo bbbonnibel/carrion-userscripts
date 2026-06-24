@@ -20,4 +20,7 @@
   "[scss]": {
     "editor.formatOnSave": true,
   },
+  "files.readonlyInclude": {
+    "dist/**/*": true
+  },
 }

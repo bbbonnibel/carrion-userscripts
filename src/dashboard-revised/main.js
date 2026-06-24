@@ -21,28 +21,31 @@ function style(css, name) {
   return e;
 }
 
+/**
+ * Repeat a string N times.
+ *
+ * @example
+ * repeat(3, "hi") // "hihihi";
+ *
+ * @param {number} num The number of times to repeat the string.
+ * @param {string} string The string.
+ * @returns The string repeated N times.
+ */
+function repeatStr(num, string) {
+  return new Array(num).fill(string).join("");
+}
+
 /** @type {HTMLDivElement} */
 const viewControls = template(`
 <div class="drv-view-controls">
   <button type="button" class="drv-button drv-view-compact">
-    <span class="drv-icon-view-compact">
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
+    <span class="drv-icon drv-icon-view-compact">
+      ${repeatStr(9, "<span></span>")}
     </span>
   </button>
   <button type="button" class="drv-button drv-view-standard">
-    <span class="drv-icon-view-standard">
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
+    <span class="drv-icon drv-icon-view-standard">
+      ${repeatStr(4, "<span></span>")}
     </span>
   </button>
 </div>
@@ -51,7 +54,7 @@ const viewControls = template(`
 /** @type {HTMLDivElement} */
 const viewAsCompact = viewControls.querySelector(".drv-view-compact");
 /** @type {HTMLDivElement} */
-const viewAsGrid = viewControls.querySelector(".drv-view-standard");
+const viewAsStandard = viewControls.querySelector(".drv-view-standard");
 
 const PAGE = (() => {
   /** @type {HTMLDivElement} */
@@ -71,24 +74,24 @@ const PAGE = (() => {
   };
 })();
 
-viewAsCompact.addEventListener("click", () => {
+function setViewAsCompact() {
   PAGE.characterGrid.classList.add("drv-as-compact");
   viewAsCompact.classList.remove("inactive");
-  viewAsGrid.classList.add("inactive");
-});
+  viewAsStandard.classList.add("inactive");
+  GM_setValue("view", "compact");
+}
 
-viewAsGrid.addEventListener("click", () => {
+function setViewAsStandard() {
   PAGE.characterGrid.classList.remove("drv-as-compact");
-  viewAsGrid.classList.remove("inactive");
+  viewAsStandard.classList.remove("inactive");
   viewAsCompact.classList.add("inactive");
-});
+  GM_setValue("view", "standard");
+}
 
-viewAsCompact.classList.add("inactive");
+viewAsCompact.addEventListener("click", setViewAsCompact);
+viewAsStandard.addEventListener("click", setViewAsStandard);
 
-function main() {
-  PAGE.sortControls.insertAdjacentElement("afterend", viewControls);
-  document.head.appendChild(style(mainCss, "main.scss"));
-
+function createCompactChatButtons() {
   /** @type {HTMLAnchorElement[]} */
   const chatButtons = [
     ...document.querySelectorAll(
@@ -101,6 +104,25 @@ function main() {
     clone.classList.add("drv-when-in-compact");
     clone.innerText = "Chat";
     chatButton.insertAdjacentElement("afterend", clone);
+  }
+}
+
+function main() {
+  PAGE.sortControls.insertAdjacentElement("afterend", viewControls);
+  document.head.appendChild(style(mainCss, "main.scss"));
+
+  createCompactChatButtons();
+
+  switch (GM_getValue("view")) {
+    case "standard":
+      setViewAsStandard();
+      break;
+    case "compact":
+      setViewAsCompact();
+      break;
+    default:
+      setViewAsStandard();
+      break;
   }
 }
 
