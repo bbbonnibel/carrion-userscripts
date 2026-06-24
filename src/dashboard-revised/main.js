@@ -24,19 +24,19 @@ function style(css, name) {
 /** @type {HTMLDivElement} */
 const viewControls = template(`
 <div class="drv-view-controls">
-  <button type="button" class="drv-button drv-view-column">
+  <button type="button" class="drv-button drv-view-compact">
     <i class="fa-solid fa-list"></i>
   </button>
-  <button type="button" class="drv-button drv-view-grid">
+  <button type="button" class="drv-button drv-view-standard">
     <i class="fa-solid fa-grip"></i>
   </button>
 </div>
 `);
 
 /** @type {HTMLDivElement} */
-const viewAsColumn = viewControls.querySelector(".drv-view-column");
+const viewAsColumn = viewControls.querySelector(".drv-view-compact");
 /** @type {HTMLDivElement} */
-const viewAsGrid = viewControls.querySelector(".drv-view-grid");
+const viewAsGrid = viewControls.querySelector(".drv-view-standard");
 
 const PAGE = (() => {
   /** @type {HTMLDivElement} */
@@ -57,11 +57,11 @@ const PAGE = (() => {
 })();
 
 viewAsColumn.addEventListener("click", () => {
-  PAGE.characterGrid.classList.add("drv-as-column");
+  PAGE.characterGrid.classList.add("drv-as-compact");
 });
 
 viewAsGrid.addEventListener("click", () => {
-  PAGE.characterGrid.classList.remove("drv-as-column");
+  PAGE.characterGrid.classList.remove("drv-as-compact");
 });
 
 function main() {
@@ -76,8 +76,8 @@ function main() {
   ];
   for (const chatButton of chatButtons) {
     const clone = chatButton.cloneNode();
-    chatButton.classList.add("drv-when-not-in-column");
-    clone.classList.add("drv-when-in-column");
+    chatButton.classList.add("drv-when-not-in-compact");
+    clone.classList.add("drv-when-in-compact");
     clone.innerText = "Chat";
     chatButton.insertAdjacentElement("afterend", clone);
   }

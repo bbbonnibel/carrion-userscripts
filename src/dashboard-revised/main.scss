@@ -22,14 +22,14 @@
   cursor: pointer;
 }
 
-.character-grid:not(.drv-as-column) {
-  .drv-when-in-column {
+.character-grid:not(.drv-as-compact) {
+  .drv-when-in-compact {
     display: none;
   }
 }
 
-.character-grid.drv-as-column {
-  .drv-when-not-in-column {
+.character-grid.drv-as-compact {
+  .drv-when-not-in-compact {
     display: none;
   }
 
