@@ -1,4 +1,4 @@
-const mainCss = $import("./main.scss");
+const mainCss = $import("./styles/main.scss");
 
 /**
  * @param {string} html The template element. Must be only one root element.
@@ -25,10 +25,25 @@ function style(css, name) {
 const viewControls = template(`
 <div class="drv-view-controls">
   <button type="button" class="drv-button drv-view-compact">
-    <i class="fa-solid fa-list"></i>
+    <span class="drv-icon-view-compact">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
   </button>
   <button type="button" class="drv-button drv-view-standard">
-    <i class="fa-solid fa-grip"></i>
+    <span class="drv-icon-view-standard">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
   </button>
 </div>
 `);
