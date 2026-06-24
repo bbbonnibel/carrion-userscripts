@@ -9,6 +9,7 @@ const css = require("./lib/css.js");
 /**
  * @typedef {Object} ProjectFile
  * @prop {string} releases The URL for userscript releases.
+ * @prop {string} homepage The homepage URL.
  */
 /**
  * @type {ProjectFile}
@@ -31,11 +32,16 @@ async function build(folder) {
 
   process.stdout.write(` • Version ${version}\n`);
 
+  const headerYaml = yaml.readYamlFile(path.join(dir.SRC, folder, headerFile));
   const header = greasemonkey.compileHeader({
-    filepath: path.join(dir.SRC, folder, headerFile),
+    ...headerYaml,
     version,
-    downloadUrl,
+    downloadURL: downloadUrl,
+    updateURL: downloadUrl,
+    homepage: PROJECT.homepage,
   });
+
+
 
   const mainFilePath = path.join(dir.SRC, folder, mainFile);
   let script = fs.readFileSync(mainFilePath, {
