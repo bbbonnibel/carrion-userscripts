@@ -35,6 +35,47 @@ function repeatStr(num, string) {
   return new Array(num).fill(string).join("");
 }
 
+const PAGE = (() => {
+  /** @type {HTMLDivElement} */
+  const mainContent = document.querySelector("#main-content");
+  /** @type {HTMLDivElement} */
+  const mainContainer = document.querySelector("#main-content > .container");
+  /** @type {HTMLDivElement} */
+  const characterGrid = document.querySelector(".character-grid");
+  /** @type {HTMLDivElement} */
+  const dashboardHeader = document.querySelector(".dashboard-header");
+  /** @type {HTMLDivElement} */
+  const sortControls = document.querySelector("div:has(> #sort-select)");
+  /** @type {HTMLDivElement} */
+  const dashboardControls = sortControls.parentElement;
+  /** @type {HTMLDivElement} */
+  const notificationCenter = document.querySelector("#notification-center");
+
+  return {
+    mainContent,
+    mainContainer,
+    characterGrid,
+    dashboardHeader,
+    dashboardControls,
+    sortControls,
+    notificationCenter,
+  };
+})();
+
+function setViewAsCompact() {
+  PAGE.characterGrid.classList.add("drv-as-compact");
+  viewAsCompact.classList.remove("drv-inactive");
+  viewAsStandard.classList.add("drv-inactive");
+  GM_setValue("view", "compact");
+}
+
+function setViewAsStandard() {
+  PAGE.characterGrid.classList.remove("drv-as-compact");
+  viewAsStandard.classList.remove("drv-inactive");
+  viewAsCompact.classList.add("drv-inactive");
+  GM_setValue("view", "standard");
+}
+
 /** @type {HTMLDivElement} */
 const viewControls = template(`
 <div class="drv-view-controls">
@@ -56,40 +97,38 @@ const viewAsCompact = viewControls.querySelector(".drv-view-compact");
 /** @type {HTMLDivElement} */
 const viewAsStandard = viewControls.querySelector(".drv-view-standard");
 
-const PAGE = (() => {
-  /** @type {HTMLDivElement} */
-  const characterGrid = document.querySelector(".character-grid");
-  /** @type {HTMLDivElement} */
-  const dashboardHeader = document.querySelector(".dashboard-header");
-  /** @type {HTMLDivElement} */
-  const sortControls = document.querySelector("div:has(> #sort-select)");
-  /** @type {HTMLDivElement} */
-  const dashboardControls = sortControls.parentElement;
-
-  return {
-    characterGrid,
-    dashboardHeader,
-    dashboardControls,
-    sortControls,
-  };
-})();
-
-function setViewAsCompact() {
-  PAGE.characterGrid.classList.add("drv-as-compact");
-  viewAsCompact.classList.remove("inactive");
-  viewAsStandard.classList.add("inactive");
-  GM_setValue("view", "compact");
-}
-
-function setViewAsStandard() {
-  PAGE.characterGrid.classList.remove("drv-as-compact");
-  viewAsStandard.classList.remove("inactive");
-  viewAsCompact.classList.add("inactive");
-  GM_setValue("view", "standard");
-}
-
 viewAsCompact.addEventListener("click", setViewAsCompact);
 viewAsStandard.addEventListener("click", setViewAsStandard);
+
+function createNotifControls() {
+  // if (!PAGE.notificationCenter) {
+  //   return;
+  // }
+  const notificationHeader = PAGE.notificationCenter.querySelector(
+    ".notification-header",
+  );
+
+  /** @type {HTMLButtonElement} */
+  const notifControl = template(`
+    <button type="button" class="drv-button drv-notifs-only">
+      Focus
+    </button>
+  `);
+
+  notifControl.addEventListener("click", () => {
+    if (notifControl.classList.contains("drv-on")) {
+      notifControl.classList.remove("drv-on");
+      notifControl.classList.remove("drv-inactive");
+      PAGE.characterGrid.classList.remove("drv-notifs-only");
+    } else {
+      notifControl.classList.add("drv-on");
+      notifControl.classList.add("drv-inactive");
+      PAGE.characterGrid.classList.add("drv-notifs-only");
+    }
+  });
+
+  notificationHeader.appendChild(notifControl);
+}
 
 function createCompactChatButtons() {
   /** @type {HTMLAnchorElement[]} */
@@ -108,9 +147,9 @@ function createCompactChatButtons() {
 }
 
 function main() {
-  PAGE.sortControls.insertAdjacentElement("afterend", viewControls);
   document.head.appendChild(style(mainCss, "main.scss"));
-
+  PAGE.sortControls.insertAdjacentElement("afterend", viewControls);
+  createNotifControls();
   createCompactChatButtons();
 
   switch (GM_getValue("view")) {

@@ -16,7 +16,7 @@
   }
 
   .character-card {
-    display: grid !important;
+    display: grid;
     grid-template-areas: "avatar name controls" "avatar meta controls";
     grid-template-rows: min-content 1fr;
     grid-template-columns: max-content auto max-content;
