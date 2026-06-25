@@ -23,8 +23,8 @@ h1, h2, h3 {
   color: var(--bs-heading-color);
 }
 
-header {
-  margin-top: 30px;
+h1 {
+  padding-bottom: 8px;
   border-bottom: 1px solid color-mix(currentColor, transparent 75%);
 }
 
@@ -32,8 +32,8 @@ h3 {
   font-size: 18px;
 }
 
-.container {
-  padding: 0 40px;
+main {
+  padding: 20px 40px;
   width: 900px;
   max-width: 100%;
   margin: 0 auto;
