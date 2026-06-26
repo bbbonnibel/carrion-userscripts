@@ -1,0 +1,91 @@
+.kink-select:has(+ .bbb-kink-switch) {
+  display: none;
+}
+
+.bbb-kink-switch {
+  --favorite: #3b82f6;
+  --yes: #10b981;
+  --maybe: #eab308;
+  --no: #ef4444;
+  --background: var(--color-surface);
+  --border: var(--color-border);
+  --border-radius: var(--radius-sm);
+
+  display: flex;
+  flex-flow: row nowrap;
+  height: 46px;
+  position: relative;
+  background: var(--background);
+  border-radius: var(--border-radius);
+
+  .bbb-kink-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: var(--background);
+    color: var(--color, inherit);
+    text-transform: capitalize;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+
+    &:active {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+      z-index: 1;
+    }
+
+    &[data-pref="favorite"] { --accent: var(--favorite); }
+    &[data-pref="yes"] { --accent: var(--yes); }
+    &[data-pref="maybe"] { --accent: var(--maybe); }
+    &[data-pref="no"] { --accent: var(--no); }
+
+    &[data-pref="favorite"] { width: 55px; }
+    &[data-pref="yes"] { width: 55px; }
+    &[data-pref="maybe"] { width: 50px; }
+    &[data-pref="no"] { width: 50px; }
+
+    &:first-of-type {
+      border-top-left-radius: var(--border-radius);
+      border-bottom-left-radius: var(--border-radius);
+    }
+
+    &:last-of-type {
+      border-top-right-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
+    }
+
+    &:not(:last-of-type) {
+      border-right: 0;
+    }
+  }
+}
+
+.kink-select[data-value="favorite"] + .bbb-kink-switch { --selection: var(--favorite); }
+.kink-select[data-value="yes"] + .bbb-kink-switch { --selection: var(--yes); }
+.kink-select[data-value="maybe"] + .bbb-kink-switch { --selection: var(--maybe); }
+.kink-select[data-value="no"] + .bbb-kink-switch { --selection: var(--no); }
+
+.kink-select[data-value="favorite"] + .bbb-kink-switch .bbb-kink-button[data-pref="favorite"],
+.kink-select[data-value="yes"] + .bbb-kink-switch .bbb-kink-button[data-pref="yes"],
+.kink-select[data-value="maybe"] + .bbb-kink-switch .bbb-kink-button[data-pref="maybe"],
+.kink-select[data-value="no"] + .bbb-kink-switch .bbb-kink-button[data-pref="no"] {
+  --background: hsl(from var(--accent) h calc(s * 0.5) calc(l * 0.5));
+}
+
+.kink-select[data-value="favorite"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="favorite"],
+.kink-select[data-value="yes"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="yes"],
+.kink-select[data-value="maybe"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="maybe"],
+.kink-select[data-value="no"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="no"] {
+  --background: var(--accent);
+  --color: black;
+  font-weight: bold;
+}
+
+.kink-select[data-value="favorite"] + .bbb-kink-switch.modified,
+.kink-select[data-value="yes"] + .bbb-kink-switch.modified,
+.kink-select[data-value="maybe"] + .bbb-kink-switch.modified,
+.kink-select[data-value="no"] + .bbb-kink-switch.modified {
+  outline: 2px solid var(--selection);
+}

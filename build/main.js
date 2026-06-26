@@ -10,7 +10,8 @@ async function main() {
   process.stdout.write("Dist cleaned.\n");
 
   process.stdout.write("\n");
-  await userscript.series(["monochrome-tags", "dashboard-revised"]);
+  await userscript.build();
+
   process.stdout.write("\n");
   await docs.build();
 }

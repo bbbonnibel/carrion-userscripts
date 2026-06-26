@@ -1,0 +1,12 @@
+---
+name: Kink Switches
+namespace: bbbonnibel
+description: Replace the kink editor's dropdowns with switches.
+author: Bonnibel
+grant:
+  - GM_getValue
+  - GM_setValue
+match:
+  - https://*.carrion.chat/edit/*
+  - https://*.carrion.chat/edit/*/
+run-at: document-idle
