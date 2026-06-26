@@ -16,6 +16,7 @@
   height: 46px;
   position: relative;
   background: var(--background);
+  border-radius: var(--border-radius);
 
   .bbb-kink-button {
     position: relative;
@@ -24,13 +25,13 @@
     padding: 10px;
     border: 0;
     background: var(--background);
-    color: inherit;
+    color: var(--color, inherit);
     text-transform: capitalize;
     cursor: pointer;
     border: 1px solid var(--color-border);
 
     &:active {
-      outline: 2px solid var(--accent, transparent);
+      outline: 2px solid var(--accent);
       z-index: 1;
     }
 
@@ -55,6 +56,10 @@
   }
 }
 
+.kink-select[data-value="favorite"] + .bbb-kink-switch { --selection: var(--favorite); }
+.kink-select[data-value="yes"] + .bbb-kink-switch { --selection: var(--yes); }
+.kink-select[data-value="maybe"] + .bbb-kink-switch { --selection: var(--maybe); }
+.kink-select[data-value="no"] + .bbb-kink-switch { --selection: var(--no); }
 
 .kink-select[data-value="favorite"] + .bbb-kink-switch .bbb-kink-button[data-pref="favorite"],
 .kink-select[data-value="yes"] + .bbb-kink-switch .bbb-kink-button[data-pref="yes"],
@@ -68,4 +73,12 @@
 .kink-select[data-value="maybe"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="maybe"],
 .kink-select[data-value="no"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="no"] {
   --background: var(--accent);
+  --color: black;
+}
+
+.kink-select[data-value="favorite"] + .bbb-kink-switch.modified,
+.kink-select[data-value="yes"] + .bbb-kink-switch.modified,
+.kink-select[data-value="maybe"] + .bbb-kink-switch.modified,
+.kink-select[data-value="no"] + .bbb-kink-switch.modified {
+  outline: 2px solid var(--selection);
 }
