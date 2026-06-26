@@ -10,15 +10,17 @@ function template(html) {
 }
 
 /**
+ * Install a style sheet into the document.
  * @param {string} css The CSS content of this style element.
- * @param {string} name The name of this style sheet.
+ * @param {string} name The name of this style sheet, e.g. "main.css"
+ * @param {string} origin The origin of this style sheet. That's this script's name.
  */
-function style(css, name) {
+function installStyle(css, name, origin) {
   const e = document.createElement("style");
-  e.setAttribute("data-origin", "dashboard-revised");
+  e.setAttribute("data-origin", origin);
   e.setAttribute("data-name", name);
   e.innerText = css;
-  return e;
+  document.head.appendChild(e);
 }
 
 /**
@@ -147,7 +149,7 @@ function createCompactChatButtons() {
 }
 
 function main() {
-  document.head.appendChild(style(mainCss, "main.scss"));
+  installStyle(mainCss, "dashboard-revised", "main.css");
   PAGE.sortControls.insertAdjacentElement("afterend", viewControls);
   createNotifControls();
   createCompactChatButtons();
