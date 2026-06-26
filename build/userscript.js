@@ -18,7 +18,7 @@ const PROJECT = yaml.readYamlFile(path.join(dir.CWD, "project.yaml"));
 
 const DIST_SCRIPT = path.join(dir.DIST, "script");
 
-async function build(folder) {
+async function buildUserscript(folder) {
   process.stdout.write(`Building ${folder}\n`);
 
   const config = yaml.readYamlFile(path.join(dir.SRC, folder, "build.yaml"));
@@ -66,14 +66,37 @@ async function series(folders) {
   process.stdout.write("\n");
 
   for (const folder of folders) {
-    await build(folder);
+    await buildUserscript(folder);
     process.stdout.write("\n");
   }
 
   process.stdout.write(`✓✓ Built all scripts\n`);
 }
 
+/**
+ * Get the list of userscript folder names inside SRC.
+ *
+ * This is every folder inside `src` that has a `build.yaml`.
+ *
+ * e.g. if `src/a` and `src/b` are userscript folders, this returns `["a", "b"]`.
+ *
+ * @returns {string[]} The list of folder names.
+ */
+function getUserscriptFolders() {
+  return fs.readdirSync(dir.SRC).map(folderName => {
+    const hasBuildYaml = fs.existsSync(path.join(dir.SRC, folderName, "build.yaml"));
+    if (!hasBuildYaml) {
+      return undefined;
+    }
+    return folderName;
+  }).filter(Boolean);
+}
+
+async function build() {
+  const folders = getUserscriptFolders();
+  await series(folders);
+}
+
 module.exports = {
-  buildUserscript: build,
-  series,
+  build,
 };
