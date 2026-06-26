@@ -2,17 +2,9 @@
 
 These are small userscripts made for [carrion.chat](https://carrion.chat/) to improve quality of life.
 
-Each userscript (although there's just one right now) is small, so you can choose only the behaviour you want.
+Each userscript is small, so you can install only the modifications you want. You will need to install a userscript manager extension like [Tampermonkey](https://www.tampermonkey.net/) in order to use them.
 
 [View source on GitHub](https://github.com/bbbonnibel/carrion-userscripts) (for nerds)
-
-## What's a userscript? How do I use one?
-
-Userscripts are small JavaScript scripts you can run to customise a website.
-
-The scripts below expect you're using a browser extension like [Tampermonkey](https://www.tampermonkey.net/). There's a few different userscript extensions; this is the one I'd recommend.
-
-Think of userscripts as not quite browser extensions, more like little lightweight extensions that work on particular webpages. The below scripts only ever run inside the carrion domain.
 
 ##  Quality of life
 
