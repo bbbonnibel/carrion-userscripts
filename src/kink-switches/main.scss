@@ -22,7 +22,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    padding: 10px;
+    justify-content: center;
     border: 0;
     background: var(--background);
     color: var(--color, inherit);
@@ -39,6 +39,11 @@
     &[data-pref="yes"] { --accent: var(--yes); }
     &[data-pref="maybe"] { --accent: var(--maybe); }
     &[data-pref="no"] { --accent: var(--no); }
+
+    &[data-pref="favorite"] { width: 55px; }
+    &[data-pref="yes"] { width: 55px; }
+    &[data-pref="maybe"] { width: 50px; }
+    &[data-pref="no"] { width: 50px; }
 
     &:first-of-type {
       border-top-left-radius: var(--border-radius);
