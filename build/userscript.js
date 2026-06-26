@@ -25,9 +25,10 @@ async function build(folder) {
   const version = config.version ?? "0.0.0";
   const headerFile = config.header ?? "header.yaml";
   const mainFile = config.main ?? "main.js";
-  const outname = config.out;
-  const outFolder = path.join(DIST_SCRIPT, folder);
-  const outFile = path.join(outFolder, outname);
+  const outname = config.outfile ?? `${folder}.user.js`;
+  const outfolder = config.outfolder ?? folder;
+  const outFolderPath = path.join(DIST_SCRIPT, outfolder);
+  const outFilePath = path.join(outFolderPath, outname);
   const downloadUrl = new URL(`${folder}/${outname}`, PROJECT.releases).href;
 
   process.stdout.write(` • Version ${version}\n`);
@@ -50,8 +51,8 @@ async function build(folder) {
   script = await imports.resolveImports(script, mainFilePath);
   script = [header, script].join("\n\n\n");
 
-  fs.ensureDirSync(outFolder);
-  fs.writeFileSync(outFile, script);
+  fs.ensureDirSync(outFolderPath);
+  fs.writeFileSync(outFilePath, script);
 
   process.stdout.write(` ✓ Built ${folder}\n`);
 }
