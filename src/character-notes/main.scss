@@ -1,0 +1,21 @@
+.bbb-character-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.bbb-badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bbb-badge-label {
+  flex: 1;
+}

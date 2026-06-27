@@ -1,0 +1,15 @@
+---
+name: Character Notes
+namespace: bbbonnibel
+description: Put notes, icons, and labels on characters to help remember things about them.
+author: Bonnibel
+grant:
+  - GM_getValue
+  - GM_setValue
+match:
+  - https://*.carrion.chat/search/*
+  - https://*.carrion.chat/dashboard/*
+  - https://*.carrion.chat/character/*
+  - https://*.carrion.chat/chat/*
+  - https://*.carrion.chat/classifieds/*
+run-at: document-body
