@@ -62,30 +62,30 @@
   }
 }
 
-.kink-select[data-value="favorite"] + .bbb-kink-switch { --selection: var(--favorite); }
-.kink-select[data-value="yes"] + .bbb-kink-switch { --selection: var(--yes); }
-.kink-select[data-value="maybe"] + .bbb-kink-switch { --selection: var(--maybe); }
-.kink-select[data-value="no"] + .bbb-kink-switch { --selection: var(--no); }
+.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch { --selection: var(--favorite); }
+.kink-select:has([value="yes"]:checked) + .bbb-kink-switch { --selection: var(--yes); }
+.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch { --selection: var(--maybe); }
+.kink-select:has([value="no"]:checked) + .bbb-kink-switch { --selection: var(--no); }
 
-.kink-select[data-value="favorite"] + .bbb-kink-switch .bbb-kink-button[data-pref="favorite"],
-.kink-select[data-value="yes"] + .bbb-kink-switch .bbb-kink-button[data-pref="yes"],
-.kink-select[data-value="maybe"] + .bbb-kink-switch .bbb-kink-button[data-pref="maybe"],
-.kink-select[data-value="no"] + .bbb-kink-switch .bbb-kink-button[data-pref="no"] {
+.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="favorite"],
+.kink-select:has([value="yes"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="yes"],
+.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="maybe"],
+.kink-select:has([value="no"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="no"] {
   --background: hsl(from var(--accent) h calc(s * 0.5) calc(l * 0.5));
 }
 
-.kink-select[data-value="favorite"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="favorite"],
-.kink-select[data-value="yes"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="yes"],
-.kink-select[data-value="maybe"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="maybe"],
-.kink-select[data-value="no"] + .bbb-kink-switch.modified .bbb-kink-button[data-pref="no"] {
+.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="favorite"],
+.kink-select:has([value="yes"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="yes"],
+.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="maybe"],
+.kink-select:has([value="no"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="no"] {
   --background: var(--accent);
   --color: black;
   font-weight: bold;
 }
 
-.kink-select[data-value="favorite"] + .bbb-kink-switch.modified,
-.kink-select[data-value="yes"] + .bbb-kink-switch.modified,
-.kink-select[data-value="maybe"] + .bbb-kink-switch.modified,
-.kink-select[data-value="no"] + .bbb-kink-switch.modified {
+.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch.modified,
+.kink-select:has([value="yes"]:checked) + .bbb-kink-switch.modified,
+.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch.modified,
+.kink-select:has([value="no"]:checked) + .bbb-kink-switch.modified {
   outline: 2px solid var(--selection);
 }
