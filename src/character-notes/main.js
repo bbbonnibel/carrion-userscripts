@@ -26,7 +26,6 @@ function installStyle(css, origin, filename) {
 
 installStyle(mainCss, "character-notes", "main.css");
 
-//#region Utilities
 /**
  * Filter an array down to only unique entries.
  *
@@ -35,7 +34,6 @@ installStyle(mainCss, "character-notes", "main.css");
 function filterUnique(value, index, array) {
   return array.indexOf(value) === index;
 }
-//#endregion
 
 /**
  * @typedef {object} Character
@@ -47,7 +45,7 @@ function filterUnique(value, index, array) {
 /**
  * @typedef {object} Label
  * @prop {string} id The label ID
- * @prop {string} icon The label icon
+ * @prop {LabelIcon} icon The label icon
  * @prop {string} color The label color
  * @prop {string} text The label text
  */
@@ -397,9 +395,59 @@ function fetchCharacterLabels(lookup) {
  */
 function putCharacterLabel(character, labelId) {
   characterBank.ensureCharacter(character.id, character.name);
-
   characterBank.addLabel(character.id, labelId);
 }
+//#endregion
+
+//#region HTML
+const HTML = Object.freeze({
+  /**
+   * Create a label list containing a set of labels.
+   *
+   * @param {Label[]} labels The set of labels to provide in this list.
+   * @returns {HTMLDivElement} A HTML element containing that list of labels.
+   */
+  createLabelList(labels) {
+    const listEl = this.createLabelListElement();
+    for (const label of labels) {
+      const labelEl = this.createLabelElement(label);
+      listEl.appendChild(labelEl);
+    }
+    return listEl;
+  },
+
+  /**
+   * Create an element for a label list.
+   *
+   *
+   * @returns {HTMLDivElement} The label list element.
+   */
+  createLabelListElement() {
+    return template(`
+      <div class="bbb-character-label-list"></div>
+    `);
+  },
+
+  /**
+   * Create an element for a label.
+   *
+   * @param {Label} label The label we're creating an element for
+   * @returns {HTMLDivElement} The label element
+   */
+  createLabelElement(label) {
+    /** @type {HTMLDivElement} */
+    const el = template(`
+      <div class="bbb-character-label">
+        <span class="bbb-character-label-icon">${label.icon}</span>
+        <span class="bbb-character-label-text">${label.text}</span>
+      </div>
+    `);
+    el.setAttribute("style", `--color: ${label.color}`);
+    el.setAttribute("data-label-id", label.id);
+    el.setAttribute("title", label.text);
+    return el;
+  },
+});
 //#endregion
 
 //#region Chat
@@ -431,12 +479,21 @@ function startCharacterPage() {
   characterBank.hardReset();
   labelBank.hardReset();
   characterBank.ensureCharacter(characterId, characterName);
-  const label = labelBank.createLabel({ icon: "❤️", color: "red", text: "cool" });
-  putCharacterLabel({ id: characterId, name: characterName }, label.id);
+  const label1 = labelBank.createLabel({ icon: "❤︎", color: "#e12525", text: "cool" });
+  const label2 = labelBank.createLabel({ icon: "🗲", color: "#4e93d7", text: "rad" });
+  const label3 = labelBank.createLabel({ icon: "$", color: "#5fbe5c", text: "owes me five bucks" });
+  putCharacterLabel({ id: characterId, name: characterName }, label1.id);
+  putCharacterLabel({ id: characterId, name: characterName }, label2.id);
+  putCharacterLabel({ id: characterId, name: characterName }, label3.id);
   // end debug setup
 
   const labels = fetchCharacterLabels({ id: characterId, name: characterName });
   console.log(LOG_PREFIX, `Character ${characterId}/${characterName} has these labels:`, labels);
+
+  const list = HTML.createLabelList(labels);
+  /** The element containing the character's name, blurb, and status. */
+  const initialContainer = cardHeader.querySelector("div:has(h1)");
+  initialContainer.insertAdjacentElement("afterend", list);
 }
 //#endregion
 
