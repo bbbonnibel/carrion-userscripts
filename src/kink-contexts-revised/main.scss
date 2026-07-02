@@ -1,0 +1,70 @@
+:root {
+  --bbb-kc-indicator: #ffcc00; // carrion yellow
+}
+
+%kc-button-active {
+  // hold
+}
+
+%hide-indicator {
+  .indicator {
+    display: none;
+  }
+}
+
+%show-indicator {
+  .indicator {
+    display: block;
+  }
+}
+
+.bbb-kc-button {
+  border-radius: 4px;
+  padding: 4px;
+  width: 24px;
+  border: 0;
+  background: transparent;
+  color: #e0e0e0;
+  font-size: 13px;
+  cursor: pointer;
+  position: relative;
+
+  .indicator {
+    display: none;
+    background-color: var(--bbb-kc-indicator);
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    top: 2px;
+    right: 0;
+  }
+}
+
+// kink item
+// not - forced to display
+// not - containing visible kink-contexts
+// has - a checked kink-context
+.kink-item:not(.bbb-force-kc):not(:has(.kink-contexts:not(.d-none))):has(
+    .kink-contexts :checked
+  )
+  .bbb-kc-button {
+  @extend %show-indicator;
+}
+
+.kink-item:has(.kink-contexts:not(.d-none)) .bbb-kc-button {
+  @extend %kc-button-active;
+  @extend %hide-indicator;
+  pointer-events: none;
+}
+
+.kink-item.bbb-force-kc {
+  .kink-contexts {
+    display: flex;
+  }
+
+  .bbb-kc-button {
+    @extend %kc-button-active;
+    @extend %hide-indicator;
+  }
+}
