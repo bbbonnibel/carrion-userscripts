@@ -1,0 +1,10 @@
+---
+name: Compact Character Controls
+namespace: bbbonnibel
+description: Compact away some of the lesser-used character controls within a context menu. Operates on dashboard and character pages.
+author: Bonnibel
+match:
+  - https://*.carrion.chat/character/*
+  - https://*.carrion.chat/dashboard
+  - https://*.carrion.chat/dashboard/
+run-at: document-body

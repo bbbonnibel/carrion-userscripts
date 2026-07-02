@@ -6,7 +6,7 @@ Each userscript is small, so you can install only the modifications you want. Yo
 
 [View source on GitHub](https://github.com/bbbonnibel/carrion-userscripts) (for nerds)
 
-##  Quality of life
+## Quality of life
 
 ### [Dashboard Revised](https://bbbonnibel.github.io/carrion-userscripts/script/dashboard-revised/dashboard-revised.user.js)
 
@@ -14,6 +14,14 @@ This script revises exclusively the dashboard page.
 
 - Adds the option of a compact view.
 - Notification center now has a Focus button, which filters the character grid down to only those characters with notifications.
+
+### [Compact Character Controls](https://bbbonnibel.github.io/carrion-userscripts/script/compact-character-controls/compact-character-controls.user.js)
+
+This script moves some less-used character controls into context menus.
+
+- **Dashboard:** Tucks away the _Import from F-List_ button.
+- **Character page (yours):** Tucks away “Overwrite from F-List” and “Improt Gallery”.
+- _Planned, later_ — **Character page (others):** Tuck away mute/block/report buttons.
 
 ### [Kink Switches](https://bbbonnibel.github.io/carrion-userscripts/script/kink-switches/kink-switches.user.js)
 

@@ -1,0 +1,36 @@
+.bbb-compact-character-controls-menu-host {
+  position: relative;
+  align-self: flex-end;
+}
+
+.bbb-compact-character-controls-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+
+  display: flex;
+  flex-flow: column;
+  gap: 4px;
+  padding: 4px 0;
+
+  background-color: color-mix(var(--color-surface), black 20%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: left;
+  width: max-content;
+  max-width: 300px;
+
+  &:not(.open) {
+    display: none;
+  }
+
+  > a {
+    padding: 10px 20px;
+    color: inherit;
+
+    &:hover {
+      color: inherit;
+      background-color: color-mix(currentColor, transparent 90%);
+    }
+  }
+}
