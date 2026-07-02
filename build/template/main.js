@@ -1,0 +1,26 @@
+const mainCss = $import("./styles/main.scss");
+
+/**
+ * @param {string} html The template element. Must be only one root element.
+ */
+function template(html) {
+  const t = document.createElement("div");
+  t.innerHTML = html;
+  return t.firstElementChild;
+}
+
+/**
+ * Install a style sheet into the document.
+ * @param {string} css The CSS content of this style element.
+ * @param {string} name The name of this style sheet, e.g. "main.css"
+ * @param {string} origin The origin of this style sheet. That's this script's name.
+ */
+function installStyle(css, name, origin) {
+  const e = document.createElement("style");
+  e.setAttribute("data-origin", origin);
+  e.setAttribute("data-name", name);
+  e.innerText = css;
+  document.head.appendChild(e);
+}
+
+installStyle(mainCss, "$SCRIPTNAME", "main.css");
