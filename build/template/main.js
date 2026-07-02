@@ -1,4 +1,4 @@
-const mainCss = $import("./styles/main.scss");
+const mainCss = $import("./main.scss");
 
 /**
  * @param {string} html The template element. Must be only one root element.

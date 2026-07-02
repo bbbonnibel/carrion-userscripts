@@ -4,6 +4,13 @@ const dir = require("./dir.js");
 
 const TEMPLATE = path.join(dir.CWD, "build/template");
 
+function getDatestamp(date) {
+  const year = today.getFullYear();
+  const month = today.getMonth().toString().padStart(2, "0");
+  const day = today.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function createUserscript(name) {
   const outFolder = path.join(dir.SRC, name);
 
@@ -16,13 +23,18 @@ function createUserscript(name) {
     return;
   }
 
+  const datestamp = getDatestamp(new Date());
+
   fs.ensureDirSync(outFolder);
   const files = fs.readdirSync(TEMPLATE);
   for (const filename of files) {
     let content = fs.readFileSync(path.join(TEMPLATE, filename), {
       encoding: "utf-8",
     });
+
     content = content.replaceAll("$SCRIPTNAME", name);
+    content = content.replaceAll("$DATESTAMP", name);
+
     fs.writeFileSync(path.join(outFolder, filename), content, {
       encoding: "utf-8",
     });
