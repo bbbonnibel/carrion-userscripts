@@ -36,15 +36,31 @@
       z-index: 1;
     }
 
-    &[data-pref="favorite"] { --accent: var(--favorite); }
-    &[data-pref="yes"] { --accent: var(--yes); }
-    &[data-pref="maybe"] { --accent: var(--maybe); }
-    &[data-pref="no"] { --accent: var(--no); }
+    &[data-pref="favorite"] {
+      --accent: var(--favorite);
+    }
+    &[data-pref="yes"] {
+      --accent: var(--yes);
+    }
+    &[data-pref="maybe"] {
+      --accent: var(--maybe);
+    }
+    &[data-pref="no"] {
+      --accent: var(--no);
+    }
 
-    &[data-pref="favorite"] { width: 55px; }
-    &[data-pref="yes"] { width: 55px; }
-    &[data-pref="maybe"] { width: 50px; }
-    &[data-pref="no"] { width: 50px; }
+    &[data-pref="favorite"] {
+      width: 55px;
+    }
+    &[data-pref="yes"] {
+      width: 55px;
+    }
+    &[data-pref="maybe"] {
+      width: 50px; // narrower
+    }
+    &[data-pref="no"] {
+      width: 50px; // narrower
+    }
 
     &:first-of-type {
       border-top-left-radius: var(--border-radius);
@@ -62,11 +78,20 @@
   }
 }
 
-.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch { --selection: var(--favorite); }
-.kink-select:has([value="yes"]:checked) + .bbb-kink-switch { --selection: var(--yes); }
-.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch { --selection: var(--maybe); }
-.kink-select:has([value="no"]:checked) + .bbb-kink-switch { --selection: var(--no); }
+.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch {
+  --selection: var(--favorite);
+}
+.kink-select:has([value="yes"]:checked) + .bbb-kink-switch {
+  --selection: var(--yes);
+}
+.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch {
+  --selection: var(--maybe);
+}
+.kink-select:has([value="no"]:checked) + .bbb-kink-switch {
+  --selection: var(--no);
+}
 
+//prettier-ignore
 .kink-select:has([value="favorite"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="favorite"],
 .kink-select:has([value="yes"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="yes"],
 .kink-select:has([value="maybe"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="maybe"],
@@ -74,6 +99,7 @@
   --background: hsl(from var(--accent) h calc(s * 0.5) calc(l * 0.5));
 }
 
+//prettier-ignore
 .kink-select:has([value="favorite"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="favorite"],
 .kink-select:has([value="yes"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="yes"],
 .kink-select:has([value="maybe"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="maybe"],
@@ -83,6 +109,7 @@
   font-weight: bold;
 }
 
+//prettier-ignore
 .kink-select:has([value="favorite"]:checked) + .bbb-kink-switch.modified,
 .kink-select:has([value="yes"]:checked) + .bbb-kink-switch.modified,
 .kink-select:has([value="maybe"]:checked) + .bbb-kink-switch.modified,

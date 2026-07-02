@@ -47,7 +47,7 @@ function createButton(pref) {
 function makeSelection(dropdown, pref) {
   if (pref) {
     const options = [...dropdown.querySelectorAll("option")];
-    const index = options.findIndex(o => o.value === pref);
+    const index = options.findIndex((o) => o.value === pref);
     dropdown.setAttribute("data-value", pref);
     dropdown.selectedIndex = index;
   } else {
@@ -103,9 +103,11 @@ function putSwitch(control) {
 }
 
 /** @type {HTMLDivElement[]} */
-const controls = [...document.querySelectorAll(".kink-item-controls:has(.kink-select)")];
+const controls = [
+  ...document.querySelectorAll(".kink-item-controls:has(.kink-select)"),
+];
 
-installStyle(mainCss, "main.css", "kink-switches")
+installStyle(mainCss, "main.css", "kink-switches");
 
 for (const control of controls) {
   putSwitch(control);
