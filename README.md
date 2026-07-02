@@ -19,8 +19,8 @@ This script revises exclusively the dashboard page.
 
 This script moves some less-used character controls into context menus.
 
-- **Dashboard:** Tucks away the _Import from F-List_ button.
-- **Character page (yours):** Tucks away “Overwrite from F-List” and “Improt Gallery”.
+- **Dashboard:** Tucks away the “Import from F-List” button.
+- **Character page (yours):** Tucks away “Overwrite from F-List” and “Import Gallery”.
 - _Planned, later_ — **Character page (others):** Tuck away mute/block/report buttons.
 
 ### [Kink Switches](https://bbbonnibel.github.io/carrion-userscripts/script/kink-switches/kink-switches.user.js)
