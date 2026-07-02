@@ -1,11 +1,10 @@
 ---
-name: compact-character-controls
+name: Compact character controls
 namespace: bbbonnibel
-description:
+description: Compact away some of the less-used character controls within a menu.
 author: Bonnibel
-grant:
-  - GM_getValue
-  - GM_setValue
 match:
-  - https://*.carrion.chat/
+  - https://*.carrion.chat/character/*
+  - https://*.carrion.chat/dashboard
+  - https://*.carrion.chat/dashboard/
 run-at: document-body
