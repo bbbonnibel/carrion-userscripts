@@ -1,6 +1,11 @@
+.bbb-compact-character-controls-btn {
+  order: 99;
+}
+
 .bbb-compact-character-controls-menu-host {
   position: relative;
   align-self: flex-end;
+  order: 100;
 }
 
 .bbb-compact-character-controls-menu {
@@ -33,4 +38,7 @@
       background-color: color-mix(currentColor, transparent 90%);
     }
   }
+}
+
+.bbb-character-controls {
 }

@@ -84,6 +84,7 @@ function startCharacterPage() {
 
   /** the container of the controls like the edit button. */
   const characterControls = editBtn.parentElement;
+  characterControls.classList.add("bbb-character-controls");
 
   /** the list of buttons to be moved. */
   const importButtons = editBtn.parentElement.querySelectorAll(
@@ -121,11 +122,14 @@ function startDashboardPage() {
 }
 
 function main() {
+  const LOG_PREFIX = "[Compact Character Controls]";
   const pathname = window.location.pathname;
   if (pathname.startsWith("/character")) {
+    console.debug(LOG_PREFIX, "Starting on character page");
     startCharacterPage();
   }
   if (pathname.startsWith("/dashboard")) {
+    console.debug(LOG_PREFIX, "Starting on dashboard page");
     startDashboardPage();
   }
 }
