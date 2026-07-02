@@ -112,20 +112,18 @@ function createNotifControls() {
 
   /** @type {HTMLButtonElement} */
   const notifControl = template(`
-    <button type="button" class="drv-button drv-notifs-only">
-      Focus
+    <button type="button" class="drv-button drv-focus-btn">
+      <span>Focus</span>
     </button>
   `);
 
   notifControl.addEventListener("click", () => {
     if (notifControl.classList.contains("drv-on")) {
       notifControl.classList.remove("drv-on");
-      notifControl.classList.remove("drv-inactive");
-      PAGE.characterGrid.classList.remove("drv-notifs-only");
+      PAGE.characterGrid.classList.remove("drv-focus-notifs");
     } else {
       notifControl.classList.add("drv-on");
-      notifControl.classList.add("drv-inactive");
-      PAGE.characterGrid.classList.add("drv-notifs-only");
+      PAGE.characterGrid.classList.add("drv-focus-notifs");
     }
   });
 

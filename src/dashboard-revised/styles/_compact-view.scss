@@ -1,9 +1,3 @@
-.character-grid.drv-notifs-only {
-  .character-card:not(:has(.pending-badge)) {
-    display: none;
-  }
-}
-
 .character-grid:not(.drv-as-compact) {
   .drv-when-in-compact {
     display: none;

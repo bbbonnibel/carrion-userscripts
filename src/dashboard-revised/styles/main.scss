@@ -1,3 +1,6 @@
-@use "./character-grid";
+@use "./settings";
+
+@use "./compact-view";
+@use "./focus";
+@use "./style-patches";
 @use "./view-controls";
-@use "./style-patches"

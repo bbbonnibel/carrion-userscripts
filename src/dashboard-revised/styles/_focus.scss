@@ -1,0 +1,33 @@
+.character-grid.drv-focus-notifs {
+  .character-card:not(:has(.pending-badge)) {
+    display: none;
+  }
+}
+
+.drv-focus-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--drv-button-depressed);
+
+  &::before {
+    content: "";
+    display: block;
+    width: 0.9ex;
+    height: 0.9ex;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  &.drv-on {
+    border-color: var(--drv-notif);
+  }
+
+  &.drv-on::before {
+    opacity: 1;
+    border-color: var(--drv-notif);
+    background-color: var(--drv-notif);
+  }
+}

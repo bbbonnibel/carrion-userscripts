@@ -15,7 +15,8 @@
   "type": "commonjs",
   "scripts": {
     "build": "node ./build/main.js",
-    "watch": "npx nodemon  --watch src --watch docs --watch build --ext 'js,css,scss,yaml,html' --exec 'node' ./build/main.js"
+    "watch": "npx nodemon  --watch src --watch docs --watch build --ext 'js,css,scss,yaml,html' --exec 'node' ./build/main.js",
+    "prettier": "prettier --check ./src/**/*.{js,scss,yaml}"
   },
   "dependencies": {
     "@prettier/sync": "^0.6.1",
