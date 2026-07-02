@@ -23,7 +23,7 @@ This script is not color-blind friendly.
 
 ⚠️ Due to a performance issue in the character editor, your editor might pause for 1-2 seconds after you click a button. That's not caused by this script. That's part of the character editor, and would equally occur if you picked something from a dropdown. It's just this script highlights that performance issue. It's been reported and hopefully will be fixed soon.
 
-### [Kink Contexts Revised](https://bbbonnibel.github.io/carrion-userscripts/script/kink-switches/kink-switches.user.js)
+### [Kink Contexts Revised](https://bbbonnibel.github.io/carrion-userscripts/script/kink-contexts-revised/kink-contexts-revised.user.js)
 
 Each kink gets a little cog icon beside it that can force contexts to show, even in “never show” mode.
 
