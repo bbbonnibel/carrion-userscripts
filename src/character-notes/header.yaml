@@ -11,5 +11,4 @@ match:
   - https://*.carrion.chat/dashboard/*
   - https://*.carrion.chat/character/*
   - https://*.carrion.chat/chat/*
-  - https://*.carrion.chat/classifieds/*
 run-at: document-body
