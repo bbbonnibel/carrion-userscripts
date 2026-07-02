@@ -4,10 +4,11 @@ const dir = require("./dir.js");
 
 const TEMPLATE = path.join(dir.CWD, "build/template");
 
+/** @param {Date} date */
 function getDatestamp(date) {
-  const year = today.getFullYear();
-  const month = today.getMonth().toString().padStart(2, "0");
-  const day = today.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -33,7 +34,7 @@ function createUserscript(name) {
     });
 
     content = content.replaceAll("$SCRIPTNAME", name);
-    content = content.replaceAll("$DATESTAMP", name);
+    content = content.replaceAll("$DATESTAMP", datestamp);
 
     fs.writeFileSync(path.join(outFolder, filename), content, {
       encoding: "utf-8",
