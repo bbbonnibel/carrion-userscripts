@@ -1,5 +1,7 @@
 const mainCss = $import("./main.scss");
 
+const LOG_PREFIX = "[Compact Character Controls]";
+
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -40,6 +42,17 @@ const contextMenuHost = template(`
 `); // boy these class names get long. good thing i only have to write them once!
 contextMenuHost.appendChild(contextMenu);
 
+const CharacterPage = Object.freeze({
+  editBtn: () => document.querySelector("a.btn[href^='/edit']"),
+  reportBtn: () => document.querySelector("#report-btn"),
+  muteBtn: () => document.querySelector("#mute-btn"),
+  blockBtn: () => document.querySelector("#block-btn"),
+});
+
+const DashboardPage = Object.freeze({
+  newCharacterBtn: () => document.querySelector("a.btn[href^='/create']"),
+});
+
 function attachMenuEvents() {
   const openClass = "open";
 
@@ -68,23 +81,13 @@ function attachMenuEvents() {
   });
 }
 
-/**
- * Install the menu controls in a container.
- *
- * @param {HTMLElement} container The element that will contain the menu controls.
- */
-function installMenu(container) {}
-
-function startCharacterPage() {
-  const editBtn = document.querySelector("a.btn[href^='/edit']");
-  if (!editBtn) {
-    // Not our character.
+function startYourCharacterPage() {
+  const editBtn = CharacterPage.editBtn();
+  if (editBtn) {
     return;
   }
 
-  /** the container of the controls like the edit button. */
   const characterControls = editBtn.parentElement;
-  characterControls.classList.add("bbb-character-controls");
 
   /** the list of buttons to be moved. */
   const importButtons = editBtn.parentElement.querySelectorAll(
@@ -96,12 +99,48 @@ function startCharacterPage() {
   attachMenuEvents();
   for (const button of importButtons) {
     contextMenu.appendChild(button);
-    button.classList.remove("btn", "btn-secondary");
+    // button.classList.remove("btn", "btn-secondary");
+  }
+}
+
+function startOtherCharacterPage() {
+  document.addEventListener("DOMContentLoaded", () => {
+    const reportBtn = CharacterPage.reportBtn();
+    const muteBtn = CharacterPage.muteBtn();
+    const blockBtn = CharacterPage.blockBtn();
+    if (!reportBtn) {
+      return;
+    }
+    const characterControls = reportBtn.parentElement;
+
+    characterControls.appendChild(menuBtn);
+    attachMenuEvents();
+    menuBtn.insertAdjacentElement("afterend", contextMenuHost);
+    console.debug(LOG_PREFIX, "Moving buttons:", {
+      reportBtn,
+      muteBtn,
+      blockBtn,
+    });
+    for (const button of [muteBtn, blockBtn, reportBtn].filter(Boolean)) {
+      contextMenu.appendChild(button);
+      // button.classList.remove("btn", "btn-secondary");
+    }
+  });
+}
+
+function startCharacterPage() {
+  if (CharacterPage.editBtn()) {
+    console.debug(LOG_PREFIX, "Starting on your character page");
+    startYourCharacterPage();
+  } else {
+    console.debug(LOG_PREFIX, "Starting on other character page");
+    startOtherCharacterPage();
   }
 }
 
 function startDashboardPage() {
-  const newCharacterBtn = document.querySelector("a.btn[href^='/create']");
+  console.debug(LOG_PREFIX, "Starting on dashboard page");
+  const newCharacterBtn = DashboardPage.newCharacterBtn();
   if (!newCharacterBtn) {
     // Mysteriously missing.
     return;
@@ -117,19 +156,15 @@ function startDashboardPage() {
   attachMenuEvents();
   for (const button of importButtons) {
     contextMenu.appendChild(button);
-    button.classList.remove("btn", "btn-secondary");
+    // button.classList.remove("btn", "btn-secondary");
   }
 }
 
 function main() {
-  const LOG_PREFIX = "[Compact Character Controls]";
   const pathname = window.location.pathname;
   if (pathname.startsWith("/character")) {
-    console.debug(LOG_PREFIX, "Starting on character page");
     startCharacterPage();
-  }
-  if (pathname.startsWith("/dashboard")) {
-    console.debug(LOG_PREFIX, "Starting on dashboard page");
+  } else if (pathname.startsWith("/dashboard")) {
     startDashboardPage();
   }
 }

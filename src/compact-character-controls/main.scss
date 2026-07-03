@@ -5,7 +5,9 @@
 .bbb-compact-character-controls-menu-host {
   position: relative;
   align-self: flex-end;
-  order: 100;
+  margin-left: -12px; // eliminate normal padding
+  order: 100; // force to the last option
+  z-index: 100; // deconflict with character list and other elements
 }
 
 .bbb-compact-character-controls-menu {
@@ -23,22 +25,24 @@
   border-radius: var(--radius-md);
   text-align: left;
   width: max-content;
+  min-width: 120px;
   max-width: 300px;
 
   &:not(.open) {
     display: none;
   }
 
-  > a {
+  > .btn {
     padding: 10px 20px;
     color: inherit;
+    border-radius: unset;
+    border: unset;
+    background-color: transparent;
+    text-align: left;
 
     &:hover {
       color: inherit;
       background-color: color-mix(currentColor, transparent 90%);
     }
   }
-}
-
-.bbb-character-controls {
 }
