@@ -10,27 +10,42 @@ async function build() {
   fs.ensureDirSync(dir.DIST);
   fs.ensureDirSync(path.join(dir.DIST, "styles"));
 
+  // Copy assets
+  const files = fs.copySync(dir.DOCS, dir.DIST);
+
   // Build index.html
-  const README = fs.readFileSync(path.join(dir.CWD, "README.md"), { encoding: "utf-8" });
+  const README = fs.readFileSync(path.join(dir.CWD, "README.md"), {
+    encoding: "utf-8",
+  });
   if (!README) {
     throw Error("README is empty");
   }
   const converter = new showdown.Converter();
   converter.setFlavor("github");
-  let index = fs.readFileSync(path.join(dir.DOCS, "index.html"), { encoding: "utf-8" });
+  let index = fs.readFileSync(path.join(dir.DOCS, "index.html"), {
+    encoding: "utf-8",
+  });
   if (!index.includes("{{README}}")) {
     throw Error("Index has no “{{README}}” marker");
   }
-  index = index.replace("{{README}}", converter.makeHtml(README))
-  fs.writeFileSync(path.join(dir.DIST, "index.html"), index, { encoding: "utf-8" });
+  index = index.replace("{{README}}", converter.makeHtml(README));
+  fs.writeFileSync(path.join(dir.DIST, "index.html"), index, {
+    encoding: "utf-8",
+  });
 
   // Build styles
-  const style = await css.compileSassFile(path.join(dir.DOCS, "styles/main.scss"), { allowNodeModules: true });
-  fs.writeFileSync(path.join(dir.DIST, "styles/main.css"), style, { encoding: "utf-8" });
+  const style = await css.compileSassFile(
+    path.join(dir.DOCS, "styles/main.scss"),
+    { allowNodeModules: true },
+  );
+  fs.writeFileSync(path.join(dir.DIST, "styles/main.css"), style, {
+    encoding: "utf-8",
+  });
+  fs.removeSync(path.join(dir.DIST, "styles/main.scss"));
 
   process.stdout.write(` ✓ Built docs\n`);
 }
 
 module.exports = {
   build,
-}
+};

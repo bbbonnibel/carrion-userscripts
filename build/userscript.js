@@ -40,9 +40,9 @@ async function buildUserscript(folder) {
     downloadURL: downloadUrl,
     updateURL: downloadUrl,
     homepage: PROJECT.homepage,
+    icon: PROJECT.icon,
+    icon64: PROJECT.icon64,
   });
-
-
 
   const mainFilePath = path.join(dir.SRC, folder, mainFile);
   let script = fs.readFileSync(mainFilePath, {
@@ -83,13 +83,18 @@ async function series(folders) {
  * @returns {string[]} The list of folder names.
  */
 function getUserscriptFolders() {
-  return fs.readdirSync(dir.SRC).map(folderName => {
-    const hasBuildYaml = fs.existsSync(path.join(dir.SRC, folderName, "build.yaml"));
-    if (!hasBuildYaml) {
-      return undefined;
-    }
-    return folderName;
-  }).filter(Boolean);
+  return fs
+    .readdirSync(dir.SRC)
+    .map((folderName) => {
+      const hasBuildYaml = fs.existsSync(
+        path.join(dir.SRC, folderName, "build.yaml"),
+      );
+      if (!hasBuildYaml) {
+        return undefined;
+      }
+      return folderName;
+    })
+    .filter(Boolean);
 }
 
 async function build() {
