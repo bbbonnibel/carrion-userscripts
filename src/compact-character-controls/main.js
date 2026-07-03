@@ -37,10 +37,11 @@ const contextMenu = template(`
   <div class="bbb-compact-character-controls-menu"></div>
 `);
 
-const contextMenuHost = template(`
-  <div class="bbb-compact-character-controls-menu-host"></div>
+const compactControlsHost = template(`
+  <div class="bbb-compact-character-controls-host"></div>
 `); // boy these class names get long. good thing i only have to write them once!
-contextMenuHost.appendChild(contextMenu);
+compactControlsHost.appendChild(menuBtn);
+compactControlsHost.appendChild(contextMenu);
 
 const CharacterPage = Object.freeze({
   editBtn: () => document.querySelector("a.btn[href^='/edit']"),
@@ -83,7 +84,7 @@ function attachMenuEvents() {
 
 function startYourCharacterPage() {
   const editBtn = CharacterPage.editBtn();
-  if (editBtn) {
+  if (!editBtn) {
     return;
   }
 
@@ -94,12 +95,10 @@ function startYourCharacterPage() {
     ".btn[href^='/import']",
   );
 
-  characterControls.appendChild(menuBtn);
-  menuBtn.insertAdjacentElement("afterend", contextMenuHost);
+  characterControls.appendChild(compactControlsHost);
   attachMenuEvents();
   for (const button of importButtons) {
     contextMenu.appendChild(button);
-    // button.classList.remove("btn", "btn-secondary");
   }
 }
 
@@ -113,9 +112,8 @@ function startOtherCharacterPage() {
     }
     const characterControls = reportBtn.parentElement;
 
-    characterControls.appendChild(menuBtn);
+    characterControls.appendChild(compactControlsHost);
     attachMenuEvents();
-    menuBtn.insertAdjacentElement("afterend", contextMenuHost);
     console.debug(LOG_PREFIX, "Moving buttons:", {
       reportBtn,
       muteBtn,
@@ -123,7 +121,6 @@ function startOtherCharacterPage() {
     });
     for (const button of [muteBtn, blockBtn, reportBtn].filter(Boolean)) {
       contextMenu.appendChild(button);
-      // button.classList.remove("btn", "btn-secondary");
     }
   });
 }
@@ -151,12 +148,10 @@ function startDashboardPage() {
     ".btn[href^='/import']",
   );
 
-  newCharacterBtn.insertAdjacentElement("afterend", menuBtn);
-  menuBtn.insertAdjacentElement("afterend", contextMenuHost);
+  newCharacterBtn.insertAdjacentElement("afterend", compactControlsHost);
   attachMenuEvents();
   for (const button of importButtons) {
     contextMenu.appendChild(button);
-    // button.classList.remove("btn", "btn-secondary");
   }
 }
 

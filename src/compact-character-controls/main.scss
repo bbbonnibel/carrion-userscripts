@@ -1,10 +1,6 @@
-.bbb-compact-character-controls-btn {
-  order: 99;
-}
-
-.bbb-compact-character-controls-menu-host {
+.bbb-compact-character-controls-host {
+  display: flex;
   position: relative;
-  align-self: flex-end;
   order: 100; // force to the last option
   z-index: 100; // deconflict with character list and other elements
 }
