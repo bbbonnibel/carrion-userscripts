@@ -5,7 +5,6 @@
 .bbb-compact-character-controls-menu-host {
   position: relative;
   align-self: flex-end;
-  margin-left: -12px; // eliminate normal padding
   order: 100; // force to the last option
   z-index: 100; // deconflict with character list and other elements
 }
