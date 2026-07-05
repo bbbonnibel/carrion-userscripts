@@ -36,3 +36,9 @@ This script is not color-blind friendly.
 Each kink gets a little cog icon beside it that can force contexts to show, even in “never show” mode.
 
 The cog icon will have an indicator telling you if there's hidden selected contexts.
+
+### [Shiny Character Page Border](https://bbbonnibel.github.io/carrion-userscripts/script/character-border/character-border.user.js)
+
+Character pages will now have their top border show the character's color.
+
+This is like what happens on the search and dashboard pages, except for those it's the left edge.

@@ -1,0 +1,8 @@
+---
+name: Shiny Character Page Border
+namespace: bbbonnibel
+description: Set the top border on a character page to that character's color.
+author: Bonnibel
+match:
+  - https://*.carrion.chat/character/*
+run-at: document-body

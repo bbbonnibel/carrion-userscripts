@@ -1,0 +1,1 @@
+/** @typedef {("red"|"orange"|"yellow"|"green"|"blue"|"purple"|"pink"|"brown"|"teal"|"white"|"black"|"gray"|"dull_red"|"dull_orange"|"dull_yellow"|"dull_green"|"dull_blue"|"dull_purple"|"dull_pink"|"dull_brown"|"dull_teal")} Carrion.Color */
