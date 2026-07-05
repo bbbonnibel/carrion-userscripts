@@ -1,4 +1,5 @@
 const mainCss = $import("./main.scss");
+const LOG_PREFIX = "[Kink Switches]";
 
 /**
  * @param {string} html The template element. Must be only one root element.
@@ -103,12 +104,26 @@ function putSwitch(control) {
 }
 
 /** @type {HTMLDivElement[]} */
-const controls = [
-  ...document.querySelectorAll(".kink-item-controls:has(.kink-select)"),
-];
+const kinks = [...document.querySelectorAll(".kink-item:has(.kink-select)")];
 
 installStyle(mainCss, "kink-switches", "main.css");
 
-for (const control of controls) {
-  putSwitch(control);
+for (const kink of kinks) {
+  const label = kink
+    .querySelector(".kink-item-name strong")
+    ?.textContent?.trim();
+  const control = kink.querySelector(".kink-item-controls");
+
+  try {
+    putSwitch(control);
+  } catch (ex) {
+    console.error(
+      LOG_PREFIX,
+      `Failed to set up the switches for a kink, "${label}".`,
+      {
+        target: kink,
+        ex,
+      },
+    );
+  }
 }

@@ -1,5 +1,7 @@
 const mainCss = $import("./main.scss");
 
+const LOG_PREFIX = "[Kink Contexts Revised]";
+
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -39,9 +41,23 @@ const kinks = document.querySelectorAll(".kink-item");
 for (const kink of kinks) {
   const button = createButton();
   const target = kink.querySelector(".kink-info-icon");
-  target.insertAdjacentElement("afterend", button);
+  const label = kink
+    .querySelector(".kink-item-name strong")
+    ?.textContent?.trim();
 
-  button.addEventListener("click", () => {
-    kink.classList.toggle("bbb-force-kc");
-  });
+  try {
+    target.insertAdjacentElement("afterend", button);
+    button.addEventListener("click", () => {
+      kink.classList.toggle("bbb-force-kc");
+    });
+  } catch (ex) {
+    console.error(
+      LOG_PREFIX,
+      `Failed to set up the context button for a kink, "${label}".`,
+      {
+        target,
+        ex,
+      },
+    );
+  }
 }
