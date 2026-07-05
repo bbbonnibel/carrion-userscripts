@@ -9,4 +9,4 @@ grant:
 match:
   - https://*.carrion.chat/edit/*
   - https://*.carrion.chat/edit/*/
-run-at: document-body
+run-at: document-idle
