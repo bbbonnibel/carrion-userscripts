@@ -36,28 +36,35 @@ function createButton() {
 `);
 }
 
-const kinks = document.querySelectorAll(".kink-item");
+function main() {
+  /** @type {HTMLDivElement[]} */
+  const kinks = [...document.querySelectorAll(".kink-item")];
 
-for (const kink of kinks) {
-  const button = createButton();
-  const target = kink.querySelector(".kink-info-icon");
-  const label = kink
-    .querySelector(".kink-item-name strong")
-    ?.textContent?.trim();
+  console.debug(LOG_PREFIX, `Applying contexts to`, kinks.length, `kinks.`);
 
-  try {
-    target.insertAdjacentElement("afterend", button);
-    button.addEventListener("click", () => {
-      kink.classList.toggle("bbb-force-kc");
-    });
-  } catch (ex) {
-    console.error(
-      LOG_PREFIX,
-      `Failed to set up the context button for a kink, "${label}".`,
-      {
-        target,
-        ex,
-      },
-    );
+  for (const kink of kinks) {
+    const button = createButton();
+    const target = kink.querySelector(".kink-info-icon");
+    const label = kink
+      .querySelector(".kink-item-name strong")
+      ?.textContent?.trim();
+
+    try {
+      target.insertAdjacentElement("afterend", button);
+      button.addEventListener("click", () => {
+        kink.classList.toggle("bbb-force-kc");
+      });
+    } catch (ex) {
+      console.error(
+        LOG_PREFIX,
+        `Failed to set up the context button for a kink, "${label}".`,
+        {
+          target,
+          ex,
+        },
+      );
+    }
   }
 }
+
+main();

@@ -103,27 +103,33 @@ function putSwitch(control) {
   }
 }
 
-/** @type {HTMLDivElement[]} */
-const kinks = [...document.querySelectorAll(".kink-item:has(.kink-select)")];
-
 installStyle(mainCss, "kink-switches", "main.css");
 
-for (const kink of kinks) {
-  const label = kink
-    .querySelector(".kink-item-name strong")
-    ?.textContent?.trim();
-  const control = kink.querySelector(".kink-item-controls");
+function main() {
+  /** @type {HTMLDivElement[]} */
+  const kinks = [...document.querySelectorAll(".kink-item:has(.kink-select)")];
 
-  try {
-    putSwitch(control);
-  } catch (ex) {
-    console.error(
-      LOG_PREFIX,
-      `Failed to set up the switches for a kink, "${label}".`,
-      {
-        target: kink,
-        ex,
-      },
-    );
+  console.debug(LOG_PREFIX, `Applying switches to`, kinks.length, `kinks.`);
+
+  for (const kink of kinks) {
+    const label = kink
+      .querySelector(".kink-item-name strong")
+      ?.textContent?.trim();
+    const control = kink.querySelector(".kink-item-controls");
+
+    try {
+      putSwitch(control);
+    } catch (ex) {
+      console.error(
+        LOG_PREFIX,
+        `Failed to set up the switches for a kink, "${label}".`,
+        {
+          target: kink,
+          ex,
+        },
+      );
+    }
   }
 }
+
+main();
