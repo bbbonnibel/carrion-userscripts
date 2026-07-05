@@ -3,20 +3,26 @@
   --color-black: #13131c;
 
   // Stealing the Bootstrap font stack.
-  --font-sans-serif: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  --font-sans-serif:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans",
+    "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 * {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   background-color: var(--color-white);
   color: var(--color-black);
   font-family: var(--font-sans-serif);
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin: 20px 0 10px;
   font-weight: 600;
   line-height: 1.2;
@@ -26,6 +32,10 @@ h1, h2, h3 {
 h1 {
   padding-bottom: 8px;
   border-bottom: 1px solid color-mix(currentColor, transparent 75%);
+}
+
+h1 a:any-link {
+  text-decoration: none;
 }
 
 h3 {
