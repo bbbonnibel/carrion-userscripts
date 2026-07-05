@@ -46,7 +46,7 @@
  * @prop {Carrion.Api.V1.CustomKink[]} custom_kinks
  * @prop {object} contact_info
  * @prop {[]} image_urls
- * @prop {(""|Carrion.Api.V1.CisTransStatus)}
+ * @prop {(""|Carrion.Api.V1.CisTransStatus)} cis_trans_status Whether the character is cis or trans (or undefined).
  * @prop {string} intent
  * @prop {string} created_at ISO timestamp
  * @prop {string} updated_at ISO timestamp
