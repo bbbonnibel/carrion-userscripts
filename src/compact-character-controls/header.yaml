@@ -7,4 +7,4 @@ match:
   - https://*.carrion.chat/character/*
   - https://*.carrion.chat/dashboard
   - https://*.carrion.chat/dashboard/
-run-at: document-body
+run-at: document-idle

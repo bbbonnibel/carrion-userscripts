@@ -103,26 +103,24 @@ function startYourCharacterPage() {
 }
 
 function startOtherCharacterPage() {
-  document.addEventListener("DOMContentLoaded", () => {
-    const reportBtn = CharacterPage.reportBtn();
-    const muteBtn = CharacterPage.muteBtn();
-    const blockBtn = CharacterPage.blockBtn();
-    if (!reportBtn) {
-      return;
-    }
-    const characterControls = reportBtn.parentElement;
+  const reportBtn = CharacterPage.reportBtn();
+  const muteBtn = CharacterPage.muteBtn();
+  const blockBtn = CharacterPage.blockBtn();
+  if (!reportBtn) {
+    return;
+  }
+  const characterControls = reportBtn.parentElement;
 
-    characterControls.appendChild(compactControlsHost);
-    attachMenuEvents();
-    console.debug(LOG_PREFIX, "Moving buttons:", {
-      reportBtn,
-      muteBtn,
-      blockBtn,
-    });
-    for (const button of [muteBtn, blockBtn, reportBtn].filter(Boolean)) {
-      contextMenu.appendChild(button);
-    }
+  characterControls.appendChild(compactControlsHost);
+  attachMenuEvents();
+  console.debug(LOG_PREFIX, "Moving buttons:", {
+    reportBtn,
+    muteBtn,
+    blockBtn,
   });
+  for (const button of [muteBtn, blockBtn, reportBtn].filter(Boolean)) {
+    contextMenu.appendChild(button);
+  }
 }
 
 function startCharacterPage() {
