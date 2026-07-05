@@ -21,6 +21,7 @@ async function build() {
     throw Error("README is empty");
   }
   const converter = new showdown.Converter();
+  converter.setOption("headerIds", false);
   converter.setFlavor("github");
   let index = fs.readFileSync(path.join(dir.DOCS, "index.html"), {
     encoding: "utf-8",
