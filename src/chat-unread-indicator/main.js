@@ -27,8 +27,12 @@ function installStyle(css, origin, filename) {
 installStyle(mainCss, "chat-unread-indicator", "main.css");
 
 const PAGE = Object.freeze({
-  roomList: () => document.querySelector("#room-list"),
   sidebar: () => document.querySelector("#sidebar"),
+  roomList: () => document.querySelector("#room-list"),
+  roomSections: () =>
+    this.roomList().querySelectorAll(
+      ".dm-section, .public-channel-section, .channel-section",
+    ),
 });
 
 class UnreadIndicator {
@@ -47,7 +51,7 @@ class UnreadIndicator {
     this.indicator = template(`
       <div class="bbb-floating-indicator">
         <div class="arrow"></div>
-        <div class="text">Unread messages</div>
+        <div class="text">new messages</div>
         <div class="count"></div>
         <div class="arrow"></div>
       </div>
@@ -69,35 +73,60 @@ class UnreadIndicator {
 const indicatorTop = new UnreadIndicator("top");
 const indicatorBottom = new UnreadIndicator("bottom");
 
+/**
+ * @typedef {object} RoomOffset
+ * The position of each room within the entire `#room-list` element.
+ *
+ * @prop {HTMLDivElement} room The room element.
+ * @prop {HTMLDivElement} section The section the room belongs to.
+ * @prop {number} offsetTop The room's offsetTop, relative to the room list.
+ * @prop {number} offsetBottom The room's offsetBottom, relative to the room list.
+ */
+
+/** @type {RoomOffset[]} */
+let roomOffsets = [];
+
 function insertUnreadIndicators() {
-  const list = PAGE.roomList();
-  list.insertAdjacentElement("beforebegin", indicatorTop.host);
-  list.insertAdjacentElement("afterend", indicatorBottom.host);
+  const roomList = PAGE.roomList();
+  roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
+  roomList.insertAdjacentElement("afterend", indicatorBottom.host);
+}
 
-  list.addEventListener("mouseenter", (event) => {
-    if (event.target !== list) {
-      return;
-    }
-    indicatorTop.show();
-    indicatorBottom.show();
+/**
+ * Recalculate room offsets for a section.
+ *
+ * @private
+ * @param {HTMLDivElement} section The section to recalculate for
+ * @returns Room offsets for the section.
+ */
+function calculateSection(section) {
+  const roomItems = [...section.querySelectorAll(".room-item")];
+  return roomItems.map((room) => {
+    const offsetTop = room.offsetTop + section.offsetTop;
+    const offsetBottom = offsetTop + room.clientHeight;
+    return {
+      room,
+      section,
+      offsetTop,
+      offsetBottom,
+    };
   });
+}
 
-  list.addEventListener("mouseleave", (event) => {
-    if (event.target !== list) {
-      return;
-    }
-    indicatorTop.hide();
-    indicatorBottom.hide();
-  });
+function calculateRoomOffsets() {
+  const sections = PAGE.roomSections();
+  const offsets = sections.map((section) => calculateSection(section)).flat();
+}
+
+function rescanIndicators() {
+  const roomList = PAGE.roomList();
+  const listTop = roomList.scrollTop;
+  const listBottom = listTop + roomList.clientHeight;
 }
 
 function main() {
   console.debug(LOG_PREFIX, "Started");
   insertUnreadIndicators();
-  console.debug(LOG_PREFIX, "Unread indicators inserted:", {
-    top: indicatorTop,
-    bottom: indicatorBottom,
-  });
 }
 
 window.addEventListener("chat-ready", () => {

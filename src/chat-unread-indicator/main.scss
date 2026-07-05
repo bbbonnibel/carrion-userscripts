@@ -33,21 +33,25 @@ $down-arrow-5: "🢃";
   gap: 10px;
 
   $time: 0.4s;
-  $halftime: calc($time / 2);
   --height: 24px;
   --half-height: calc(var(--height) / 2);
   background: #1a1a1a;
   border: 1px solid white;
   border-radius: var(--half-height);
   color: white;
+  cursor: pointer;
   font-size: 12px;
   padding: 0 10px;
   height: var(--height);
 
   opacity: 0;
+  transform: translateY(0);
 
   &.show {
     opacity: 1;
+    transition:
+      transform $time ease-in-out,
+      opacity $time linear;
   }
 
   &.top {
@@ -58,23 +62,19 @@ $down-arrow-5: "🢃";
     }
 
     &.show {
-      top: 10px;
-      transition:
-        top $time ease-in-out,
-        opacity $halftime linear $halftime;
+      transform: translateY(10px);
     }
   }
 
   &.bottom {
+    bottom: 0;
+
     .arrow::before {
       content: $down-arrow-1;
     }
 
     &.show {
-      bottom: 10px;
-      transition:
-        bottom $time ease-in-out,
-        opacity $halftime linear $halftime;
+      transform: translateY(-10px);
     }
   }
 
