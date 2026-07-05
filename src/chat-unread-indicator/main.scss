@@ -1,0 +1,88 @@
+$up-arrow-1: "🡡";
+$up-arrow-2: "🡩";
+$up-arrow-3: "🡱";
+$up-arrow-4: "🡹";
+$up-arrow-5: "🢁";
+$down-arrow-1: "🡣";
+$down-arrow-2: "🡫";
+$down-arrow-3: "🡳";
+$down-arrow-4: "🡻";
+$down-arrow-5: "🢃";
+
+// .room-list {
+//   position: relative;
+// }
+
+.bbb-floating-indicator-host {
+  height: 0;
+
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  justify-content: center;
+}
+
+.bbb-floating-indicator {
+  position: absolute;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  $time: 0.4s;
+  $halftime: calc($time / 2);
+  --height: 24px;
+  --half-height: calc(var(--height) / 2);
+  background: #1a1a1a;
+  border: 1px solid white;
+  border-radius: var(--half-height);
+  color: white;
+  font-size: 12px;
+  padding: 0 10px;
+  height: var(--height);
+
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+  }
+
+  &.top {
+    top: 0;
+
+    .arrow::before {
+      content: $up-arrow-1;
+    }
+
+    &.show {
+      top: 10px;
+      transition:
+        top $time ease-in-out,
+        opacity $halftime linear $halftime;
+    }
+  }
+
+  &.bottom {
+    .arrow::before {
+      content: $down-arrow-1;
+    }
+
+    &.show {
+      bottom: 10px;
+      transition:
+        bottom $time ease-in-out,
+        opacity $halftime linear $halftime;
+    }
+  }
+
+  .arrow {
+    display: flex;
+  }
+
+  .count {
+    display: none;
+  }
+}
