@@ -1,4 +1,4 @@
-# Bonnibel's carrion userscripts
+# [Bonnibel's carrion userscripts](https://bbbonnibel.github.io/carrion-userscripts)
 
 These are small userscripts made for [carrion.chat](https://carrion.chat/) to improve quality of life.
 
