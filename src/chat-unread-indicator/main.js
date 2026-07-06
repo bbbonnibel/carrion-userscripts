@@ -27,12 +27,17 @@ function installStyle(css, origin, filename) {
 installStyle(mainCss, "chat-unread-indicator", "main.css");
 
 const PAGE = Object.freeze({
+  /** @returns {HTMLDivElement} */
   sidebar: () => document.querySelector("#sidebar"),
+  /** @returns {HTMLDivElement} */
   roomList: () => document.querySelector("#room-list"),
+  /** @returns {NodeListOf<HTMLDivElement>} */
   roomSections: () =>
-    this.roomList().querySelectorAll(
-      ".dm-section, .public-channel-section, .channel-section",
-    ),
+    document
+      .querySelector("#room-list")
+      .querySelectorAll(
+        ".dm-section, .public-channel-section, .channel-section",
+      ),
 });
 
 class UnreadIndicator {
@@ -73,6 +78,7 @@ class UnreadIndicator {
 const indicatorTop = new UnreadIndicator("top");
 const indicatorBottom = new UnreadIndicator("bottom");
 
+//#region Room offsets
 /**
  * @typedef {object} RoomOffset
  * The position of each room within the entire `#room-list` element.
@@ -81,16 +87,11 @@ const indicatorBottom = new UnreadIndicator("bottom");
  * @prop {HTMLDivElement} section The section the room belongs to.
  * @prop {number} offsetTop The room's offsetTop, relative to the room list.
  * @prop {number} offsetBottom The room's offsetBottom, relative to the room list.
+ * @prop {number} offsetMiddle The value between the top and bottom, like a horizontal line through the middle of the element.
  */
 
-/** @type {RoomOffset[]} */
+/** @type {RoomOffset[]} The list of room offsets. */
 let roomOffsets = [];
-
-function insertUnreadIndicators() {
-  const roomList = PAGE.roomList();
-  roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
-  roomList.insertAdjacentElement("afterend", indicatorBottom.host);
-}
 
 /**
  * Recalculate room offsets for a section.
@@ -104,6 +105,7 @@ function calculateSection(section) {
   return roomItems.map((room) => {
     const offsetTop = room.offsetTop + section.offsetTop;
     const offsetBottom = offsetTop + room.clientHeight;
+    const offsetMiddle = offsetTop + room.clientHeight / 2;
     return {
       room,
       section,
@@ -113,20 +115,87 @@ function calculateSection(section) {
   });
 }
 
+/**
+ * Calculate all the room offsets in the room list.
+ *
+ * @returns All the room offsets in the list.
+ */
 function calculateRoomOffsets() {
   const sections = PAGE.roomSections();
   const offsets = sections.map((section) => calculateSection(section)).flat();
+  return offsets;
 }
 
-function rescanIndicators() {
+/**
+ * Refresh the room offsets.
+ * This modifies {@link roomOffsets} with new values.
+ */
+function refreshRoomOffsets() {
+  roomOffsets = calculateRoomOffsets();
+}
+//#endregion
+
+function getRoomsOutOfView() {
   const roomList = PAGE.roomList();
+
   const listTop = roomList.scrollTop;
   const listBottom = listTop + roomList.clientHeight;
+
+  /** @type {RoomOffset[]} Rooms invisible above, including partial overlap. */
+  const above = [];
+  /** @type {RoomOffset[]} Rooms invisible below, including partial overlap. */
+  const below = [];
+  /** @type {RoomOffset[]} Rooms that are visible in view. */
+  const visible = [];
+
+  for (const roff of roomOffsets) {
+    if (roff.offsetMiddle < listTop) {
+      above.push(roff);
+    } else if (roff.offsetMiddle > listBottom) {
+      below.push(roff);
+    } else {
+      visible.push(roff);
+    }
+  }
+
+  return { above, below, visible };
+}
+
+// TODO (next step):
+// Whenever there's a scroll event (debounced), or a new message, recalculate getRoomsOutOfView().
+// Check if any of the rooms above/below have messages. If so, show that indicator.
+
+// TODO What if the indicator "host" was a 30px high element overlapping the top
+// and bottom of the room list, but with pointer-events: none and overflow: hidden?
+// We hide the top/bottom indicators by positioning them outside the box,
+// and bring them inward when needed.
+// Try it later!
+
+// TODO Indicators should show up red if any of those rooms have mentions.
+
+// TODO Indicators should show totals.
+
+function insertUnreadIndicators() {
+  const roomList = PAGE.roomList();
+  roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
+  roomList.insertAdjacentElement("afterend", indicatorBottom.host);
 }
 
 function main() {
   console.debug(LOG_PREFIX, "Started");
   insertUnreadIndicators();
+  refreshRoomOffsets();
+
+  // Watch for changes.
+  // Whenever rooms are added/removed/(repositioned?), refresh room offsets.
+  const observer = new MutationObserver(() => refreshRoomOffsets());
+  const sections = PAGE.roomSections();
+  for (const section of sections) {
+    const rooms = section.querySelector("div:has(.room-item)");
+    observer.observe(rooms, {
+      childList: true,
+    });
+  }
 }
 
 window.addEventListener("chat-ready", () => {
