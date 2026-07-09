@@ -22,9 +22,14 @@ $carrion-color-yellow: #ffcc00;
   opacity: 1;
   transition: opacity 0.2s;
 
+  &:focus,
+  &:focus-visible {
+    outline: unset;
+  }
+
   .star {
     display: flex;
-    position: relative;
+    position: absolute;
     z-index: 1;
 
     svg {
@@ -44,7 +49,7 @@ $carrion-color-yellow: #ffcc00;
     transition: opacity 0.2s;
   }
 
-  &:not(:hover) .halo {
+  &:not(:hover, :focus) .halo {
     opacity: var(--halo-off-opacity, 0);
   }
 }
@@ -53,18 +58,38 @@ $carrion-color-yellow: #ffcc00;
   order: -1;
 }
 
-.character-card:not(.bbb-pinned):not(:hover) .bbb-pin-character-button {
+.character-card:not(.bbb-pinned, :hover, :focus) .bbb-pin-character-button {
   opacity: 0;
+}
+
+.character-card .bbb-pin-character-button:focus {
+  opacity: 1;
 }
 
 .character-card:not(.bbb-pinned) .bbb-pin-character-button {
   --halo-off-opacity: 0.25;
 }
 
-.character-card.bbb-pinned .bbb-pin-character-button .hide-when-pinned {
-  display: none;
+// ordinary card
+.character-card .bbb-pin-character-button,
+// pinned and pressed
+.character-card.bbb-pinned .bbb-pin-character-button:active {
+  .when-inactive {
+    opacity: 1;
+  }
+  .when-active {
+    opacity: 0;
+  }
 }
 
-.character-card:not(.bbb-pinned) .bbb-pin-character-button .hide-unless-pinned {
-  display: none;
+// pinned card
+.character-card.bbb-pinned .bbb-pin-character-button,
+// pressed card
+.character-card .bbb-pin-character-button:active {
+  .when-inactive {
+    opacity: 0;
+  }
+  .when-active {
+    opacity: 1;
+  }
 }

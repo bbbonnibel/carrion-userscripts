@@ -133,8 +133,8 @@ function makePinBtn() {
       data-title-pinned="${title_pinned}"
     >
       <div class="halo"></div>
-      <div class="star hide-when-pinned">${starEmpty}</div>
-      <div class="star hide-unless-pinned">${starFilled}</div>
+      <div class="star when-inactive">${starEmpty}</div>
+      <div class="star when-active">${starFilled}</div>
     </button>
   `);
 }
