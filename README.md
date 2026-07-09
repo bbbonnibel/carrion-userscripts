@@ -4,7 +4,8 @@ These are small userscripts made for [carrion.chat](https://carrion.chat/) to im
 
 Each userscript focuses on doing one specific thing, so you can install only the modifications you want. You will need to install a userscript manager extension like [Tampermonkey](https://www.tampermonkey.net/) in order to use them.
 
-[View source on GitHub](https://github.com/bbbonnibel/carrion-userscripts) (for nerds)
+- **Contact:** These userscripts are maintained by ***Bonnibel*** and ***Spider-Gwen***. Message us if you have any issues!
+- **Nerd stuff:** [View source on GitHub](https://github.com/bbbonnibel/carrion-userscripts)
 
 ## New features
 
