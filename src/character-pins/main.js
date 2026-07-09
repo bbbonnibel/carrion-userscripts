@@ -3,6 +3,9 @@ const starEmpty = $import("./star-empty.svg");
 const starFilled = $import("./star-filled.svg");
 const LOG_PREFIX = "[Character Pins]";
 
+const pinClass = "bbb-pinned";
+const pinBtnClass = "bbb-pin-character-button";
+
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -114,7 +117,46 @@ function addPin(name) {
   setPins(pins);
 }
 
-const pinClass = "bbb-pinned";
+/**
+ * Make a pin button.
+ * @returns {HTMLDivElement}
+ */
+function makePinBtn() {
+  const title_unpinned = "Click to pin to start, or right click to pin to end";
+  const title_pinned = "Click to unpin";
+  return template(`
+    <button
+      type="button"
+      class="${pinBtnClass}"
+      title="${title_unpinned}"
+      data-title-unpinned="${title_unpinned}";
+      data-title-pinned="${title_pinned}"
+    >
+      <div class="halo"></div>
+      <div class="star hide-when-pinned">${starEmpty}</div>
+      <div class="star hide-unless-pinned">${starFilled}</div>
+    </button>
+  `);
+}
+
+/**
+ * Pin a card.
+ *
+ * This alters HTML only, not state. You also need to call {@link addPin} or {@link removePin}.
+ *
+ * @param {Card} card The character card
+ * @param {boolean} pin Whether to pin the card or not
+ */
+function setCardPin(card, pin) {
+  const btn = card.querySelector(`.${pinBtnClass}`);
+  if (pin) {
+    card.classList.add(pinClass);
+    btn.setAttribute("title", btn.getAttribute("data-title-pinned"));
+  } else {
+    card.classList.remove(pinClass);
+    btn.setAttribute("title", btn.getAttribute("data-title-unpinned"));
+  }
+}
 
 /**
  * Install a pin button in each characer card.
@@ -122,22 +164,16 @@ const pinClass = "bbb-pinned";
  */
 function installPinButtons(cards) {
   for (const card of cards) {
-    const pinBtn = template(`
-      <button type="button" class="bbb-pin-character-button">
-        <div class="halo"></div>
-        <div class="star hide-when-pinned">${starEmpty}</div>
-        <div class="star hide-unless-pinned">${starFilled}</div>
-      </button>
-    `);
+    const pinBtn = makePinBtn();
     card.insertBefore(pinBtn, card.firstChild);
     const name = getCharacterName(card);
 
     pinBtn.addEventListener("click", () => {
       if (card.classList.contains(pinClass)) {
-        card.classList.remove(pinClass);
+        setCardPin(card, false);
         removePin(name);
       } else {
-        card.classList.add(pinClass);
+        setCardPin(card, true);
         addPin(name);
       }
     });
@@ -146,6 +182,7 @@ function installPinButtons(cards) {
 
 function main() {
   console.debug(LOG_PREFIX, "Started.");
+  /** @type {Card[]} */
   const cards = [...document.querySelectorAll(".character-card")];
   validatePins(cards);
   installPinButtons(cards);
@@ -157,7 +194,7 @@ function main() {
   for (const card of cards) {
     const name = getCharacterName(card);
     if (pinMap.has(name)) {
-      card.classList.add(pinClass);
+      setCardPin(card, true);
     }
   }
 }
