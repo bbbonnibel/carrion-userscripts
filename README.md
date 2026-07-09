@@ -2,11 +2,21 @@
 
 These are small userscripts made for [carrion.chat](https://carrion.chat/) to improve quality of life.
 
-Each userscript is small, so you can install only the modifications you want. You will need to install a userscript manager extension like [Tampermonkey](https://www.tampermonkey.net/) in order to use them.
+Each userscript focuses on doing one specific thing, so you can install only the modifications you want. You will need to install a userscript manager extension like [Tampermonkey](https://www.tampermonkey.net/) in order to use them.
 
 [View source on GitHub](https://github.com/bbbonnibel/carrion-userscripts) (for nerds)
 
+## New features
+
+These scripts introduce new features to your carrion experience.
+
+### [Character Pins](https://bbbonnibel.github.io/carrion-userscripts/script/character-pins/character-pins.user.js)
+
+Pin characters to the top of your dashboard.
+
 ## Quality of life
+
+These scripts focus on small adjustments to existing features.
 
 ### [Dashboard Revised](https://bbbonnibel.github.io/carrion-userscripts/script/dashboard-revised/dashboard-revised.user.js)
 
