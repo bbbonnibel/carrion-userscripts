@@ -123,11 +123,11 @@ const pinClass = "bbb-pinned";
 function installPinButtons(cards) {
   for (const card of cards) {
     const pinBtn = template(`
-      <div class="bbb-pin-character-button">
+      <button type="button" class="bbb-pin-character-button">
         <div class="halo"></div>
         <div class="star hide-when-pinned">${starEmpty}</div>
         <div class="star hide-unless-pinned">${starFilled}</div>
-      </div>
+      </button>
     `);
     card.insertBefore(pinBtn, card.firstChild);
     const name = getCharacterName(card);
