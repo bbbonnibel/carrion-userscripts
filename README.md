@@ -8,15 +8,18 @@ Each userscript focuses on doing one specific thing, so you can install only the
 
 ## New features
 
-These scripts introduce new features to your carrion experience.
+_These scripts introduce new features to your carrion experience._
 
 ### [Character Pins](https://bbbonnibel.github.io/carrion-userscripts/script/character-pins/character-pins.user.js)
 
-Pin characters to the top of your dashboard.
+Pin characters to the top of your dashboard. No matter what sort order you choose, those characters will appear before any others.
+
+- Click a character's pin button to pin them to start.
+- Right-click that pin button to pin them to the end.
 
 ## Quality of life
 
-These scripts focus on small adjustments to existing features.
+_These scripts focus on positive adjustments to existing features._
 
 ### [Dashboard Revised](https://bbbonnibel.github.io/carrion-userscripts/script/dashboard-revised/dashboard-revised.user.js)
 
