@@ -1,8 +1,10 @@
 $carrion-color-yellow: #ffcc00;
+$carrion-color-purple: #bd6eff;
 
 .bbb-pin-character-button {
   --pin-btn-size: 30px;
   --star-size: 20px;
+  --star-color: #{$carrion-color-yellow};
 
   position: absolute;
   top: 5px;
@@ -33,7 +35,7 @@ $carrion-color-yellow: #ffcc00;
     z-index: 1;
 
     svg {
-      fill: $carrion-color-yellow;
+      fill: var(--star-color);
       width: var(--star-size);
     }
   }
@@ -54,14 +56,31 @@ $carrion-color-yellow: #ffcc00;
   }
 }
 
+// Cards pinned to end
+.character-card.bbb-pinned-to-end .bbb-pin-character-button,
+// Cards (that aren't pinned to start) where the right button is being held
+.character-card:not(.bbb-pinned:not(.bbb-pinned-to-end))
+  .bbb-pin-character-button.bbb-mb-right-held {
+  --star-color: #{$carrion-color-purple};
+}
+
+// Pin to start
 .character-card.bbb-pinned {
   order: -1;
 }
 
+// Pin to end
+.character-card.bbb-pinned.bbb-pinned-to-end {
+  // surely nobody will ever create ten million characters
+  order: 9999999;
+}
+
+// Pin buttons usually invisible
 .character-card:not(.bbb-pinned, :hover, :focus) .bbb-pin-character-button {
   opacity: 0;
 }
 
+// Pin buttons always visible when they have keyboard focus
 .character-card .bbb-pin-character-button:focus {
   opacity: 1;
 }
@@ -73,7 +92,7 @@ $carrion-color-yellow: #ffcc00;
 // ordinary card
 .character-card .bbb-pin-character-button,
 // pinned and pressed
-.character-card.bbb-pinned .bbb-pin-character-button:active {
+.character-card.bbb-pinned .bbb-pin-character-button:is(:active, .bbb-mb-right-held) {
   .when-inactive {
     opacity: 1;
   }
@@ -85,7 +104,7 @@ $carrion-color-yellow: #ffcc00;
 // pinned card
 .character-card.bbb-pinned .bbb-pin-character-button,
 // pressed card
-.character-card .bbb-pin-character-button:active {
+.character-card .bbb-pin-character-button:is(:active, .bbb-mb-right-held) {
   .when-inactive {
     opacity: 0;
   }
