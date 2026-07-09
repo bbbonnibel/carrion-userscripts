@@ -1,8 +1,10 @@
 $carrion-color-yellow: #ffcc00;
+$carrion-color-purple: #bd6eff;
 
 .bbb-pin-character-button {
   --pin-btn-size: 30px;
   --star-size: 20px;
+  --star-color: #{$carrion-color-yellow};
 
   position: absolute;
   top: 5px;
@@ -22,13 +24,19 @@ $carrion-color-yellow: #ffcc00;
   opacity: 1;
   transition: opacity 0.2s;
 
+  &:focus,
+  &:focus-visible {
+    outline: unset;
+  }
+
   .star {
     display: flex;
-    position: relative;
+    position: absolute;
     z-index: 1;
+    filter: drop-shadow(2px 1px #300) drop-shadow(0 0 2px #300);
 
     svg {
-      fill: $carrion-color-yellow;
+      fill: var(--star-color);
       width: var(--star-size);
     }
   }
@@ -44,27 +52,64 @@ $carrion-color-yellow: #ffcc00;
     transition: opacity 0.2s;
   }
 
-  &:not(:hover) .halo {
+  &:not(:hover, :focus) .halo {
     opacity: var(--halo-off-opacity, 0);
   }
 }
 
+// Cards pinned to end
+.character-card.bbb-pinned-to-end .bbb-pin-character-button svg,
+// Cards (that aren't pinned to start) where the right button is being held
+.character-card:not(.bbb-pinned:not(.bbb-pinned-to-end))
+  .bbb-pin-character-button.bbb-mb-right-held svg {
+  --star-color: #{$carrion-color-purple};
+}
+
+// Pin to start
 .character-card.bbb-pinned {
   order: -1;
 }
 
-.character-card:not(.bbb-pinned):not(:hover) .bbb-pin-character-button {
+// Pin to end
+.character-card.bbb-pinned.bbb-pinned-to-end {
+  // surely nobody will ever create ten million characters
+  order: 9999999;
+}
+
+// Pin buttons usually invisible
+.character-card:not(.bbb-pinned, :hover, :focus) .bbb-pin-character-button {
   opacity: 0;
+}
+
+// Pin buttons always visible when they have keyboard focus
+.character-card .bbb-pin-character-button:focus {
+  opacity: 1;
 }
 
 .character-card:not(.bbb-pinned) .bbb-pin-character-button {
   --halo-off-opacity: 0.25;
 }
 
-.character-card.bbb-pinned .bbb-pin-character-button .hide-when-pinned {
-  display: none;
+// ordinary card
+.character-card .bbb-pin-character-button,
+// pinned and pressed
+.character-card.bbb-pinned .bbb-pin-character-button:is(:active, .bbb-mb-right-held) {
+  .when-inactive {
+    opacity: 1;
+  }
+  .when-active {
+    opacity: 0;
+  }
 }
 
-.character-card:not(.bbb-pinned) .bbb-pin-character-button .hide-unless-pinned {
-  display: none;
+// pinned card
+.character-card.bbb-pinned .bbb-pin-character-button,
+// pressed card
+.character-card .bbb-pin-character-button:is(:active, .bbb-mb-right-held) {
+  .when-inactive {
+    opacity: 0;
+  }
+  .when-active {
+    opacity: 1;
+  }
 }
