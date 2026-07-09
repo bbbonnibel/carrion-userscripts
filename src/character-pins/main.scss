@@ -58,10 +58,10 @@ $carrion-color-purple: #bd6eff;
 }
 
 // Cards pinned to end
-.character-card.bbb-pinned-to-end .bbb-pin-character-button,
+.character-card.bbb-pinned-to-end .bbb-pin-character-button svg,
 // Cards (that aren't pinned to start) where the right button is being held
 .character-card:not(.bbb-pinned:not(.bbb-pinned-to-end))
-  .bbb-pin-character-button.bbb-mb-right-held {
+  .bbb-pin-character-button.bbb-mb-right-held svg {
   --star-color: #{$carrion-color-purple};
 }
 
