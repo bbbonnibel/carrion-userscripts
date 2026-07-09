@@ -33,6 +33,7 @@ $carrion-color-purple: #bd6eff;
     display: flex;
     position: absolute;
     z-index: 1;
+    filter: drop-shadow(2px 1px #300) drop-shadow(0 0 2px #300);
 
     svg {
       fill: var(--star-color);
