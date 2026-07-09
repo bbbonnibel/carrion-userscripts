@@ -104,7 +104,7 @@ function removePin(name) {
  * Remove a character from the pin list.
  * @param {string} name The character's name
  */
-function addPin(card) {
+function addPin(name) {
   console.debug(LOG_PREFIX, "Adding pin:", name);
   let pins = getPins();
   if (pins.includes(name)) {
