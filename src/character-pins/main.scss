@@ -1,0 +1,70 @@
+$carrion-color-yellow: #ffcc00;
+
+.bbb-pin-character-button {
+  --pin-btn-size: 30px;
+  --star-size: 20px;
+
+  position: absolute;
+  top: 5px;
+  left: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--pin-btn-size);
+  height: var(--pin-btn-size);
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  border-radius: 50%;
+  overflow: visible;
+  opacity: 1;
+  transition: opacity 0.2s;
+
+  .star {
+    display: flex;
+    position: relative;
+    z-index: 1;
+
+    svg {
+      fill: $carrion-color-yellow;
+      width: var(--star-size);
+    }
+  }
+
+  .halo {
+    position: absolute;
+    inset: -2.5px;
+    border-radius: 50%;
+    background-color: black;
+    opacity: 0.75;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:not(:hover) .halo {
+    opacity: var(--halo-off-opacity, 0);
+  }
+}
+
+.character-card.bbb-pinned {
+  order: -1;
+}
+
+.character-card:not(.bbb-pinned):not(:hover) .bbb-pin-character-button {
+  opacity: 0;
+}
+
+.character-card:not(.bbb-pinned) .bbb-pin-character-button {
+  --halo-off-opacity: 0.25;
+}
+
+.character-card.bbb-pinned .bbb-pin-character-button .hide-when-pinned {
+  display: none;
+}
+
+.character-card:not(.bbb-pinned) .bbb-pin-character-button .hide-unless-pinned {
+  display: none;
+}

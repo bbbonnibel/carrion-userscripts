@@ -8,4 +8,4 @@ grant:
   - GM_setValue
 match:
   - https://*.carrion.chat/
-run-at: document-body
+run-at: document-idle
