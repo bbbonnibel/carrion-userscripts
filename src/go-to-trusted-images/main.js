@@ -74,12 +74,9 @@ function main() {
   });
 
   if (shouldNavigate) {
-    console.debug(LOG_PREFIX, "Navigating in 1 second.");
     setTimeout(() => {
       window.location = target.href;
-    }, 1000);
-  } else {
-    console.debug(LOG_PREFIX, "Will not navigate this time.");
+    }, 333);
   }
 }
 
