@@ -1,0 +1,8 @@
+---
+name: Go to Trusted Images
+namespace: bbbonnibel
+description: Immediately forward the “You are now leaving carrion” page to image links on trusted image hosts.
+author: Bonnibel
+match:
+  - https://*.carrion.chat/go/*
+run-at: document-idle

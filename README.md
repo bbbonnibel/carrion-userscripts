@@ -56,3 +56,7 @@ The cog icon will have an indicator telling you if there's hidden selected conte
 Character pages will now have their top border show the character's color.
 
 This is like what happens on the search and dashboard pages, except for those it's the left edge.
+
+### [Go to Trusted Images](https://bbbonnibel.github.io/carrion-userscripts/script/go-to-trusted-images/go-to-trusted-images.user.js)
+
+Carrion intercepts most outgoing links with a “You are now leaving carrion” page. This script makes that page auto-forward if two conditions are met: (1) the link is on carrion's list of trusted image domains, *and* (2) it looks like an image link. Any other kinds of links, or images on any other kind of domain, are not auto-forwarded.
