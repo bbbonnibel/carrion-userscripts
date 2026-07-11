@@ -57,6 +57,14 @@ $carrion-color-purple: #bd6eff;
   }
 }
 
+.drv-as-compact {
+  .bbb-pin-character-button {
+    top: unset;
+    bottom: 5px;
+    left: 0;
+  }
+}
+
 // Cards pinned to end
 .character-card.bbb-pinned-to-end .bbb-pin-character-button svg,
 // Cards (that aren't pinned to start) where the right button is being held
