@@ -9,18 +9,34 @@ $down-arrow-3: "🡳";
 $down-arrow-4: "🡻";
 $down-arrow-5: "🢃";
 
-// .room-list {
-//   position: relative;
-// }
-
 .bbb-floating-indicator-host {
   height: 0;
+  width: 100%;
 
   position: relative;
   z-index: 1;
 
   display: flex;
   justify-content: center;
+}
+
+.bbb-floating-indicator-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  height: 30px;
+
+  pointer-events: none;
+  overflow: hidden;
+
+  &.top {
+    top: 0;
+  }
+
+  &.bottom {
+    bottom: 0;
+  }
 }
 
 .bbb-floating-indicator {
@@ -43,6 +59,7 @@ $down-arrow-5: "🢃";
   font-size: 12px;
   padding: 0 10px;
   height: var(--height);
+  pointer-events: auto;
 
   opacity: 0;
   transform: translateY(0);

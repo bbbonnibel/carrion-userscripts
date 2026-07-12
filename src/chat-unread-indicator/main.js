@@ -54,10 +54,15 @@ class UnreadIndicator {
      * @private
      * @type {HTMLDivElement}
      */
-    this.host = template(`
-      <div class="bbb-floating-indicator-host">
-      </div>
-    `);
+    this.host = template(`<div class="bbb-floating-indicator-host"></div>`);
+    /**
+     * The inner indicator container.
+     * @private
+     * @type {HTMLDivElement}
+     */
+    this.container = template(
+      `<div class="bbb-floating-indicator-container"></div>`,
+    );
     /**
      * The indicator itself.
      * @private
@@ -79,8 +84,10 @@ class UnreadIndicator {
     this.count = this.indicator.querySelector(".count");
 
     this.host.classList.add(name);
+    this.container.classList.add(name);
     this.indicator.classList.add(name);
-    this.host.appendChild(this.indicator);
+    this.host.appendChild(this.container);
+    this.container.appendChild(this.indicator);
   }
 
   /**
