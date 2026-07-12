@@ -65,7 +65,7 @@ class UnreadIndicator {
     );
     /**
      * The indicator itself.
-     * @private
+     * @public
      * @type {HTMLDivElement}
      */
     this.indicator = template(`
@@ -136,6 +136,19 @@ function insertUnreadIndicators() {
   const roomList = PAGE.roomList();
   roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
   roomList.insertAdjacentElement("afterend", indicatorBottom.host);
+
+  indicatorTop.indicator.addEventListener("click", () => {
+    roomList.scrollBy({
+      top: -400,
+      behavior: "smooth",
+    });
+  });
+  indicatorBottom.indicator.addEventListener("click", () => {
+    roomList.scrollBy({
+      top: +400,
+      behavior: "smooth",
+    });
+  });
 }
 //#endregion
 

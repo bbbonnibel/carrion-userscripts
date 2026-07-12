@@ -15,18 +15,16 @@ $down-arrow-5: "🢃";
 
   position: relative;
   z-index: 1;
-
-  display: flex;
-  justify-content: center;
 }
 
 .bbb-floating-indicator-container {
   position: absolute;
   left: 0;
   right: 0;
-
   height: 30px;
 
+  display: flex;
+  justify-content: center;
   pointer-events: none;
   overflow: hidden;
 
@@ -60,38 +58,39 @@ $down-arrow-5: "🢃";
   padding: 0 10px;
   height: var(--height);
   pointer-events: auto;
+  user-select: none;
 
   opacity: 0;
-  transform: translateY(0);
 
   &.show {
     opacity: 1;
     transition:
-      transform $time ease-in-out,
+      bottom $time ease-in-out,
+      top $time ease-in-out,
       opacity $time linear;
   }
 
   &.top {
-    top: 0;
+    bottom: 100%;
 
     .arrow::before {
       content: $up-arrow-1;
     }
 
     &.show {
-      transform: translateY(10px);
+      bottom: 0%;
     }
   }
 
   &.bottom {
-    bottom: 0;
+    top: 100%;
 
     .arrow::before {
       content: $down-arrow-1;
     }
 
     &.show {
-      transform: translateY(-10px);
+      top: 0%;
     }
   }
 
