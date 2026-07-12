@@ -1,0 +1,10 @@
+---
+name: Monochrome Tags
+namespace: bbbonnibel
+description: Revise the appearance of character tags.
+author: bbbonnibel
+grant: none
+match:
+  - https://*.carrion.chat/character/*
+  # - https://*.carrion.chat/search/*
+run-at: document-start
