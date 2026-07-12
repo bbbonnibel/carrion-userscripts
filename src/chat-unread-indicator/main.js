@@ -32,12 +32,13 @@ const PAGE = Object.freeze({
   /** @returns {HTMLDivElement} */
   roomList: () => document.querySelector("#room-list"),
   /** @returns {NodeListOf<HTMLDivElement>} */
-  roomSections: () =>
-    document
+  roomSections: () => [
+    ...document
       .querySelector("#room-list")
       .querySelectorAll(
         ".dm-section, .public-channel-section, .channel-section",
       ),
+  ],
 });
 
 //#region Indicators
@@ -48,12 +49,20 @@ class UnreadIndicator {
    * @param {string} name The name of the indicator ("top" or "bottom")
    */
   constructor(name) {
-    /** @type {HTMLDivElement} The outer indicator host. */
+    /**
+     * The outer indicator host.
+     * @private
+     * @type {HTMLDivElement}
+     */
     this.host = template(`
       <div class="bbb-floating-indicator-host">
       </div>
     `);
-    /** @type {HTMLDivElement} The indicator itself. */
+    /**
+     * The indicator itself.
+     * @private
+     * @type {HTMLDivElement}
+     */
     this.indicator = template(`
       <div class="bbb-floating-indicator">
         <div class="arrow"></div>
@@ -62,22 +71,65 @@ class UnreadIndicator {
         <div class="arrow"></div>
       </div>
     `);
-    this.host.appendChild(this.indicator);
+    /**
+     * The element that's storing the message count.
+     * @private
+     * @type {HTMLDivElement}
+     */
+    this.count = this.indicator.querySelector(".count");
+
     this.host.classList.add(name);
     this.indicator.classList.add(name);
+    this.host.appendChild(this.indicator);
   }
 
+  /**
+   * Show this indicator.
+   * @private
+   */
   show() {
     this.indicator.classList.add("show");
   }
 
+  /**
+   * Hide this indicator.
+   * @private
+   */
   hide() {
     this.indicator.classList.remove("show");
+  }
+
+  /**
+   * Update this unread indicator.
+   *
+   * @param {object} state The current state this indicator should reflect.
+   * @param {number} state.unreadCount The total unread count.
+   * @param {boolean} state.mention Whether there's been a mention.
+   */
+  update(state) {
+    if (state.unreadCount > 0) {
+      this.count.innerText = state.unreadCount;
+      this.show();
+    } else {
+      this.count.innerText = "";
+      this.hide();
+    }
+    if (state.mention) {
+      this.indicator.classList.add("has-mention");
+    } else {
+      this.indicator.classList.remove("has-mention");
+    }
   }
 }
 
 const indicatorTop = new UnreadIndicator("top");
 const indicatorBottom = new UnreadIndicator("bottom");
+
+function insertUnreadIndicators() {
+  const roomList = PAGE.roomList();
+  roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
+  roomList.insertAdjacentElement("afterend", indicatorBottom.host);
+}
 //#endregion
 
 //#region Room Manager
@@ -85,7 +137,7 @@ const indicatorBottom = new UnreadIndicator("bottom");
  * @typedef {object} RoomOffset
  * The position of each room within the entire `#room-list` element.
  *
- * @prop {HTMLDivElement} room The room element.
+ * @prop {HTMLDivElement} element The room element.
  * @prop {HTMLDivElement} section The section the room belongs to.
  * @prop {number} offsetTop The room's offsetTop, relative to the room list.
  * @prop {number} offsetBottom The room's offsetBottom, relative to the room list.
@@ -106,7 +158,7 @@ class RoomManager {
    *
    * @private
    * @param {HTMLDivElement} section The section to recalculate for
-   * @returns Room offsets for the section.
+   * @returns {RoomOffset} Room offsets for the section.
    */
   calculateSection(section) {
     const roomItems = [...section.querySelectorAll(".room-item")];
@@ -115,10 +167,11 @@ class RoomManager {
       const offsetBottom = offsetTop + room.clientHeight;
       const offsetMiddle = offsetTop + room.clientHeight / 2;
       return {
-        room,
+        element: room,
         section,
         offsetTop,
         offsetBottom,
+        offsetMiddle,
       };
     });
   }
@@ -154,11 +207,11 @@ class RoomManager {
    * @public
    */
   manageRoomOffsets() {
-    refreshRoomOffsets();
+    this.refreshRoomOffsets();
 
     const observer = new MutationObserver((mutation) => {
       console.log(LOG_PREFIX, "Mutation observed in channels:", mutation);
-      refreshRoomOffsets();
+      this.refreshRoomOffsets();
     });
     const sections = PAGE.roomSections();
     for (const section of sections) {
@@ -170,9 +223,9 @@ class RoomManager {
 
     window.addEventListener(
       "resize",
-      () => {
+      (mutation) => {
         console.log(LOG_PREFIX, "Window size changed:", mutation);
-        refreshRoomOffsets();
+        this.refreshRoomOffsets();
       },
       { passive: true },
     );
@@ -228,10 +281,69 @@ const roomManager = new RoomManager();
 
 // TODO Indicators should show totals.
 
-function insertUnreadIndicators() {
-  const roomList = PAGE.roomList();
-  roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
-  roomList.insertAdjacentElement("afterend", indicatorBottom.host);
+/**
+ * Get information about a room element.
+ *
+ * @param {HTMLDivElement} element
+ * @returns Information about the room's mentions and unread count.
+ */
+function getRoomInfo(element) {
+  const hasUnread = element.classList.contains("has-unread");
+  const hasMention = element.classList.contains("has-mention");
+  let unreadCount = 0;
+  if (hasUnread) {
+    const unreadBadge = element.querySelector(".unread-badge");
+    if (unreadBadge) {
+      unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
+    }
+  }
+  return { hasUnread, hasMention, unreadCount };
+}
+
+function manageIndicators() {
+  PAGE.roomList().addEventListener(
+    "scrollend",
+    () => {
+      const rooms = roomManager.getRoomsOutOfView();
+      let unreadCountAbove = 0;
+      let unreadMentionAbove = false;
+      let unreadCountBelow = 0;
+      let unreadMentionBelow = false;
+      for (const room of rooms.above) {
+        const info = getRoomInfo(room.element);
+        unreadCountAbove += info.unreadCount;
+        if (info.hasMention) {
+          unreadMentionAbove = true;
+        }
+      }
+
+      for (const room of rooms.below) {
+        const info = getRoomInfo(room.element);
+        unreadCountBelow += info.unreadCount;
+        if (info.hasMention) {
+          unreadMentionBelow = true;
+        }
+      }
+
+      indicatorTop.update({
+        unreadCount: unreadCountAbove,
+        mention: unreadMentionAbove,
+      });
+      indicatorBottom.update({
+        unreadCount: unreadCountBelow,
+        mention: unreadMentionBelow,
+      });
+
+      console.debug(LOG_PREFIX, "Scrollend processed.", {
+        rooms,
+        unreadCountAbove,
+        unreadMentionAbove,
+        unreadCountBelow,
+        unreadMentionBelow,
+      });
+    },
+    { passive: true },
+  );
 }
 
 function main() {
