@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 /** @typedef {null | undefined | object | string | number} GMPrimitive */
 
 /**

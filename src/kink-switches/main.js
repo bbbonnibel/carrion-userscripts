@@ -91,7 +91,7 @@ function putSwitch(control) {
   for (const pref of prefs) {
     const btn = createButton(pref);
     kinkSwitch.appendChild(btn);
-    btn.addEventListener("click", (event) => {
+    btn.addEventListener("click", () => {
       kinkSwitch.classList.add("modified");
       const existingValue = getSelectValue(dropdown);
       if (existingValue === pref) {

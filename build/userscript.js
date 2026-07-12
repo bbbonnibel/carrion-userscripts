@@ -4,7 +4,6 @@ const imports = require("./imports.js");
 const dir = require("./dir.js");
 const yaml = require("./lib/yaml.js");
 const greasemonkey = require("./lib/greasemonkey.js");
-const css = require("./lib/css.js");
 
 /**
  * @typedef {Object} ProjectFile

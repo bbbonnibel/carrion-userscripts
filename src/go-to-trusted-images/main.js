@@ -65,6 +65,7 @@ function main() {
   const isImage = isImageLink(target);
   const isProcessed = isPageProcessed();
   const shouldNavigate = isTrusted && isImage && !isProcessed;
+  markPageProcessed();
 
   console.debug(LOG_PREFIX, "Evaluation:", {
     isTrusted,

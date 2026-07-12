@@ -214,23 +214,35 @@ function installPinButtons(cards) {
       }
     });
 
-    pinBtn.addEventListener("mouseup", (event) => {
-      pinBtn.classList.remove(mbRightHeld);
-    });
+    pinBtn.addEventListener(
+      "mouseup",
+      () => {
+        pinBtn.classList.remove(mbRightHeld);
+      },
+      { passive: true },
+    );
 
-    pinBtn.addEventListener("mouseout", (event) => {
-      pinBtn.classList.remove(mbRightHeld);
-    });
+    pinBtn.addEventListener(
+      "mouseout",
+      () => {
+        pinBtn.classList.remove(mbRightHeld);
+      },
+      { passive: true },
+    );
 
-    pinBtn.addEventListener("click", (event) => {
-      if (card.classList.contains(pinClass)) {
-        setCardPin(card, false);
-        removePin(name);
-      } else {
-        setCardPin(card, "start");
-        savePin(name, "start");
-      }
-    });
+    pinBtn.addEventListener(
+      "click",
+      () => {
+        if (card.classList.contains(pinClass)) {
+          setCardPin(card, false);
+          removePin(name);
+        } else {
+          setCardPin(card, "start");
+          savePin(name, "start");
+        }
+      },
+      { passive: true },
+    );
 
     pinBtn.addEventListener("contextmenu", (event) => {
       event.preventDefault();

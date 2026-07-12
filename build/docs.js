@@ -8,10 +8,9 @@ async function build() {
   process.stdout.write(`Building docs...\n`);
 
   fs.ensureDirSync(dir.DIST);
+  fs.copySync(path.join(dir.CWD, "docs"), dir.DIST);
   fs.ensureDirSync(path.join(dir.DIST, "styles"));
-
-  // Copy assets
-  const files = fs.copySync(dir.DOCS, dir.DIST);
+  fs.emptyDirSync(path.join(dir.DIST, "styles"));
 
   // Build index.html
   const README = fs.readFileSync(path.join(dir.CWD, "README.md"), {
