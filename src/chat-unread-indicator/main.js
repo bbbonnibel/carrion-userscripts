@@ -2,6 +2,7 @@ const mainCss = $import("./main.scss");
 const LOG_PREFIX = "[Chat Unread Indicator]";
 const DEBUG_VISREP_BARS = false;
 
+//#region externals
 /**
  * Debounce a script to not occur repeatedly within a time period.
  * @see {@link https://github.com/sindresorhus/debounce#readme} Author's readme
@@ -121,6 +122,7 @@ function debounce(function_, wait = 100, options = {}) {
 
   return debounced;
 }
+//#endregion
 
 /**
  * @param {string} html The template element. Must be only one root element.
@@ -192,7 +194,7 @@ class UnreadIndicator {
     this.indicator = template(`
       <div class="bbb-floating-indicator">
         <div class="arrow"></div>
-        <div class="text">new messages</div>
+        <div class="text"><span>new messages</span></div>
         <div class="count"></div>
         <div class="arrow"></div>
       </div>
@@ -236,8 +238,12 @@ class UnreadIndicator {
    */
   update(state) {
     if (state.unreadCount > 0) {
-      this.count.innerText = state.unreadCount;
       this.show();
+      if (state.unreadCount >= 99) {
+        this.count.innerText = "99+";
+      } else {
+        this.count.innerText = state.unreadCount;
+      }
     } else {
       this.count.innerText = "";
       this.hide();
@@ -335,7 +341,7 @@ class RoomManager {
    * Refresh the room offsets.
    * This modifies {@link roomOffsets} with new values.
    *
-   * @public // make private again later
+   * @private
    */
   refreshRoomOffsets() {
     console.debug(LOG_PREFIX, "Refreshing room offsets");
@@ -370,10 +376,11 @@ class RoomManager {
    */
   manageRoomOffsets() {
     this.refreshRoomOffsets();
+    const debouncedRefresh = debounce(() => this.refreshRoomOffsets(), 20);
 
     const observer = new MutationObserver((mutation) => {
       console.log(LOG_PREFIX, "Mutation observed in channels:", mutation);
-      this.refreshRoomOffsets();
+      debouncedRefresh();
     });
     const sections = PAGE.roomSections();
     for (const section of sections) {
@@ -387,7 +394,7 @@ class RoomManager {
       "resize",
       (mutation) => {
         console.log(LOG_PREFIX, "Window size changed:", mutation);
-        this.refreshRoomOffsets();
+        debouncedRefresh();
       },
       { passive: true },
     );

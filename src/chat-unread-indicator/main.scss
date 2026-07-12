@@ -38,6 +38,9 @@ $down-arrow-5: "🢃";
 }
 
 .bbb-floating-indicator {
+  --indicator-background: #1a1a1a;
+  --mention-color: #ff4444;
+
   position: absolute;
   z-index: 1;
 
@@ -49,7 +52,7 @@ $down-arrow-5: "🢃";
   $time: 0.4s;
   --height: 24px;
   --half-height: calc(var(--height) / 2);
-  background: #1a1a1a;
+  background: var(--indicator-background);
   border-radius: var(--half-height);
   color: color-mix(white, transparent 20%);
   cursor: pointer;
@@ -95,10 +98,30 @@ $down-arrow-5: "🢃";
 
   .arrow {
     display: flex;
+    padding-bottom: 2px;
+  }
+
+  .text {
+    padding-bottom: 1px;
   }
 
   .count {
-    display: none;
+    border-radius: 10px;
+    background: #666;
+    color: #ccc;
+    font-size: 90%;
+    padding: 0 4px;
+  }
+
+  &.has-mention {
+    background: color-mix(var(--indicator-background), var(--mention-color));
+    border: 1px solid var(--mention-color);
+    color: white;
+  }
+
+  &.has-mention .count {
+    background: var(--mention-color);
+    color: white;
   }
 }
 
