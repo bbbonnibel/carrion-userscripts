@@ -31,11 +31,15 @@ This script revises exclusively the dashboard page.
 
 ### [Compact Character Controls](https://bbbonnibel.github.io/carrion-userscripts/script/compact-character-controls/compact-character-controls.user.js)
 
-This script moves some less-used character controls into context menus.
+This script introduces a compact menu [&nbsp;⋮&nbsp;] to the dashboard and character pages (yours and others). Most lesser-used options on those pages get moved into that menu.
+
+On your own character pages, this script adds a new “chat as this character” button to the top of the compact menu.
+
+Exact changes:
 
 - *Dashboard:* Tucks away the “Import from F-List” button.
-- *Character page (yours):* Tucks away “Overwrite from F-List” and “Import Gallery”.
-- *Character page (others):* Tuck away mute/block/report buttons.
+- *Character page (yours):* Tucks away “Overwrite from F-List” and “Import Gallery”, and adds “Chat as this character” to the top of the list.
+- *Character page (others):* Tucks away the mute/block/report buttons.
 
 ### [Kink Switches](https://bbbonnibel.github.io/carrion-userscripts/script/kink-switches/kink-switches.user.js)
 

@@ -44,10 +44,17 @@ compactControlsHost.appendChild(menuBtn);
 compactControlsHost.appendChild(contextMenu);
 
 const CharacterPage = Object.freeze({
+  /** @type {HTMLLinkElement} */
   editBtn: () => document.querySelector("a.btn[href^='/edit']"),
+  /** @type {HTMLButtonElement} */
   reportBtn: () => document.querySelector("#report-btn"),
+  /** @type {HTMLButtonElement} */
   muteBtn: () => document.querySelector("#mute-btn"),
+  /** @type {HTMLButtonElement} */
   blockBtn: () => document.querySelector("#block-btn"),
+  /** @type {HTMLDivElement} */
+  cardBody: () =>
+    document.querySelector("#filtered-profile-content .card-body"),
 });
 
 const DashboardPage = Object.freeze({
@@ -97,6 +104,19 @@ function startYourCharacterPage() {
 
   characterControls.appendChild(compactControlsHost);
   attachMenuEvents();
+
+  // Create new controls  in the context menu.
+  const characterId =
+    CharacterPage.cardBody().getAttribute("data-character-id");
+  const chatAsCharacter = template(`
+    <a href="/chat/?character=${characterId}" class="btn btn-primary">
+      <span>Chat as this character</span>
+    </button>
+  `);
+  contextMenu.appendChild(chatAsCharacter);
+  contextMenu.appendChild(template(`<hr>`));
+
+  // Move existing buttons into the context menu.
   for (const button of importButtons) {
     contextMenu.appendChild(button);
   }
