@@ -1,7 +1,7 @@
 ---
 name: Chat Unread Indicator
 namespace: bbbonnibel
-description: Introduce a floating unread indicator into the chat page.
+description: Introduce a floating unread indicator to the room list which tells you if there's new messages out of view.
 author: Bonnibel
 match:
   - https://*.carrion.chat/chat/*
