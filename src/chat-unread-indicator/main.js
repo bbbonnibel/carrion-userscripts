@@ -1,5 +1,6 @@
 const mainCss = $import("./main.scss");
 const LOG_PREFIX = "[Chat Unread Indicator]";
+const DEBUG_VISREP_BARS = false;
 
 /**
  * @param {string} html The template element. Must be only one root element.
@@ -214,10 +215,31 @@ class RoomManager {
    * Refresh the room offsets.
    * This modifies {@link roomOffsets} with new values.
    *
-   * @private
+   * @public // make private again later
    */
   refreshRoomOffsets() {
+    console.debug(LOG_PREFIX, "Refreshing room offsets");
     this.roomOffsets = this.calculateRoomOffsets();
+
+    if (DEBUG_VISREP_BARS) {
+      function createVisrepBar(cls, y) {
+        const bar = template(`<div class="bbb-debug-visrep-bar"></div>`);
+        bar.classList.add(cls);
+        bar.setAttribute("style", `top: ${y}px`);
+        return bar;
+      }
+
+      const roomList = PAGE.roomList();
+      roomList
+        .querySelectorAll(".bbb-debug-visrep-bar")
+        .forEach((e) => e.remove());
+      for (const room of this.roomOffsets) {
+        const barTop = createVisrepBar("top", room.offsetTop);
+        const barMiddle = createVisrepBar("middle", room.offsetMiddle);
+        const barBottom = createVisrepBar("bottom", room.offsetBottom);
+        roomList.append(barTop, barMiddle, barBottom);
+      }
+    }
   }
 
   /**
@@ -259,8 +281,9 @@ class RoomManager {
    */
   getRoomsOutOfView() {
     const roomList = PAGE.roomList();
+    const sidebar = PAGE.sidebar();
 
-    const listTop = roomList.scrollTop;
+    const listTop = roomList.scrollTop + sidebar.offsetTop;
     const listBottom = listTop + roomList.clientHeight;
 
     /** @type {RoomOffset[]} Rooms invisible above, including partial overlap. */

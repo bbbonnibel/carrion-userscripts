@@ -102,3 +102,22 @@ $down-arrow-5: "🢃";
     display: none;
   }
 }
+
+.bbb-debug-visrep-bar {
+  pointer-events: none;
+  position: absolute;
+  left: 40px;
+  width: 40px;
+
+  &.top {
+    border-top: 1px solid #f00;
+  }
+
+  &.middle {
+    border-top: 1px solid #0f0;
+  }
+
+  &.bottom {
+    border-top: 1px solid #00f;
+  }
+}
