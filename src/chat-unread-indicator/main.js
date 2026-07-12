@@ -40,6 +40,7 @@ const PAGE = Object.freeze({
       ),
 });
 
+//#region Indicators
 class UnreadIndicator {
   /**
    * Create a new unread indicator.
@@ -77,8 +78,9 @@ class UnreadIndicator {
 
 const indicatorTop = new UnreadIndicator("top");
 const indicatorBottom = new UnreadIndicator("bottom");
+//#endregion
 
-//#region Room offsets
+//#region Room Manager
 /**
  * @typedef {object} RoomOffset
  * The position of each room within the entire `#room-list` element.
@@ -90,76 +92,127 @@ const indicatorBottom = new UnreadIndicator("bottom");
  * @prop {number} offsetMiddle The value between the top and bottom, like a horizontal line through the middle of the element.
  */
 
-/** @type {RoomOffset[]} The list of room offsets. */
-let roomOffsets = [];
-
-/**
- * Recalculate room offsets for a section.
- *
- * @private
- * @param {HTMLDivElement} section The section to recalculate for
- * @returns Room offsets for the section.
- */
-function calculateSection(section) {
-  const roomItems = [...section.querySelectorAll(".room-item")];
-  return roomItems.map((room) => {
-    const offsetTop = room.offsetTop + section.offsetTop;
-    const offsetBottom = offsetTop + room.clientHeight;
-    const offsetMiddle = offsetTop + room.clientHeight / 2;
-    return {
-      room,
-      section,
-      offsetTop,
-      offsetBottom,
-    };
-  });
-}
-
-/**
- * Calculate all the room offsets in the room list.
- *
- * @returns All the room offsets in the list.
- */
-function calculateRoomOffsets() {
-  const sections = PAGE.roomSections();
-  const offsets = sections.map((section) => calculateSection(section)).flat();
-  return offsets;
-}
-
-/**
- * Refresh the room offsets.
- * This modifies {@link roomOffsets} with new values.
- */
-function refreshRoomOffsets() {
-  roomOffsets = calculateRoomOffsets();
-}
-//#endregion
-
-function getRoomsOutOfView() {
-  const roomList = PAGE.roomList();
-
-  const listTop = roomList.scrollTop;
-  const listBottom = listTop + roomList.clientHeight;
-
-  /** @type {RoomOffset[]} Rooms invisible above, including partial overlap. */
-  const above = [];
-  /** @type {RoomOffset[]} Rooms invisible below, including partial overlap. */
-  const below = [];
-  /** @type {RoomOffset[]} Rooms that are visible in view. */
-  const visible = [];
-
-  for (const roff of roomOffsets) {
-    if (roff.offsetMiddle < listTop) {
-      above.push(roff);
-    } else if (roff.offsetMiddle > listBottom) {
-      below.push(roff);
-    } else {
-      visible.push(roff);
-    }
+class RoomManager {
+  constructor() {
+    /**
+     * The list of room offsets.
+     * @type {RoomOffset[]}
+     * @public
+     */
+    this.roomOffsets = [];
+  }
+  /**
+   * Recalculate room offsets for a section.
+   *
+   * @private
+   * @param {HTMLDivElement} section The section to recalculate for
+   * @returns Room offsets for the section.
+   */
+  calculateSection(section) {
+    const roomItems = [...section.querySelectorAll(".room-item")];
+    return roomItems.map((room) => {
+      const offsetTop = room.offsetTop + section.offsetTop;
+      const offsetBottom = offsetTop + room.clientHeight;
+      const offsetMiddle = offsetTop + room.clientHeight / 2;
+      return {
+        room,
+        section,
+        offsetTop,
+        offsetBottom,
+      };
+    });
   }
 
-  return { above, below, visible };
+  /**
+   * Calculate all the room offsets in the room list.
+   *
+   * @private
+   * @returns All the room offsets in the list.
+   */
+  calculateRoomOffsets() {
+    const sections = PAGE.roomSections();
+    const offsets = sections
+      .map((section) => this.calculateSection(section))
+      .flat();
+    return offsets;
+  }
+
+  /**
+   * Refresh the room offsets.
+   * This modifies {@link roomOffsets} with new values.
+   *
+   * @private
+   */
+  refreshRoomOffsets() {
+    this.roomOffsets = this.calculateRoomOffsets();
+  }
+
+  /**
+   * Calculate the room offsets and start watching for changes.
+   * Whenever rooms are added/removed/(repositioned?), refresh room offsets.
+   *
+   * @public
+   */
+  manageRoomOffsets() {
+    refreshRoomOffsets();
+
+    const observer = new MutationObserver((mutation) => {
+      console.log(LOG_PREFIX, "Mutation observed in channels:", mutation);
+      refreshRoomOffsets();
+    });
+    const sections = PAGE.roomSections();
+    for (const section of sections) {
+      const rooms = section.querySelector("div:has(.room-item)");
+      observer.observe(rooms, {
+        childList: true,
+      });
+    }
+
+    window.addEventListener(
+      "resize",
+      () => {
+        console.log(LOG_PREFIX, "Window size changed:", mutation);
+        refreshRoomOffsets();
+      },
+      { passive: true },
+    );
+  }
+
+  /**
+   * Get the list of rooms according to whether they're in or out of view.
+   *
+   * @public
+   * @returns The rooms in or out of view.
+   */
+  getRoomsOutOfView() {
+    const roomList = PAGE.roomList();
+
+    const listTop = roomList.scrollTop;
+    const listBottom = listTop + roomList.clientHeight;
+
+    /** @type {RoomOffset[]} Rooms invisible above, including partial overlap. */
+    const above = [];
+    /** @type {RoomOffset[]} Rooms invisible below, including partial overlap. */
+    const below = [];
+    /** @type {RoomOffset[]} Rooms that are visible in view. */
+    const visible = [];
+
+    for (const roff of roomManager.roomOffsets) {
+      if (roff.offsetMiddle < listTop) {
+        above.push(roff);
+      } else if (roff.offsetMiddle > listBottom) {
+        below.push(roff);
+      } else {
+        visible.push(roff);
+      }
+    }
+
+    return { above, below, visible };
+  }
 }
+
+const roomManager = new RoomManager();
+//#endregion
 
 // TODO (next step):
 // Whenever there's a scroll event (debounced), or a new message, recalculate getRoomsOutOfView().
@@ -184,18 +237,8 @@ function insertUnreadIndicators() {
 function main() {
   console.debug(LOG_PREFIX, "Started");
   insertUnreadIndicators();
-  refreshRoomOffsets();
-
-  // Watch for changes.
-  // Whenever rooms are added/removed/(repositioned?), refresh room offsets.
-  const observer = new MutationObserver(() => refreshRoomOffsets());
-  const sections = PAGE.roomSections();
-  for (const section of sections) {
-    const rooms = section.querySelector("div:has(.room-item)");
-    observer.observe(rooms, {
-      childList: true,
-    });
-  }
+  roomManager.manageRoomOffsets();
+  manageIndicators();
 }
 
 window.addEventListener("chat-ready", () => {
