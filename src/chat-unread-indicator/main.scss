@@ -1,0 +1,145 @@
+$up-arrow-1: "🡡";
+$up-arrow-2: "🡩";
+$up-arrow-3: "🡱";
+$up-arrow-4: "🡹";
+$up-arrow-5: "🢁";
+$down-arrow-1: "🡣";
+$down-arrow-2: "🡫";
+$down-arrow-3: "🡳";
+$down-arrow-4: "🡻";
+$down-arrow-5: "🢃";
+
+.bbb-floating-indicator-host {
+  height: 0;
+  width: 100%;
+
+  position: relative;
+  z-index: 1;
+}
+
+.bbb-floating-indicator-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30px;
+
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+
+  &.top {
+    top: 0;
+  }
+
+  &.bottom {
+    bottom: 0;
+  }
+}
+
+.bbb-floating-indicator {
+  --indicator-background: #1a1a1a;
+  --mention-color: #ff4444;
+
+  position: absolute;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  $time: 0.4s;
+  --height: 24px;
+  --half-height: calc(var(--height) / 2);
+  background: var(--indicator-background);
+  border-radius: var(--half-height);
+  color: color-mix(white, transparent 20%);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 10px;
+  height: var(--height);
+  pointer-events: auto;
+  user-select: none;
+
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+    transition:
+      bottom $time ease-in-out,
+      top $time ease-in-out,
+      opacity $time linear;
+  }
+
+  &.top {
+    bottom: 100%;
+
+    .arrow::before {
+      content: $up-arrow-1;
+    }
+
+    &.show {
+      bottom: 0%;
+    }
+  }
+
+  &.bottom {
+    top: 100%;
+
+    .arrow::before {
+      content: $down-arrow-1;
+    }
+
+    &.show {
+      top: 0%;
+    }
+  }
+
+  .arrow {
+    display: flex;
+    padding-bottom: 2px;
+  }
+
+  .text {
+    padding-bottom: 1px;
+  }
+
+  .count {
+    border-radius: 10px;
+    background: #666;
+    color: #ccc;
+    font-size: 90%;
+    padding: 0 4px;
+  }
+
+  &.has-mention {
+    background: color-mix(var(--indicator-background), var(--mention-color));
+    border: 1px solid var(--mention-color);
+    color: white;
+  }
+
+  &.has-mention .count {
+    background: var(--mention-color);
+    color: white;
+  }
+}
+
+.bbb-debug-visrep-bar {
+  pointer-events: none;
+  position: absolute;
+  left: 40px;
+  width: 40px;
+
+  &.top {
+    border-top: 1px solid #f00;
+  }
+
+  &.middle {
+    border-top: 1px solid #0f0;
+  }
+
+  &.bottom {
+    border-top: 1px solid #00f;
+  }
+}

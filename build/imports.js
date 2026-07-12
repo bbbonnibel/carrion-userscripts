@@ -2,6 +2,8 @@ const path = require("node:path");
 const fs = require("fs-extra");
 const css = require("./lib/css");
 
+const RESOLUTION_LOGGING = false;
+
 /**
  * Escape a string so that it can be injected into the script JS.
  * @param {string} content The file content string to escape.
@@ -16,14 +18,15 @@ function escapeImportString(content) {
  * @param {string} filepath The filepath being imported.
  */
 async function resolveImportReference(filepath) {
-  console.log("Resolving import:", path.relative(process.cwd(), filepath));
+  RESOLUTION_LOGGING &&
+    console.log("Resolving import:", path.relative(process.cwd(), filepath));
   try {
     let content = "";
     if (filepath.endsWith(".scss")) {
-      console.log("Resolving as a SCSS file");
+      RESOLUTION_LOGGING && console.log("Resolving as a SCSS file");
       content = await css.compileSassFile(filepath);
     } else {
-      console.log("Resolving as plaintext");
+      RESOLUTION_LOGGING && console.log("Resolving as plaintext");
       content = fs.readFileSync(filepath, {
         encoding: "utf-8",
       });

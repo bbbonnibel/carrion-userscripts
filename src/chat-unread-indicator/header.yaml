@@ -1,0 +1,8 @@
+---
+name: Chat Unread Indicator
+namespace: bbbonnibel
+description: Introduce a floating unread indicator into the chat page.
+author: Bonnibel
+match:
+  - https://*.carrion.chat/chat/*
+run-at: document-start

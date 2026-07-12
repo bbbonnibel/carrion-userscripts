@@ -18,7 +18,7 @@ const PROJECT = yaml.readYamlFile(path.join(dir.CWD, "project.yaml"));
 const DIST_SCRIPT = path.join(dir.DIST, "script");
 
 async function buildUserscript(folder) {
-  process.stdout.write(`Building ${folder}\n`);
+  console.log(`Building ${folder}`);
 
   const config = yaml.readYamlFile(path.join(dir.SRC, folder, "build.yaml"));
   const version = config.version ?? "0.0.0";
@@ -30,7 +30,7 @@ async function buildUserscript(folder) {
   const outFilePath = path.join(outFolderPath, outname);
   const downloadUrl = new URL(`${folder}/${outname}`, PROJECT.releases).href;
 
-  process.stdout.write(` • Version ${version}\n`);
+  console.log(`Version ${version}`);
 
   const headerYaml = yaml.readYamlFile(path.join(dir.SRC, folder, headerFile));
   const header = greasemonkey.compileHeader({
@@ -53,7 +53,7 @@ async function buildUserscript(folder) {
   fs.ensureDirSync(outFolderPath);
   fs.writeFileSync(outFilePath, script);
 
-  process.stdout.write(` ✓ Built ${folder}\n`);
+  console.log(`✓ Built ${path.relative(dir.CWD, outFilePath)}`);
 }
 
 /**
