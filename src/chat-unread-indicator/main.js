@@ -3,6 +3,126 @@ const LOG_PREFIX = "[Chat Unread Indicator]";
 const DEBUG_VISREP_BARS = false;
 
 /**
+ * Debounce a script to not occur repeatedly within a time period.
+ * @see {@link https://github.com/sindresorhus/debounce#readme} Author's readme
+ * @param {function} function_ The inner function to debounce.
+ * @param {number} wait Number of milliseconds to wait between running the function again.
+ * @param {object} options
+ * @param {boolean} options.immediate Whether the function runs immediately, instead of on the tail end after the wait.
+ * @returns
+ */
+function debounce(function_, wait = 100, options = {}) {
+  if (typeof function_ !== "function") {
+    throw new TypeError(
+      `Expected the first parameter to be a function, got \`${typeof function_}\`.`,
+    );
+  }
+
+  if (wait < 0) {
+    throw new RangeError("`wait` must not be negative.");
+  }
+
+  if (typeof options === "boolean") {
+    throw new TypeError(
+      "The `options` parameter must be an object, not a boolean. Use `{immediate: true}` instead.",
+    );
+  }
+
+  const { immediate } = options;
+
+  let storedContext;
+  let storedArguments;
+  let timeoutId;
+  let timestamp;
+  let result;
+
+  function run() {
+    const callContext = storedContext;
+    const callArguments = storedArguments;
+    storedContext = undefined;
+    storedArguments = undefined;
+    result = function_.apply(callContext, callArguments);
+    return result;
+  }
+
+  function later() {
+    const last = Date.now() - timestamp;
+
+    if (last < wait && last >= 0) {
+      timeoutId = setTimeout(later, wait - last);
+    } else {
+      timeoutId = undefined;
+
+      if (!immediate) {
+        result = run();
+      }
+    }
+  }
+
+  const debounced = function (...arguments_) {
+    if (
+      storedContext &&
+      this !== storedContext &&
+      Object.getPrototypeOf(this) === Object.getPrototypeOf(storedContext)
+    ) {
+      throw new Error(
+        "Debounced method called with different contexts of the same prototype.",
+      );
+    }
+
+    storedContext = this;
+    storedArguments = arguments_;
+    timestamp = Date.now();
+
+    const callNow = immediate && !timeoutId;
+
+    if (!timeoutId) {
+      timeoutId = setTimeout(later, wait);
+    }
+
+    if (callNow) {
+      result = run();
+      return result;
+    }
+
+    return undefined;
+  };
+
+  Object.defineProperty(debounced, "isPending", {
+    get() {
+      return timeoutId !== undefined;
+    },
+  });
+
+  debounced.clear = () => {
+    if (!timeoutId) {
+      return;
+    }
+
+    clearTimeout(timeoutId);
+    timeoutId = undefined;
+    storedContext = undefined;
+    storedArguments = undefined;
+  };
+
+  debounced.flush = () => {
+    if (!timeoutId) {
+      return;
+    }
+
+    debounced.trigger();
+  };
+
+  debounced.trigger = () => {
+    result = run();
+
+    debounced.clear();
+  };
+
+  return debounced;
+}
+
+/**
  * @param {string} html The template element. Must be only one root element.
  */
 function template(html) {
@@ -329,49 +449,61 @@ function getRoomInfo(element) {
   return { hasUnread, hasMention, unreadCount };
 }
 
+const redrawIndicators = debounce(
+  () => {
+    const rooms = roomManager.getRoomsOutOfView();
+    let unreadCountAbove = 0;
+    let unreadMentionAbove = false;
+    let unreadCountBelow = 0;
+    let unreadMentionBelow = false;
+    for (const room of rooms.above) {
+      const info = getRoomInfo(room.element);
+      unreadCountAbove += info.unreadCount;
+      if (info.hasMention) {
+        unreadMentionAbove = true;
+      }
+    }
+
+    for (const room of rooms.below) {
+      const info = getRoomInfo(room.element);
+      unreadCountBelow += info.unreadCount;
+      if (info.hasMention) {
+        unreadMentionBelow = true;
+      }
+    }
+
+    indicatorTop.update({
+      unreadCount: unreadCountAbove,
+      mention: unreadMentionAbove,
+    });
+    indicatorBottom.update({
+      unreadCount: unreadCountBelow,
+      mention: unreadMentionBelow,
+    });
+  },
+  100,
+  { immediate: false },
+);
+
 function manageIndicators() {
   PAGE.roomList().addEventListener(
-    "scrollend",
+    "scroll",
     () => {
-      const rooms = roomManager.getRoomsOutOfView();
-      let unreadCountAbove = 0;
-      let unreadMentionAbove = false;
-      let unreadCountBelow = 0;
-      let unreadMentionBelow = false;
-      for (const room of rooms.above) {
-        const info = getRoomInfo(room.element);
-        unreadCountAbove += info.unreadCount;
-        if (info.hasMention) {
-          unreadMentionAbove = true;
-        }
-      }
-
-      for (const room of rooms.below) {
-        const info = getRoomInfo(room.element);
-        unreadCountBelow += info.unreadCount;
-        if (info.hasMention) {
-          unreadMentionBelow = true;
-        }
-      }
-
-      indicatorTop.update({
-        unreadCount: unreadCountAbove,
-        mention: unreadMentionAbove,
-      });
-      indicatorBottom.update({
-        unreadCount: unreadCountBelow,
-        mention: unreadMentionBelow,
-      });
-
-      console.debug(LOG_PREFIX, "Scrollend processed.", {
-        rooms,
-        unreadCountAbove,
-        unreadMentionAbove,
-        unreadCountBelow,
-        unreadMentionBelow,
-      });
+      redrawIndicators();
     },
     { passive: true },
+  );
+
+  ["display-message", "room-left", "tabs-updated", "dm-tabs-changed"].forEach(
+    (chatEventName) => {
+      window.addEventListener(
+        chatEventName,
+        () => {
+          redrawIndicators();
+        },
+        { passive: true },
+      );
+    },
   );
 }
 
