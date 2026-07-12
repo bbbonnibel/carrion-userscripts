@@ -154,7 +154,7 @@ const PAGE = Object.freeze({
   sidebar: () => document.querySelector("#sidebar"),
   /** @returns {HTMLDivElement} */
   roomList: () => document.querySelector("#room-list"),
-  /** @returns {NodeListOf<HTMLDivElement>} */
+  /** @returns {HTMLDivElement[]} */
   roomSections: () => [
     ...document
       .querySelector("#room-list")
@@ -258,25 +258,6 @@ class UnreadIndicator {
 
 const indicatorTop = new UnreadIndicator("top");
 const indicatorBottom = new UnreadIndicator("bottom");
-
-function insertUnreadIndicators() {
-  const roomList = PAGE.roomList();
-  roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
-  roomList.insertAdjacentElement("afterend", indicatorBottom.host);
-
-  indicatorTop.indicator.addEventListener("click", () => {
-    roomList.scrollBy({
-      top: -400,
-      behavior: "smooth",
-    });
-  });
-  indicatorBottom.indicator.addEventListener("click", () => {
-    roomList.scrollBy({
-      top: +400,
-      behavior: "smooth",
-    });
-  });
-}
 //#endregion
 
 //#region Room Manager
@@ -309,18 +290,20 @@ class RoomManager {
    */
   calculateSection(section) {
     const roomItems = [...section.querySelectorAll(".room-item")];
-    return roomItems.map((room) => {
-      const offsetTop = room.offsetTop + section.offsetTop;
-      const offsetBottom = offsetTop + room.clientHeight;
-      const offsetMiddle = offsetTop + room.clientHeight / 2;
-      return {
-        element: room,
-        section,
-        offsetTop,
-        offsetBottom,
-        offsetMiddle,
-      };
-    });
+    return roomItems
+      .map((room) => {
+        const offsetTop = room.offsetTop + section.offsetTop;
+        const offsetBottom = offsetTop + room.clientHeight;
+        const offsetMiddle = offsetTop + room.clientHeight / 2;
+        return {
+          element: room,
+          section,
+          offsetTop,
+          offsetBottom,
+          offsetMiddle,
+        };
+      })
+      .toSorted((a, b) => a.offsetMiddle - b.offsetMiddle);
   }
 
   /**
@@ -330,7 +313,10 @@ class RoomManager {
    * @returns All the room offsets in the list.
    */
   calculateRoomOffsets() {
-    const sections = PAGE.roomSections();
+    // Sections, sorted (by view) top to bottom.
+    const sections = PAGE.roomSections().toSorted(
+      (a, b) => a.offsetTop - b.offsetTop,
+    );
     const offsets = sections
       .map((section) => this.calculateSection(section))
       .flat();
@@ -514,6 +500,32 @@ function manageIndicators() {
   );
 }
 
+function insertUnreadIndicators() {
+  const roomList = PAGE.roomList();
+  roomList.insertAdjacentElement("beforebegin", indicatorTop.host);
+  roomList.insertAdjacentElement("afterend", indicatorBottom.host);
+
+  indicatorTop.indicator.addEventListener("click", () => {
+    const rooms = roomManager.getRoomsOutOfView();
+    const target = rooms.above.at(-1);
+    if (target) {
+      target.element.scrollIntoView({
+        block: "start",
+        behavior: "smooth",
+      });
+    }
+  });
+  indicatorBottom.indicator.addEventListener("click", () => {
+    const rooms = roomManager.getRoomsOutOfView();
+    const target = rooms.below.at(0);
+    if (target) {
+      target.element.scrollIntoView({
+        block: "end",
+        behavior: "smooth",
+      });
+    }
+  });
+}
 function main() {
   console.debug(LOG_PREFIX, "Started");
   insertUnreadIndicators();

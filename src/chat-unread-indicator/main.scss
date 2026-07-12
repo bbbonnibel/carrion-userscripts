@@ -9,6 +9,11 @@ $down-arrow-3: "🡳";
 $down-arrow-4: "🡻";
 $down-arrow-5: "🢃";
 
+.room-item {
+  scroll-margin-top: 100px;
+  scroll-margin-bottom: 100px;
+}
+
 .bbb-floating-indicator-host {
   height: 0;
   width: 100%;
