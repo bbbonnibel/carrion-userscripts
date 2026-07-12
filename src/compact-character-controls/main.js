@@ -108,11 +108,13 @@ function startYourCharacterPage() {
   // Create new controls  in the context menu.
   const characterId =
     CharacterPage.cardBody().getAttribute("data-character-id");
+  /** @type {HTMLAnchorElement} */
   const chatAsCharacter = template(`
-    <a href="/chat/?character=${characterId}" class="btn btn-primary">
+    <a target="_blank" class="btn btn-primary">
       <span>Chat as this character</span>
     </button>
   `);
+  chatAsCharacter.setAttribute("href", `/chat/?character=${characterId}`);
   contextMenu.appendChild(chatAsCharacter);
   contextMenu.appendChild(template(`<hr>`));
 
