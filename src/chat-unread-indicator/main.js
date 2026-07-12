@@ -310,20 +310,6 @@ class RoomManager {
 const roomManager = new RoomManager();
 //#endregion
 
-// TODO (next step):
-// Whenever there's a scroll event (debounced), or a new message, recalculate getRoomsOutOfView().
-// Check if any of the rooms above/below have messages. If so, show that indicator.
-
-// TODO What if the indicator "host" was a 30px high element overlapping the top
-// and bottom of the room list, but with pointer-events: none and overflow: hidden?
-// We hide the top/bottom indicators by positioning them outside the box,
-// and bring them inward when needed.
-// Try it later!
-
-// TODO Indicators should show up red if any of those rooms have mentions.
-
-// TODO Indicators should show totals.
-
 /**
  * Get information about a room element.
  *
