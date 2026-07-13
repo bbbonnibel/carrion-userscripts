@@ -47,7 +47,7 @@ const processedId = "bbb-page-processed";
 function markPageProcessed() {
   const form = document.createElement("form");
   form.id = processedId;
-  document.appendChild(form);
+  document.body.appendChild(form);
 }
 
 /**
