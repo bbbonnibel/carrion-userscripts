@@ -36,6 +36,7 @@
     "bootstrap": "^5.3.8",
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
+    "jsdom": "^29.1.1",
     "showdown": "^2.1.0"
   }
 }

@@ -27,6 +27,26 @@ h3 {
   font-weight: 600;
   line-height: 1.2;
   color: var(--bs-heading-color);
+  position: relative;
+  scroll-margin-block-start: 1.5em;
+
+  &:not(:hover) .hashlink {
+    opacity: 0;
+  }
+}
+
+.hashlink {
+  position: absolute;
+  right: 100%;
+  color: unset;
+  text-decoration: none;
+  opacity: 0.33;
+  padding: 0 10px;
+  font-style: italic;
+
+  &:hover {
+    opacity: 0.66;
+  }
 }
 
 h1 {
