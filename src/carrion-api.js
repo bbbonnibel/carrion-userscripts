@@ -1,4 +1,4 @@
-/** @typedef {("red"|"orange"|"yellow"|"green"|"blue"|"purple"|"pink"|"brown"|"teal"|"white"|"black"|"gray"|"dark_red"|"dark_orange"|"dark_yellow"|"dark_green"|"dark_blue"|"dark_purple"|"dark_pink"|"dark_brown"|"dark_teal")} Carrion.Api.V1.Color */
+/** @typedef {Carrion.Color} Carrion.Api.V1.Color */
 
 /** @typedef {("unlisted"|"public")} Carrion.Api.V1.ProfileVisibility */
 
