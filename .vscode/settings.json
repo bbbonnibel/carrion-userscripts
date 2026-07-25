@@ -2,7 +2,7 @@
   "files.eol": "\n",
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.rulers": [80],
+  "editor.rulers": [100],
   "files.exclude": {
     "node_modules/": true
   },
@@ -13,7 +13,6 @@
   "scss.lint.emptyRules": "ignore",
   "[html]": {
     "editor.formatOnSave": true,
-    "editor.rulers": [100],
   },
   "[javascript]": {
     "editor.formatOnSave": true,

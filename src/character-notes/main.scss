@@ -1,0 +1,47 @@
+.bbb-character-label {
+  --color: rgb(255 0 255);
+  --background-shade: hsl(from var(--color) h calc(0.5 * s) calc(0.5 * l));
+  --background: color-mix(var(--background-shade), transparent 50%);
+  --border: var(--color);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1em;
+
+  color: var(--color);
+  background-color: var(--background);
+  border: 1px solid var(--border);
+
+  .bbb-character-label-icon,
+  .bbb-character-label-text {
+    padding-bottom: 2px;
+  }
+}
+
+.bbb-character-label-list {
+  display: inline-flex;
+  flex-flow: row wrap;
+  gap: 8px;
+}
+
+.bbb-character-label-icon {
+  background: var(--color);
+  background-clip: text;
+  color: transparent;
+}
+
+.bbb-badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bbb-badge-label {
+  flex: 1;
+}
