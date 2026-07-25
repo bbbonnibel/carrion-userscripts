@@ -362,8 +362,8 @@ function getRoomInfo(element) {
 const redrawIndicators = debounce(
   () => {
     recalculateRooms();
-    const roomsAbove = document.querySelectorAll(`.${clsRoomOutOfViewAbove}`);
-    const roomsBelow = document.querySelectorAll(`.${clsRoomOutOfViewBelow}`);
+    const roomsAbove = document.querySelectorAll(cls(clsRoomOutOfViewAbove));
+    const roomsBelow = document.querySelectorAll(cls(clsRoomOutOfViewBelow));
     let unreadCountAbove = 0;
     let unreadMentionAbove = false;
     let unreadCountBelow = 0;
