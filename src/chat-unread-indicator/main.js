@@ -289,6 +289,21 @@ function recalculateRooms() {
   /** @type {RoomMeta | undefined} */
   let closestBelow;
 
+  // Reset classes.
+  const removeClasses = [
+    clsRoomOutOfView,
+    clsRoomOutOfViewAbove,
+    clsRoomOutOfViewBelow,
+    clsRoomClosestAbove,
+    clsRoomClosestBelow,
+  ];
+  document
+    .querySelectorAll(removeClasses.map(cls).join(", "))
+    .forEach((element) => {
+      element.classList.remove(...removeClasses);
+    });
+
+  // Gather data about each room.
   /** @type {HTMLDivElement[]} */
   const roomItems = [...roomList.querySelectorAll(".room-item")];
   /** @type {RoomMeta[]} */
@@ -304,6 +319,7 @@ function recalculateRooms() {
     };
   });
 
+  // Apply above/below to rooms above/eblow
   for (const room of rooms) {
     if (room.midline < BB_roomList.top) {
       room.el.classList.add(clsRoomOutOfView, clsRoomOutOfViewAbove);
@@ -318,12 +334,7 @@ function recalculateRooms() {
     }
   }
 
-  roomList
-    .querySelectorAll(cls(clsRoomClosestAbove))
-    .forEach((el) => el.classList.remove(clsRoomClosestAbove));
-  roomList
-    .querySelectorAll(cls(clsRoomClosestBelow))
-    .forEach((el) => el.classList.remove(clsRoomClosestBelow));
+  // Apply closest above/below
   closestAbove?.el.classList.add(clsRoomClosestAbove);
   closestBelow?.el.classList.add(clsRoomClosestBelow);
 }
@@ -351,15 +362,15 @@ function getRoomInfo(element) {
 const redrawIndicators = debounce(
   () => {
     recalculateRooms();
-    const roomsAbove = document.querySelector(`.${clsRoomOutOfViewAbove}`);
-    const roomsBelow = document.querySelector(`.${clsRoomOutOfViewBelow}`);
+    const roomsAbove = document.querySelectorAll(`.${clsRoomOutOfViewAbove}`);
+    const roomsBelow = document.querySelectorAll(`.${clsRoomOutOfViewBelow}`);
     let unreadCountAbove = 0;
     let unreadMentionAbove = false;
     let unreadCountBelow = 0;
     let unreadMentionBelow = false;
 
     for (const room of roomsAbove) {
-      const info = getRoomInfo(room.element);
+      const info = getRoomInfo(room);
       unreadCountAbove += info.unreadCount;
       if (info.hasMention) {
         unreadMentionAbove = true;
@@ -367,7 +378,7 @@ const redrawIndicators = debounce(
     }
 
     for (const room of roomsBelow) {
-      const info = getRoomInfo(room.element);
+      const info = getRoomInfo(room);
       unreadCountBelow += info.unreadCount;
       if (info.hasMention) {
         unreadMentionBelow = true;
@@ -417,7 +428,7 @@ function insertUnreadIndicators() {
   indicatorTop.indicator.addEventListener("click", () => {
     const target = document.querySelector(cls(clsRoomClosestAbove));
     if (target) {
-      target.element.scrollIntoView({
+      target.scrollIntoView({
         block: "start",
         behavior: "smooth",
       });
@@ -426,7 +437,7 @@ function insertUnreadIndicators() {
   indicatorBottom.indicator.addEventListener("click", () => {
     const target = document.querySelector(cls(clsRoomClosestBelow));
     if (target) {
-      target.element.scrollIntoView({
+      target.scrollIntoView({
         block: "end",
         behavior: "smooth",
       });
