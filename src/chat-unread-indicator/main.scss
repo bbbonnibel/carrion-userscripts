@@ -130,21 +130,12 @@ $down-arrow-5: "🢃";
   }
 }
 
-.bbb-debug-visrep-bar {
-  pointer-events: none;
-  position: absolute;
-  left: 40px;
-  width: 40px;
-
-  &.top {
-    border-top: 1px solid #f00;
+.bbb-debug-visrep {
+  .bbb-room-out-of-view-above {
+    background: darkred;
   }
 
-  &.middle {
-    border-top: 1px solid #0f0;
-  }
-
-  &.bottom {
-    border-top: 1px solid #00f;
+  .bbb-room-out-of-view-below {
+    background: darkblue;
   }
 }

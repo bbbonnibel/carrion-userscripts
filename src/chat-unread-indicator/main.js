@@ -1,6 +1,6 @@
 const mainCss = $import("./main.scss");
 const LOG_PREFIX = "[Chat Unread Indicator]";
-const DEBUG_VISREP_BARS = false;
+const DEBUG_VISREP = false;
 
 //#region externals
 /**
@@ -260,167 +260,84 @@ const indicatorTop = new UnreadIndicator("top");
 const indicatorBottom = new UnreadIndicator("bottom");
 //#endregion
 
-//#region Room Manager
+//#region Room analysis
+const clsRoomOutOfView = "bbb-room-out-of-view";
+const clsRoomOutOfViewAbove = "bbb-room-out-of-view-above";
+const clsRoomOutOfViewBelow = "bbb-room-out-of-view-below";
+const clsRoomClosestAbove = "bbb-room-closest-above";
+const clsRoomClosestBelow = "bbb-room-closest-below";
+
+const cls = (str) => `.${str}`;
+
 /**
- * @typedef {object} RoomOffset
- * The position of each room within the entire `#room-list` element.
- *
- * @prop {HTMLDivElement} element The room element.
- * @prop {HTMLDivElement} section The section the room belongs to.
- * @prop {number} offsetTop The room's offsetTop, relative to the room list.
- * @prop {number} offsetBottom The room's offsetBottom, relative to the room list.
- * @prop {number} offsetMiddle The value between the top and bottom, like a horizontal line through the middle of the element.
+ * @typedef {object} RoomMeta
+ * @prop {HTMLDivElement} el The room element
+ * @prop {DOMRect} bb The room bounding box
+ * @prop {number} midline The room's vertical middle (halfway between its top and bottom)
  */
 
-class RoomManager {
-  constructor() {
-    /**
-     * The list of room offsets.
-     * @type {RoomOffset[]}
-     * @public
-     */
-    this.roomOffsets = [];
-  }
-  /**
-   * Recalculate room offsets for a section.
-   *
-   * @private
-   * @param {HTMLDivElement} section The section to recalculate for
-   * @returns {RoomOffset} Room offsets for the section.
-   */
-  calculateSection(section) {
-    const roomItems = [...section.querySelectorAll(".room-item")];
-    return roomItems
-      .map((room) => {
-        const offsetTop = room.offsetTop + section.offsetTop;
-        const offsetBottom = offsetTop + room.clientHeight;
-        const offsetMiddle = offsetTop + room.clientHeight / 2;
-        return {
-          element: room,
-          section,
-          offsetTop,
-          offsetBottom,
-          offsetMiddle,
-        };
-      })
-      .toSorted((a, b) => a.offsetMiddle - b.offsetMiddle);
-  }
+/**
+ * Check each room to see if it's out of view, and label them appropriately.
+ */
+function recalculateRooms() {
+  const roomList = PAGE.roomList();
+  /** The room list's bounding box. */
+  const BB_roomList = roomList.getBoundingClientRect();
 
-  /**
-   * Calculate all the room offsets in the room list.
-   *
-   * @private
-   * @returns All the room offsets in the list.
-   */
-  calculateRoomOffsets() {
-    // Sections, sorted (by view) top to bottom.
-    const sections = PAGE.roomSections().toSorted(
-      (a, b) => a.offsetTop - b.offsetTop,
-    );
-    const offsets = sections
-      .map((section) => this.calculateSection(section))
-      .flat();
-    return offsets;
-  }
+  /** @type {RoomMeta | undefined} */
+  let closestAbove;
+  /** @type {RoomMeta | undefined} */
+  let closestBelow;
 
-  /**
-   * Refresh the room offsets.
-   * This modifies {@link roomOffsets} with new values.
-   *
-   * @private
-   */
-  refreshRoomOffsets() {
-    console.debug(LOG_PREFIX, "Refreshing room offsets");
-    this.roomOffsets = this.calculateRoomOffsets();
-
-    if (DEBUG_VISREP_BARS) {
-      function createVisrepBar(cls, y) {
-        const bar = template(`<div class="bbb-debug-visrep-bar"></div>`);
-        bar.classList.add(cls);
-        bar.setAttribute("style", `top: ${y}px`);
-        return bar;
-      }
-
-      const roomList = PAGE.roomList();
-      roomList
-        .querySelectorAll(".bbb-debug-visrep-bar")
-        .forEach((e) => e.remove());
-      for (const room of this.roomOffsets) {
-        const barTop = createVisrepBar("top", room.offsetTop);
-        const barMiddle = createVisrepBar("middle", room.offsetMiddle);
-        const barBottom = createVisrepBar("bottom", room.offsetBottom);
-        roomList.append(barTop, barMiddle, barBottom);
-      }
-    }
-  }
-
-  /**
-   * Calculate the room offsets and start watching for changes.
-   * Whenever rooms are added/removed/(repositioned?), refresh room offsets.
-   *
-   * @public
-   */
-  manageRoomOffsets() {
-    this.refreshRoomOffsets();
-    const debouncedRefresh = debounce(() => this.refreshRoomOffsets(), 20);
-
-    const observer = new MutationObserver((mutation) => {
-      console.log(LOG_PREFIX, "Mutation observed in channels:", mutation);
-      debouncedRefresh();
+  // Reset classes.
+  const removeClasses = [
+    clsRoomOutOfView,
+    clsRoomOutOfViewAbove,
+    clsRoomOutOfViewBelow,
+    clsRoomClosestAbove,
+    clsRoomClosestBelow,
+  ];
+  document
+    .querySelectorAll(removeClasses.map(cls).join(", "))
+    .forEach((element) => {
+      element.classList.remove(...removeClasses);
     });
-    const sections = PAGE.roomSections();
-    for (const section of sections) {
-      const rooms = section.querySelector("div:has(.room-item)");
-      observer.observe(rooms, {
-        childList: true,
-      });
-    }
 
-    window.addEventListener(
-      "resize",
-      (mutation) => {
-        console.log(LOG_PREFIX, "Window size changed:", mutation);
-        debouncedRefresh();
-      },
-      { passive: true },
-    );
-  }
+  // Gather data about each room.
+  /** @type {HTMLDivElement[]} */
+  const roomItems = [...roomList.querySelectorAll(".room-item")];
+  /** @type {RoomMeta[]} */
+  const rooms = roomItems.map((el) => {
+    const bb = el.getBoundingClientRect();
+    const halfHeight = 0.5 * bb.height;
+    const midline = bb.top + halfHeight;
 
-  /**
-   * Get the list of rooms according to whether they're in or out of view.
-   *
-   * @public
-   * @returns The rooms in or out of view.
-   */
-  getRoomsOutOfView() {
-    const roomList = PAGE.roomList();
-    const sidebar = PAGE.sidebar();
+    return {
+      el,
+      bb,
+      midline,
+    };
+  });
 
-    const listTop = roomList.scrollTop + sidebar.offsetTop;
-    const listBottom = listTop + roomList.clientHeight;
-
-    /** @type {RoomOffset[]} Rooms invisible above, including partial overlap. */
-    const above = [];
-    /** @type {RoomOffset[]} Rooms invisible below, including partial overlap. */
-    const below = [];
-    /** @type {RoomOffset[]} Rooms that are visible in view. */
-    const visible = [];
-
-    for (const roff of roomManager.roomOffsets) {
-      if (roff.offsetMiddle < listTop) {
-        above.push(roff);
-      } else if (roff.offsetMiddle > listBottom) {
-        below.push(roff);
-      } else {
-        visible.push(roff);
+  // Apply above/below to rooms above/eblow
+  for (const room of rooms) {
+    if (room.midline < BB_roomList.top) {
+      room.el.classList.add(clsRoomOutOfView, clsRoomOutOfViewAbove);
+      if (!closestAbove || room.midline > closestAbove.midline) {
+        closestAbove = room;
+      }
+    } else if (room.midline > BB_roomList.bottom) {
+      room.el.classList.add(clsRoomOutOfView, clsRoomOutOfViewBelow);
+      if (!closestBelow || room.midline < closestBelow.midline) {
+        closestBelow = room;
       }
     }
-
-    return { above, below, visible };
   }
-}
 
-const roomManager = new RoomManager();
+  // Apply closest above/below
+  closestAbove?.el.classList.add(clsRoomClosestAbove);
+  closestBelow?.el.classList.add(clsRoomClosestBelow);
+}
 //#endregion
 
 /**
@@ -444,21 +361,24 @@ function getRoomInfo(element) {
 
 const redrawIndicators = debounce(
   () => {
-    const rooms = roomManager.getRoomsOutOfView();
+    recalculateRooms();
+    const roomsAbove = document.querySelectorAll(cls(clsRoomOutOfViewAbove));
+    const roomsBelow = document.querySelectorAll(cls(clsRoomOutOfViewBelow));
     let unreadCountAbove = 0;
     let unreadMentionAbove = false;
     let unreadCountBelow = 0;
     let unreadMentionBelow = false;
-    for (const room of rooms.above) {
-      const info = getRoomInfo(room.element);
+
+    for (const room of roomsAbove) {
+      const info = getRoomInfo(room);
       unreadCountAbove += info.unreadCount;
       if (info.hasMention) {
         unreadMentionAbove = true;
       }
     }
 
-    for (const room of rooms.below) {
-      const info = getRoomInfo(room.element);
+    for (const room of roomsBelow) {
+      const info = getRoomInfo(room);
       unreadCountBelow += info.unreadCount;
       if (info.hasMention) {
         unreadMentionBelow = true;
@@ -506,20 +426,18 @@ function insertUnreadIndicators() {
   roomList.insertAdjacentElement("afterend", indicatorBottom.host);
 
   indicatorTop.indicator.addEventListener("click", () => {
-    const rooms = roomManager.getRoomsOutOfView();
-    const target = rooms.above.at(-1);
+    const target = document.querySelector(cls(clsRoomClosestAbove));
     if (target) {
-      target.element.scrollIntoView({
+      target.scrollIntoView({
         block: "start",
         behavior: "smooth",
       });
     }
   });
   indicatorBottom.indicator.addEventListener("click", () => {
-    const rooms = roomManager.getRoomsOutOfView();
-    const target = rooms.below.at(0);
+    const target = document.querySelector(cls(clsRoomClosestBelow));
     if (target) {
-      target.element.scrollIntoView({
+      target.scrollIntoView({
         block: "end",
         behavior: "smooth",
       });
@@ -529,27 +447,14 @@ function insertUnreadIndicators() {
 function main() {
   console.debug(LOG_PREFIX, "Started");
   insertUnreadIndicators();
-  roomManager.manageRoomOffsets();
+  recalculateRooms();
   manageIndicators();
+
+  if (DEBUG_VISREP) {
+    PAGE.roomList().classList.add("bbb-debug-visrep");
+  }
 }
 
 window.addEventListener("chat-ready", () => {
   main();
 });
-
-// [
-//   "drakensberg:ready",
-//   "siteInit:ready",
-//   "chat-ready",
-//   "connection-status",
-//   "drakensberg:character-changed",
-//   "app:channel-tab-changed",
-//   "tabs-updated",
-// ].forEach((name) => {
-//   window.addEventListener(name, (event) => {
-//     console.debug("[EVENT DISCOVERY]", name, {
-//       "room list exists?": document.querySelector("#room-list"),
-//       event,
-//     });
-//   });
-// });
