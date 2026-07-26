@@ -124,6 +124,7 @@ function debounce(function_, wait = 100, options = {}) {
 }
 //#endregion
 
+//#region Boilerplate
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -148,13 +149,15 @@ function installStyle(css, origin, filename) {
 }
 
 installStyle(mainCss, "chat-unread-indicator", "main.css");
+//#endregion
 
+//#region Page info, types
 const PAGE = Object.freeze({
   /** @returns {HTMLDivElement} */
   sidebar: () => document.querySelector("#sidebar"),
   /** @returns {HTMLDivElement} */
   roomList: () => document.querySelector("#room-list"),
-  /** @returns {HTMLDivElement[]} */
+  /** @returns {SectionElement[]} */
   roomSections: () => [
     ...document
       .querySelector("#room-list")
@@ -163,6 +166,16 @@ const PAGE = Object.freeze({
       ),
   ],
 });
+
+/**
+ * @typedef {HTMLDivElement} RoomElement
+ */
+
+/**
+ * @typedef {HTMLDivElement} SectionElement
+ */
+
+//#endregion
 
 //#region Indicators
 class UnreadIndicator {
@@ -343,12 +356,15 @@ function recalculateRooms() {
 /**
  * Get information about a room element.
  *
- * @param {HTMLDivElement} element
+ * @param {RoomElement} element
  * @returns Information about the room's mentions and unread count.
  */
 function getRoomInfo(element) {
   const hasUnread = element.classList.contains("has-unread");
   const hasMention = element.classList.contains("has-mention");
+  const isLoveLetter = element.classList.contains("love-letter-room");
+  const isDm =
+
   let unreadCount = 0;
   if (hasUnread) {
     const unreadBadge = element.querySelector(".unread-badge");
