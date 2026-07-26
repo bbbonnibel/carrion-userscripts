@@ -13,7 +13,7 @@ const greasemonkey = require("./lib/greasemonkey.js");
 /**
  * @type {ProjectFile}
  */
-const PROJECT = yaml.readYamlFile(path.join(dir.CWD, "project.yaml"));
+const PROJECT = yaml.readYamlFile(path.join(dir.SRC, "project.yaml"));
 
 const DIST_SCRIPT = path.join(dir.DIST, "script");
 
@@ -38,6 +38,7 @@ async function buildUserscript(folder) {
     version,
     downloadURL: downloadUrl,
     updateURL: downloadUrl,
+    supportURL: PROJECT.issues,
     homepage: PROJECT.homepage,
     icon: PROJECT.icon,
     icon64: PROJECT.icon64,
