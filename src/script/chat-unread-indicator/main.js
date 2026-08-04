@@ -124,6 +124,7 @@ function debounce(function_, wait = 100, options = {}) {
 }
 //#endregion
 
+//#region Boilerplate
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -152,7 +153,7 @@ const PAGE = Object.freeze({
   sidebar: () => document.querySelector("#sidebar"),
   /** @returns {HTMLDivElement} */
   roomList: () => document.querySelector("#room-list"),
-  /** @returns {HTMLDivElement[]} */
+  /** @returns {SectionElement[]} */
   roomSections: () => [
     ...document
       .querySelector("#room-list")
@@ -161,6 +162,16 @@ const PAGE = Object.freeze({
       ),
   ],
 });
+
+/**
+ * @typedef {HTMLDivElement} RoomElement
+ */
+
+/**
+ * @typedef {HTMLDivElement} SectionElement
+ */
+
+//#endregion
 
 //#region Indicators
 class UnreadIndicator {
@@ -258,7 +269,7 @@ const indicatorTop = new UnreadIndicator("top");
 const indicatorBottom = new UnreadIndicator("bottom");
 //#endregion
 
-//#region Room analysis
+//#region Room position analysis
 const clsRoomOutOfView = "bbb-room-out-of-view";
 const clsRoomOutOfViewAbove = "bbb-room-out-of-view-above";
 const clsRoomOutOfViewBelow = "bbb-room-out-of-view-below";
@@ -268,8 +279,8 @@ const clsRoomClosestBelow = "bbb-room-closest-below";
 const cls = (str) => `.${str}`;
 
 /**
- * @typedef {object} RoomMeta
- * @prop {HTMLDivElement} el The room element
+ * @typedef {object} RoomPositionMeta
+ * @prop {RoomElement} el The room element
  * @prop {DOMRect} bb The room bounding box
  * @prop {number} midline The room's vertical middle (halfway between its top and bottom)
  */
@@ -282,9 +293,9 @@ function recalculateRooms() {
   /** The room list's bounding box. */
   const BB_roomList = roomList.getBoundingClientRect();
 
-  /** @type {RoomMeta | undefined} */
+  /** @type {RoomPositionMeta | undefined} */
   let closestAbove;
-  /** @type {RoomMeta | undefined} */
+  /** @type {RoomPositionMeta | undefined} */
   let closestBelow;
 
   // Reset classes.
@@ -302,9 +313,9 @@ function recalculateRooms() {
     });
 
   // Gather data about each room.
-  /** @type {HTMLDivElement[]} */
+  /** @type {RoomElement[]} */
   const roomItems = [...roomList.querySelectorAll(".room-item")];
-  /** @type {RoomMeta[]} */
+  /** @type {RoomPositionMeta[]} */
   const rooms = roomItems.map((el) => {
     const bb = el.getBoundingClientRect();
     const halfHeight = 0.5 * bb.height;
@@ -339,22 +350,59 @@ function recalculateRooms() {
 //#endregion
 
 /**
+ * Get the section that contains a room item.
+ * @param {RoomElement} element
+ * @returns {SectionElement | undefined} The room's containing section, if it has one.
+ */
+function getRoomSection(element) {
+  if (element.classList.contains("love-letter-room")) {
+    return undefined;
+  }
+  const list = element.parentNode;
+  const section = list.parentNode;
+  return section;
+}
+
+/**
  * Get information about a room element.
  *
- * @param {HTMLDivElement} element
+ * @param {RoomElement} element
  * @returns Information about the room's mentions and unread count.
  */
 function getRoomInfo(element) {
-  const hasUnread = element.classList.contains("has-unread");
-  const hasMention = element.classList.contains("has-mention");
+  const unreadBadge = element.querySelector(".unread-badge");
+  const section = getRoomSection(element);
+
+  let hasUnread = element.classList.contains("has-unread");
+  let hasMention = element.classList.contains("has-mention");
+  let isLoveLetter = element.classList.contains("love-letter-room");
+  let isDm = false;
+  if (!isLoveLetter) {
+    if (section.classList.contains("dm-section")) {
+      isDm = true;
+    }
+  }
+
   let unreadCount = 0;
   if (hasUnread) {
-    const unreadBadge = element.querySelector(".unread-badge");
     if (unreadBadge) {
       unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
     }
   }
-  return { hasUnread, hasMention, unreadCount };
+  return {
+    /** Is this the love letter room? */
+    isLoveLetter,
+    /** Is this room a DM? */
+    isDm,
+    /** Does this have unread messages? */
+    hasUnread,
+    /** Does this room have a mention? */
+    hasMention,
+    /** What's the unread count on this room? */
+    unreadCount,
+    /** What's this room's section? (A love letter room won't have one.) */
+    section,
+  };
 }
 
 const redrawIndicators = debounce(
@@ -370,7 +418,7 @@ const redrawIndicators = debounce(
     for (const room of roomsAbove) {
       const info = getRoomInfo(room);
       unreadCountAbove += info.unreadCount;
-      if (info.hasMention) {
+      if (info.hasMention || (info.isDm && info.hasUnread)) {
         unreadMentionAbove = true;
       }
     }
@@ -378,7 +426,7 @@ const redrawIndicators = debounce(
     for (const room of roomsBelow) {
       const info = getRoomInfo(room);
       unreadCountBelow += info.unreadCount;
-      if (info.hasMention) {
+      if (info.hasMention || (info.isDm && info.hasUnread)) {
         unreadMentionBelow = true;
       }
     }
