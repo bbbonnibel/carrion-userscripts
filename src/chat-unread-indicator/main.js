@@ -512,6 +512,9 @@ const redrawIndicators = debounce(
   { immediate: false },
 );
 
+/**
+ * Start managing the unread indicators, by redrawing when specific events occur.
+ */
 function manageIndicators() {
   PAGE.roomList().addEventListener(
     "scroll",
@@ -520,6 +523,17 @@ function manageIndicators() {
     },
     { passive: true },
   );
+
+  PAGE.roomSections().forEach((section) => {
+    const collapsible = section.querySelector(".collapsible");
+    if (collapsible) {
+      const observer = new MutationObserver(() => redrawIndicators());
+      observer.observe(collapsible, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
+  });
 
   ["display-message", "room-left", "tabs-updated", "dm-tabs-changed"].forEach(
     (chatEventName) => {
