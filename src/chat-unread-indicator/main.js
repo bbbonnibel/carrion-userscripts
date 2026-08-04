@@ -288,23 +288,46 @@ const clsRoomClosestBelow = "bbb-room-closest-below";
 const cls = (str) => `.${str}`;
 
 /**
- * @typedef {object} RoomPositionMeta
- * @prop {RoomElement} el The room element
- * @prop {DOMRect} bb The room bounding box
- * @prop {number} midline The room's vertical middle (halfway between its top and bottom)
+ * @typedef {object} PositionMeta
+ * @prop {RoomElement} element The room or section element
+ * @prop {DOMRect} bb The bounding box
+ * @prop {number} midline The vertical middle (halfway between its top and bottom)
+ * @prop {Boolean} visible Whether the room or section is even visible
  */
+
+/**
+ * Get position meta for a room or section.
+ *
+ * @param {RoomElement | SectionElement} element The room or section to examine
+ * @returns {PositionMeta}
+ */
+function getPositionMeta(element) {
+  const bb = element.getBoundingClientRect();
+  const halfHeight = 0.5 * bb.height;
+  const midline = bb.top + halfHeight;
+
+  return {
+    visible: bb.height > 0,
+    element,
+    bb,
+    midline,
+  };
+}
 
 /**
  * Check each room to see if it's out of view, and label them appropriately.
  */
 function recalculateRooms() {
   const roomList = PAGE.roomList();
+  const sections = PAGE.roomSections();
   /** The room list's bounding box. */
   const BB_roomList = roomList.getBoundingClientRect();
+  /** @type {RoomElement[]} */
+  const roomItems = [...roomList.querySelectorAll(".room-item")];
 
-  /** @type {RoomPositionMeta | undefined} */
+  /** @type {PositionMeta | undefined} */
   let closestAbove;
-  /** @type {RoomPositionMeta | undefined} */
+  /** @type {PositionMeta | undefined} */
   let closestBelow;
 
   // Reset classes.
@@ -321,31 +344,26 @@ function recalculateRooms() {
       element.classList.remove(...removeClasses);
     });
 
-  // Gather data about each room.
-  /** @type {RoomElement[]} */
-  const roomItems = [...roomList.querySelectorAll(".room-item")];
-  /** @type {RoomPositionMeta[]} */
-  const rooms = roomItems.map((el) => {
-    const bb = el.getBoundingClientRect();
-    const halfHeight = 0.5 * bb.height;
-    const midline = bb.top + halfHeight;
-
-    return {
-      el,
-      bb,
-      midline,
-    };
+  const roomMeta = roomItems.map(getPositionMeta);
+  const collapsedSections = sections.filter((section) => {
+    const info = getSectionInfo(section);
+    return info.collapsed;
   });
+  const sectionMeta = collapsedSections.map(getPositionMeta);
 
-  // Apply above/below to rooms above/eblow
-  for (const room of rooms) {
+  // Apply above/below to rooms (and collapsed sections) above/eblow
+  for (const room of [...roomMeta, ...sectionMeta]) {
+    if (!room.visible) {
+      continue;
+    }
+
     if (room.midline < BB_roomList.top) {
-      room.el.classList.add(clsRoomOutOfView, clsRoomOutOfViewAbove);
+      room.element.classList.add(clsRoomOutOfView, clsRoomOutOfViewAbove);
       if (!closestAbove || room.midline > closestAbove.midline) {
         closestAbove = room;
       }
     } else if (room.midline > BB_roomList.bottom) {
-      room.el.classList.add(clsRoomOutOfView, clsRoomOutOfViewBelow);
+      room.element.classList.add(clsRoomOutOfView, clsRoomOutOfViewBelow);
       if (!closestBelow || room.midline < closestBelow.midline) {
         closestBelow = room;
       }
@@ -353,8 +371,8 @@ function recalculateRooms() {
   }
 
   // Apply closest above/below
-  closestAbove?.el.classList.add(clsRoomClosestAbove);
-  closestBelow?.el.classList.add(clsRoomClosestBelow);
+  closestAbove?.element.classList.add(clsRoomClosestAbove);
+  closestBelow?.element.classList.add(clsRoomClosestBelow);
 }
 //#endregion
 
