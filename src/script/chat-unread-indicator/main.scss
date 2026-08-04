@@ -131,11 +131,13 @@ $down-arrow-5: "🢃";
 }
 
 .bbb-debug-visrep {
-  .bbb-room-out-of-view-above {
+  .room-item.bbb-room-out-of-view-above,
+  [data-section-id].room-item.bbb-room-out-of-view-above .collapsible {
     background: darkred;
   }
 
-  .bbb-room-out-of-view-below {
+  .room-item.bbb-room-out-of-view-below,
+  [data-section-id].room-item.bbb-room-out-of-view-below .collapsible {
     background: darkblue;
   }
 }
