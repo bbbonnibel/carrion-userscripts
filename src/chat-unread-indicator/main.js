@@ -384,7 +384,6 @@ function getRoomInfo(element) {
   if (!isLoveLetter) {
     if (section.classList.contains("dm-section")) {
       isDm = true;
-      hasMention = true;
     }
   }
 
@@ -423,7 +422,7 @@ const redrawIndicators = debounce(
     for (const room of roomsAbove) {
       const info = getRoomInfo(room);
       unreadCountAbove += info.unreadCount;
-      if (info.hasMention) {
+      if (info.hasMention || (info.isDm && info.hasUnread)) {
         unreadMentionAbove = true;
       }
     }
@@ -431,7 +430,7 @@ const redrawIndicators = debounce(
     for (const room of roomsBelow) {
       const info = getRoomInfo(room);
       unreadCountBelow += info.unreadCount;
-      if (info.hasMention) {
+      if (info.hasMention || (info.isDm && info.hasUnread)) {
         unreadMentionBelow = true;
       }
     }
