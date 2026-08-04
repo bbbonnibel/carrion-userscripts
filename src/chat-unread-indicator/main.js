@@ -175,6 +175,11 @@ const PAGE = Object.freeze({
  * @typedef {HTMLDivElement} SectionElement
  */
 
+/**
+ * @typedef {"core"|"user"|"dm"} SectionType
+ * Is this section the default channels ("core"), public channels ("user"), or DMs ("dm")?
+ */
+
 //#endregion
 
 //#region Indicators
@@ -368,31 +373,72 @@ function getRoomSection(element) {
 }
 
 /**
+ * Get the section type of a section.
+ *
+ * @param {SectionElement} element The section element to examine
+ * @returns {SectionType | undefined}
+ */
+function getSectionType(element) {
+  switch (element.getAttribute("data-section-id")) {
+    case "public-channels":
+      return "core";
+    case "user-channels":
+      return "user";
+    case "dms":
+      return "dm";
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Get information about a section element.
+ *
+ * @param {SectionElement} element The section element to examine
+ */
+function getSectionInfo(element) {
+  const type = getSectionType(element);
+  const collapsed = Boolean(element.querySelector(".collapsible.collapsed"));
+  const unreadBadge = element.querySelector(".section-unread-badge");
+  let unreadCount = 0;
+  if (unreadBadge) {
+    unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
+  }
+  const hasUnread = unreadCount > 0;
+
+  return {
+    type,
+    collapsed,
+    unreadCount,
+    hasUnread,
+  };
+}
+
+/**
  * Get information about a room element.
  *
- * @param {RoomElement} element
+ * @param {RoomElement} element The room element to examine
  * @returns Information about the room's mentions and unread count.
  */
 function getRoomInfo(element) {
   const unreadBadge = element.querySelector(".unread-badge");
   const section = getRoomSection(element);
 
-  let hasUnread = element.classList.contains("has-unread");
-  let hasMention = element.classList.contains("has-mention");
-  let isLoveLetter = element.classList.contains("love-letter-room");
+  // const hasUnread = element.classList.contains("has-unread");
+  const hasMention = element.classList.contains("has-mention");
+  const isLoveLetter = element.classList.contains("love-letter-room");
   let isDm = false;
   if (!isLoveLetter) {
-    if (section.classList.contains("dm-section")) {
-      isDm = true;
-    }
+    const sectionType = getSectionType(section);
+    isDm = sectionType === "dm";
   }
 
   let unreadCount = 0;
-  if (hasUnread) {
-    if (unreadBadge) {
-      unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
-    }
+  if (unreadBadge) {
+    unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
   }
+  const hasUnread = unreadCount > 0;
+
   return {
     /** Is this the love letter room? */
     isLoveLetter,
