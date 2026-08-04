@@ -175,6 +175,11 @@ const PAGE = Object.freeze({
  * @typedef {HTMLDivElement} SectionElement
  */
 
+/**
+ * @typedef {"core"|"user"|"dm"} SectionType
+ * Is this section the default channels ("core"), public channels ("user"), or DMs ("dm")?
+ */
+
 //#endregion
 
 //#region Indicators
@@ -283,23 +288,46 @@ const clsRoomClosestBelow = "bbb-room-closest-below";
 const cls = (str) => `.${str}`;
 
 /**
- * @typedef {object} RoomPositionMeta
- * @prop {RoomElement} el The room element
- * @prop {DOMRect} bb The room bounding box
- * @prop {number} midline The room's vertical middle (halfway between its top and bottom)
+ * @typedef {object} PositionMeta
+ * @prop {RoomElement} element The room or section element
+ * @prop {DOMRect} bb The bounding box
+ * @prop {number} midline The vertical middle (halfway between its top and bottom)
+ * @prop {Boolean} visible Whether the room or section is even visible
  */
+
+/**
+ * Get position meta for a room or section.
+ *
+ * @param {RoomElement | SectionElement} element The room or section to examine
+ * @returns {PositionMeta}
+ */
+function getPositionMeta(element) {
+  const bb = element.getBoundingClientRect();
+  const halfHeight = 0.5 * bb.height;
+  const midline = bb.top + halfHeight;
+
+  return {
+    visible: bb.height > 0,
+    element,
+    bb,
+    midline,
+  };
+}
 
 /**
  * Check each room to see if it's out of view, and label them appropriately.
  */
 function recalculateRooms() {
   const roomList = PAGE.roomList();
+  const sections = PAGE.roomSections();
   /** The room list's bounding box. */
   const BB_roomList = roomList.getBoundingClientRect();
+  /** @type {RoomElement[]} */
+  const roomItems = [...roomList.querySelectorAll(".room-item")];
 
-  /** @type {RoomPositionMeta | undefined} */
+  /** @type {PositionMeta | undefined} */
   let closestAbove;
-  /** @type {RoomPositionMeta | undefined} */
+  /** @type {PositionMeta | undefined} */
   let closestBelow;
 
   // Reset classes.
@@ -316,31 +344,26 @@ function recalculateRooms() {
       element.classList.remove(...removeClasses);
     });
 
-  // Gather data about each room.
-  /** @type {RoomElement[]} */
-  const roomItems = [...roomList.querySelectorAll(".room-item")];
-  /** @type {RoomPositionMeta[]} */
-  const rooms = roomItems.map((el) => {
-    const bb = el.getBoundingClientRect();
-    const halfHeight = 0.5 * bb.height;
-    const midline = bb.top + halfHeight;
-
-    return {
-      el,
-      bb,
-      midline,
-    };
+  const roomMeta = roomItems.map(getPositionMeta);
+  const collapsedSections = sections.filter((section) => {
+    const info = getSectionInfo(section);
+    return info.collapsed;
   });
+  const sectionMeta = collapsedSections.map(getPositionMeta);
 
-  // Apply above/below to rooms above/eblow
-  for (const room of rooms) {
+  // Apply above/below to rooms (and collapsed sections) above/eblow
+  for (const room of [...roomMeta, ...sectionMeta]) {
+    if (!room.visible) {
+      continue;
+    }
+
     if (room.midline < BB_roomList.top) {
-      room.el.classList.add(clsRoomOutOfView, clsRoomOutOfViewAbove);
+      room.element.classList.add(clsRoomOutOfView, clsRoomOutOfViewAbove);
       if (!closestAbove || room.midline > closestAbove.midline) {
         closestAbove = room;
       }
     } else if (room.midline > BB_roomList.bottom) {
-      room.el.classList.add(clsRoomOutOfView, clsRoomOutOfViewBelow);
+      room.element.classList.add(clsRoomOutOfView, clsRoomOutOfViewBelow);
       if (!closestBelow || room.midline < closestBelow.midline) {
         closestBelow = room;
       }
@@ -348,8 +371,8 @@ function recalculateRooms() {
   }
 
   // Apply closest above/below
-  closestAbove?.el.classList.add(clsRoomClosestAbove);
-  closestBelow?.el.classList.add(clsRoomClosestBelow);
+  closestAbove?.element.classList.add(clsRoomClosestAbove);
+  closestBelow?.element.classList.add(clsRoomClosestBelow);
 }
 //#endregion
 
@@ -368,31 +391,72 @@ function getRoomSection(element) {
 }
 
 /**
+ * Get the section type of a section.
+ *
+ * @param {SectionElement} element The section element to examine
+ * @returns {SectionType | undefined}
+ */
+function getSectionType(element) {
+  switch (element.getAttribute("data-section-id")) {
+    case "public-channels":
+      return "core";
+    case "user-channels":
+      return "user";
+    case "dms":
+      return "dm";
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Get information about a section element.
+ *
+ * @param {SectionElement} element The section element to examine
+ */
+function getSectionInfo(element) {
+  const type = getSectionType(element);
+  const collapsed = Boolean(element.querySelector(".collapsible.collapsed"));
+  const unreadBadge = element.querySelector(".section-unread-badge");
+  let unreadCount = 0;
+  if (unreadBadge) {
+    unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
+  }
+  const hasUnread = unreadCount > 0;
+
+  return {
+    type,
+    collapsed,
+    unreadCount,
+    hasUnread,
+  };
+}
+
+/**
  * Get information about a room element.
  *
- * @param {RoomElement} element
+ * @param {RoomElement} element The room element to examine
  * @returns Information about the room's mentions and unread count.
  */
 function getRoomInfo(element) {
   const unreadBadge = element.querySelector(".unread-badge");
   const section = getRoomSection(element);
 
-  let hasUnread = element.classList.contains("has-unread");
-  let hasMention = element.classList.contains("has-mention");
-  let isLoveLetter = element.classList.contains("love-letter-room");
+  // const hasUnread = element.classList.contains("has-unread");
+  const hasMention = element.classList.contains("has-mention");
+  const isLoveLetter = element.classList.contains("love-letter-room");
   let isDm = false;
   if (!isLoveLetter) {
-    if (section.classList.contains("dm-section")) {
-      isDm = true;
-    }
+    const sectionType = getSectionType(section);
+    isDm = sectionType === "dm";
   }
 
   let unreadCount = 0;
-  if (hasUnread) {
-    if (unreadBadge) {
-      unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
-    }
+  if (unreadBadge) {
+    unreadCount = parseInt(unreadBadge.textContent.trim(), 10);
   }
+  const hasUnread = unreadCount > 0;
+
   return {
     /** Is this the love letter room? */
     isLoveLetter,
@@ -448,6 +512,9 @@ const redrawIndicators = debounce(
   { immediate: false },
 );
 
+/**
+ * Start managing the unread indicators, by redrawing when specific events occur.
+ */
 function manageIndicators() {
   PAGE.roomList().addEventListener(
     "scroll",
@@ -456,6 +523,17 @@ function manageIndicators() {
     },
     { passive: true },
   );
+
+  PAGE.roomSections().forEach((section) => {
+    const collapsible = section.querySelector(".collapsible");
+    if (collapsible) {
+      const observer = new MutationObserver(() => redrawIndicators());
+      observer.observe(collapsible, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
+  });
 
   ["display-message", "room-left", "tabs-updated", "dm-tabs-changed"].forEach(
     (chatEventName) => {
