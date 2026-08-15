@@ -555,12 +555,17 @@ function insertUnreadIndicators() {
 
   indicatorTop.indicator.addEventListener("click", () => {
     const target = document.querySelector(cls(clsRoomClosestAbove));
-    if (target) {
-      target.scrollIntoView({
-        block: "start",
-        behavior: "smooth",
-      });
+    if (!target) {
+      return;
     }
+    const roomTop = target.getBoundingClientRect().top;
+    const listTop = roomList.getClientBoundingRect().top;
+    const scrollDiff = roomTop - listTop;
+    const margin = 200;
+    roomList.scrollBy({
+      top: scrollDiff - margin,
+      behavior: "smooth",
+    });
   });
   indicatorBottom.indicator.addEventListener("click", () => {
     const target = document.querySelector(cls(clsRoomClosestBelow));
@@ -570,6 +575,17 @@ function insertUnreadIndicators() {
         behavior: "smooth",
       });
     }
+    if (!target) {
+      return;
+    }
+    const roomBottom = target.getBoundingClientRect().bottom;
+    const listBottom = roomList.getClientBoundingRect().bottom;
+    const scrollDiff = roomBottom - listBottom;
+    const margin = 200;
+    roomList.scrollBy({
+      top: scrollDiff + margin,
+      behavior: "smooth",
+    });
   });
 }
 function main() {
