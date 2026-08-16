@@ -2,7 +2,7 @@
   position: absolute;
   background: #1a1a1a;
   border: 1px solid #3a3a3a;
-  padding: 0.5rem 0.65rem;
+  padding: 4px;
 
   &:not(.open) {
     display: none;
@@ -17,6 +17,7 @@
 
   ol {
     display: flex;
+    flex-flow: column;
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -26,5 +27,12 @@
   li {
     font-size: 14px;
     color: #848484;
+  }
+
+  .li-emoji {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2px 4px;
   }
 }

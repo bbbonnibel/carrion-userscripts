@@ -73,8 +73,9 @@ async function loadEmojis() {
 
     EMOJIS.all[emoji.emoji] = emoji;
     for (const shortcode of emoji.shortcodes) {
-      putEmoji(EMOJIS.prefix2, shortcode.slice(0, 2), emoji.emoji);
-      putEmoji(EMOJIS.prefix3, shortcode.slice(0, 3), emoji.emoji);
+      const shortDef = { emoji: emoji.emoji, shortcode: shortcode };
+      putEmoji(EMOJIS.prefix2, shortcode.slice(0, 2), shortDef);
+      putEmoji(EMOJIS.prefix3, shortcode.slice(0, 3), shortDef);
     }
   }
 }
