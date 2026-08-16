@@ -55,6 +55,9 @@ function assertIntegrity(json) {
 async function loadEmojis() {
   const response = await fetch("https://www.emoji.family/api/emojis", {
     cache: "default",
+    headers: {
+      Accept: "application/json",
+    },
   });
   /** @type {EmojiFamily.Emoji} */
   const json = await response.json();
