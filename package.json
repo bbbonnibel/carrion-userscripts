@@ -16,6 +16,7 @@
   "scripts": {
     "create": "node ./build/create.js",
     "build": "node ./build/main.js",
+    "tasks": "node ./scripts/update-emojis.js",
     "watch": "npx nodemon  --watch src --watch docs --watch build --ext 'js,css,scss,yaml,html' --exec 'node' ./build/main.js",
     "lint": "eslint",
     "prettier": "prettier --check ./src/**/*.{js,scss,yaml}"

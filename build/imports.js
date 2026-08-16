@@ -25,13 +25,20 @@ async function resolveImportReference(filepath) {
     if (filepath.endsWith(".scss")) {
       RESOLUTION_LOGGING && console.log("Resolving as a SCSS file");
       content = await css.compileSassFile(filepath);
+      content = escapeImportString(content);
+    } else if (filepath.endsWith(".json")) {
+      RESOLUTION_LOGGING && console.log("Resolving as a JSON file");
+      content = fs.readFileSync(filepath, {
+        encoding: "utf-8",
+      });
     } else {
       RESOLUTION_LOGGING && console.log("Resolving as plaintext");
       content = fs.readFileSync(filepath, {
         encoding: "utf-8",
       });
+      content = escapeImportString(content);
     }
-    return escapeImportString(content);
+    return content;
   } catch (ex) {
     console.error("Failed to resolve file", filepath, "for reason:", ex);
     throw ex;

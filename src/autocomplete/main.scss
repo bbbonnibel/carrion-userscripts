@@ -1,0 +1,30 @@
+.bbb-chat-autocomplete {
+  position: absolute;
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  padding: 0.5rem 0.65rem;
+
+  &:not(.open) {
+    display: none;
+  }
+
+  .input-area:has(&.open) {
+    #message-input {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+
+  ol {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    gap: 4px;
+  }
+
+  li {
+    font-size: 14px;
+    color: #848484;
+  }
+}
