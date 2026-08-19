@@ -30,9 +30,11 @@
   }
 
   .li-emoji {
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     padding: 2px 4px;
+    gap: 8px;
   }
 }

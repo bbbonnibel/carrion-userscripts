@@ -106,7 +106,112 @@ function watchAutocompletePosition() {
 }
 //#endregion
 
-//#region Textarea
+//#region Parse command
+/**
+ * Parse the current command.
+ * @param {HTMLTextAreaElement} messageInput
+ * @param {Words} words
+ */
+function parseCommand(messageInput, words) {
+  // if ()
+}
+//#endregion
+
+//#region Parse emoji
+/**
+ *
+ * @param {string} original The original piece of text to modify
+ * @param {string} insert The word to insert into that text
+ * @param {string} span.start The start of the span of text to replace in the original.
+ * @param {string} span.end The end of the span of text to replace in the original.
+ */
+function replaceWord(original, insert, span) {
+  const before = original.slice(0, span.start);
+  const after = original.slice(span.end);
+  return [before, insert, after].join("");
+}
+
+function pickEmoji(emoji, text, word) {}
+
+/**
+ *
+ * @param {EmojiDefinition} emoji The emoji to make an option for.
+ */
+function makeEmojiAutocompleteOption(emoji) {
+  return template(`
+    <li class="li-emoji">
+      <span class="emoji">${emoji.emoji}</span>
+      <span class="label">${emoji.default}</span>
+    </li>
+  `);
+}
+
+/**
+ * Get emoji options that match a piece of text.
+ *
+ * @param {string} text The word we're looking at
+ * @returns {Emoji[]} Emojis that match the text
+ */
+function getEmojiOptions(text) {
+  if (text.length < 2) {
+    return [];
+  }
+  /** @type {EmojiShortDefinition[]} */
+  let options = [];
+  if (text.length === 2) {
+    options = EMOJIS.prefix2[text] ?? [];
+  } else if (text.length >= 3) {
+    options = EMOJIS.prefix3[text.slice(0, 3)] ?? [];
+  }
+  options = options.filter(
+    (option) =>
+      option.shortcode.startsWith(text) ||
+      option.shortcode.replaceAll("-", "").startsWith(text),
+  );
+  return options
+    .slice(0, 10)
+    .sort((a, b) => a.shortcode.length - b.shortcode.length)
+    .map((o) => EMOJIS.all[o.emoji]);
+}
+
+/**
+ * Parse the current emoji, if any.
+ * @param {HTMLTextAreaElement} messageInput
+ * @param {Words} words
+ */
+function parseEmoji(messageInput, words) {
+  if (messageInput.selectionStart !== messageInput.selectionEnd) {
+    // The user is actually selecting text, so let's not do any emoji autocomplete.
+    return;
+  }
+  const cursorPosition = messageInput.selectionEnd;
+  const emojiWords = words
+    .filter((w) => w.segment.startsWith(":")) // begins with emoji marker
+    .filter((w) => !w.segment.startsWith("::")) // details marker
+    .filter((w) => !w.segment.endsWith(":")); // not a complete emoji
+  // The current word, *if* it's an emoji.
+  const currentWord = emojiWords.find(
+    (w) => cursorPosition >= w.start && cursorPosition <= w.end,
+  );
+  if (!currentWord) {
+    return;
+  }
+
+  const options = getEmojiOptions(currentWord.segment);
+  if (options.length > 0) {
+    autocomplete.show();
+  }
+  options.forEach((option) => {
+    const li = makeEmojiAutocompleteOption(option);
+    autocomplete.list.appendChild(li);
+    li.addEventListener("click", () => {
+      pickEmoji(messageInput, currentWord, option);
+    });
+  });
+}
+//#endregion
+
+//#region Parse message
 /**
  * @typedef {object} Word
  * @prop {string} segment The word itself
@@ -136,84 +241,6 @@ function getWords(text) {
     return { segment, start, end };
   });
   return words;
-}
-
-/**
- * Parse the current command.
- * @param {HTMLTextAreaElement} messageInput
- * @param {Words} words
- */
-function parseCommand(messageInput, words) {
-  // if ()
-}
-
-/**
- *
- * @param {EmojiDefinition} emoji The emoji to make an option for.
- */
-function makeEmojiAutocompleteOption(emoji) {
-  return template(`
-    <li class="li-emoji">
-      <span class="emoji">${emoji.emoji}</span>
-      <span class="label">${emoji.shortcodes[0]}</span>
-    </li>
-  `);
-}
-
-/**
- * Get emoji options that match a piece of text.
- *
- * @param {string} text The word we're looking at
- * @returns {Emoji[]} Emojis that match the text
- */
-function getEmojiOptions(text) {
-  if (text.length < 2) {
-    return [];
-  }
-  /** @type {EmojiShortDefinition[]} */
-  let options = [];
-  if (text.length === 2) {
-    options = EMOJIS.prefix2[text] ?? [];
-  } else if (text.length >= 3) {
-    options = EMOJIS.prefix3[text.slice(0, 3)] ?? [];
-  }
-  options = options.filter(
-    (option) =>
-      option.shortcode.startsWith(text) ||
-      option.shortcode.replaceAll("-", "").startsWith(text),
-  );
-  return options.map((o) => EMOJIS.all[o.emoji]);
-}
-
-/**
- * Parse the current emoji, if any.
- * @param {HTMLTextAreaElement} messageInput
- * @param {Words} words
- */
-function parseEmoji(messageInput, words) {
-  if (messageInput.selectionStart !== messageInput.selectionEnd) {
-    return;
-  }
-  const cursorPosition = messageInput.selectionEnd;
-  const emojis = words
-    .filter((w) => w.segment.startsWith(":")) // begins with emoji marker
-    .filter((w) => !w.segment.startsWith("::")) // details marker
-    .filter((w) => !w.segment.endsWith(":")); // not a complete emoji
-  const currentEmoji = emojis.find(
-    (w) => cursorPosition >= w.start && cursorPosition <= w.end,
-  );
-  if (!currentEmoji) {
-    return;
-  }
-
-  const options = getEmojiOptions(currentEmoji.segment);
-  if (options.length > 0) {
-    autocomplete.show();
-  }
-  options.forEach((option) => {
-    const li = makeEmojiAutocompleteOption(option);
-    autocomplete.list.appendChild(li);
-  });
 }
 
 function parseMessageInput() {

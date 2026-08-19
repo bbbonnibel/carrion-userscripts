@@ -51,6 +51,37 @@ function assertIntegrity(json) {
   }
 }
 
+/**
+ * Convert an external emoji to a local emoji definition.
+ *
+ * @param {EmojiFamily.Emoji} jsonEmoji The external emoji to convert
+ * @returns {EmojiDefinition} The locally defined emoji
+ */
+function convertToEmoji(jsonEmoji) {
+  /** @type {EmojiDefinition} */
+  const emoji = {
+    emoji: jsonEmoji.emoji,
+    default: jsonEmoji.shortcodes[0],
+    hexcode: jsonEmoji.hexcode,
+    shortcodes: jsonEmoji.shortcodes,
+  };
+  function updateShortcodes(emoji, shortcodes) {
+    emoji.shortcodes = shortcodes;
+    emoji.default = shortcodes[0];
+  }
+  switch (emoji.emoji) {
+    case "💥":
+      updateShortcodes(emoji, [
+        ":bang:",
+        ":boom:",
+        ":explosion:",
+        ":collison:",
+      ]);
+      break;
+  }
+  return emoji;
+}
+
 /** Load emojis into the emoji record. */
 async function loadEmojis() {
   const response = await fetch("https://www.emoji.family/api/emojis", {
@@ -64,12 +95,7 @@ async function loadEmojis() {
   assertIntegrity(json);
 
   for (const item of json) {
-    /** @type {Emoji} (from autocomplete/main.js) */
-    const emoji = {
-      emoji: item.emoji,
-      hexcode: item.hexcode,
-      shortcodes: item.shortcodes,
-    };
+    const emoji = convertToEmoji(item);
 
     EMOJIS.all[emoji.emoji] = emoji;
     for (const shortcode of emoji.shortcodes) {
