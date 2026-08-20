@@ -40,6 +40,7 @@ installStyle(mainCss, "autocomplete", "main.css");
 const COMMANDS = [
   {
     command: "/invite",
+    aliases: ["/link"],
     annotation: `Get the invite link for this channel`,
   },
   {
@@ -57,7 +58,7 @@ const COMMANDS = [
   {
     command: "/help",
     fulltext: `/help [command]`,
-    annotation: `Show available commands or help for a specific command`,
+    annotation: `Show available commands (/help) or help for a specific command`,
   },
   {
     command: "/purge",
@@ -126,7 +127,7 @@ const COMMANDS = [
   },
   {
     command: "/modmute",
-    fulltext: `/modmute "name" <duration|perm> [reason]`,
+    fulltext: `/modmute "name" [duration|perm] [reason]`,
     annotation: `Site-wide mute that blocks public chat. Duration: 5m, 2h, 1d, 3d (janitor max), 30d, or "perm" (mod+ only). Janitors capped at 72h. Append --account to apply across all alts. Mod-tier only.`,
   },
   {
@@ -150,9 +151,10 @@ const COMMANDS = [
 const EMOJIS = $import("../data/emojis.json");
 //#endregion
 
-//#region Words
+//#region Words and text
 /**
  * @typedef {object} Word
+ * @prop {number} index The word's index. 0 is the first word, 1 the second, etc.
  * @prop {string} segment The word itself
  * @prop {number} start The start index within the text
  * @prop {number} end The end index within the text
@@ -168,16 +170,35 @@ const EMOJIS = $import("../data/emojis.json");
  */
 function getWords(text) {
   const wordRegex = /(?<=(^|\s))(.+?)(?=($|\s))/g;
-  const words = [...text.matchAll(wordRegex)].map((match) => {
+  const words = [...text.matchAll(wordRegex)].map((match, index) => {
     /** @type {string} */
     const segment = match[0];
     /** @type {number} */
     const start = match.index;
     const end = start + segment.length;
-    return { segment, start, end };
+    return { index, segment, start, end };
   });
   return words;
 }
+
+/**
+ * @typedef {object} Span A range between two numbers.
+ * @prop {number} start
+ * @prop {number} end
+ */
+
+/**
+ *
+ * @param {string} original The original piece of text to modify
+ * @param {string} insert The word to insert into that text
+ * @param {(Word | Span)} span The span of text to replace in the original. You can pass in a Word here.
+ */
+function replaceWord(original, insert, span) {
+  const before = original.slice(0, span.start);
+  const after = original.slice(span.end);
+  return [before, insert, after].join("");
+}
+
 //#endregion
 
 //#region Message input management
@@ -250,11 +271,25 @@ const messageInput = new MessageInputManager();
 //#region Autocomplete
 class Autocomplete {
   constructor() {
-    /** @type {HTMLDivElement} */
+    /**
+     * The autocomplete element itself.
+     * @type {HTMLDivElement}
+     */
     this.element = template(`<div class="bbb-chat-autocomplete"></div>`);
-    /** @type {HTMLOListElement} */
-    this.list = template(`<ol></ol>`);
+    /**
+     * The list of autocomplete options.
+     * @type {HTMLOListElement}
+     */
+    this.list = template(`<ol class="options"></ol>`);
+    /**
+     * The a container for housing the current established command.
+     * @type {HTMLDivElement}
+     */
+    this.currentCommand = template(
+      `<div class="current-command-container"></div>`,
+    );
     this.element.appendChild(this.list);
+    this.element.appendChild(this.currentCommand);
   }
 
   show() {
@@ -267,6 +302,7 @@ class Autocomplete {
 
   clear() {
     this.list.innerHTML = "";
+    this.currentCommand.innerHTML = "";
     this.hide();
   }
 }
@@ -275,9 +311,6 @@ const autocomplete = new Autocomplete();
 function insertAutocomplete() {
   const inputArea = messageInput.inputArea;
   inputArea.appendChild(autocomplete.element);
-  autocomplete.list.appendChild(
-    template(`<li><span>autocomplete here</span></li>`),
-  );
 }
 
 function updateAutocompletePosition() {
@@ -308,27 +341,39 @@ function watchAutocompletePosition() {
 
 //#region Parse command
 /**
+ * Parse the filled command that has already been locked in at the start of this message.
+ */
+function parseFilledCommand() {
+  const firstWord = messageInput.words[0];
+  if (firstWord.start > 0 || !firstWord.segment.startsWith("/")) {
+    // Not a command.
+    return;
+  }
+  const command = COMMANDS.find((c) => c.command === firstWord);
+  if (!command) {
+    return;
+  }
+  const displayText = command.fulltext ?? command.command;
+  const element = template(`<div class="current-command">${displayText}</div>`);
+  autocomplete.currentCommand.appendChild(element);
+}
+
+/**
  * Parse the current command.
  */
 function parseCommand() {
-  // if ()
+  if (messageInput.currentWord.index > 0) {
+    // If the first word matches a command, that command is locked in.
+    parseFilledCommand();
+  }
+
+  if (messageInput.currentWord.index === 0) {
+    // Autocomplete the command.
+  }
 }
 //#endregion
 
 //#region Parse emoji
-/**
- *
- * @param {string} original The original piece of text to modify
- * @param {string} insert The word to insert into that text
- * @param {string} span.start The start of the span of text to replace in the original.
- * @param {string} span.end The end of the span of text to replace in the original.
- */
-function replaceWord(original, insert, span) {
-  const before = original.slice(0, span.start);
-  const after = original.slice(span.end);
-  return [before, insert, after].join("");
-}
-
 /**
  * Pick an emoji from autocomplete.
  *
@@ -338,12 +383,9 @@ function replaceWord(original, insert, span) {
  * @param {EmojiDefinition} emojiDef The emoji picked to autocomplete that word.
  */
 function pickEmoji(word, emojiDef) {
-  const value = messageInput.input.value;
+  const original = messageInput.input.value;
   const emoji = emojiDef.emoji;
-  const replacement = replaceWord(value, emoji, {
-    start: word.start,
-    end: word.end,
-  });
+  const replacement = replaceWord(original, emoji, word);
   messageInput.input.value = replacement;
   messageInput.setSelectionRange(word.start + emoji.length);
 }
