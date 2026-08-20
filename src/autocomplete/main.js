@@ -281,14 +281,13 @@ function parseMessageInput() {
 
 function watchMessageInput() {
   const messageInput = PAGE.messageInput();
+  const options = { passive: true };
+  messageInput.addEventListener("blur", () => autocomplete.clear(), options);
+  messageInput.addEventListener("focus", () => parseMessageInput(), options);
   messageInput.addEventListener(
     "selectionchange",
-    () => {
-      parseMessageInput();
-    },
-    {
-      passive: true,
-    },
+    () => parseMessageInput(),
+    options,
   );
 }
 //#endregion
