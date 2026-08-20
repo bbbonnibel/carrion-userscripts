@@ -131,7 +131,25 @@ function replaceWord(original, insert, span) {
   return [before, insert, after].join("");
 }
 
-function pickEmoji(emoji, text, word) {}
+/**
+ * Pick an emoji from autocomplete.
+ *
+ * This will modify the message input by replacing the given word with the autocompleted emoji.
+ *
+ * @param {HTMLTextAreaElement} messageInput The message input being modified
+ * @param {Word} word The current word
+ * @param {EmojiDefinition} emojiDef The emoji picked to autocomplete that word.
+ */
+function pickEmoji(messageInput, word, emojiDef) {
+  const value = messageInput.value;
+  const emoji = emojiDef.emoji;
+  const replacement = replaceWord(value, emoji, {
+    start: word.start,
+    end: word.end,
+  });
+  messageInput.value = replacement;
+  messageInput.setSelectionRange(word.start + emoji.length);
+}
 
 /**
  *
