@@ -32,7 +32,8 @@ installStyle(mainCss, "autocomplete", "main.css");
 /**
  * @typedef {object} CommandDefinition
  * @prop {string} command The command text, including slash.
- * @prop {[fulltext]} fulltext The full text of the command including parameters.
+ * @prop {string[]} [aliases] A possible list of aliases for the comamnd.
+ * @prop {string} [fulltext] The full text of the command including parameters.
  * @prop {string} annotation A human-friendly explanation of the command.
  */
 
@@ -266,6 +267,19 @@ class MessageInputManager {
 }
 
 const messageInput = new MessageInputManager();
+
+/**
+ * Replace a word in the entered message, then put the cursor at the end of that word.
+ *
+ * @param {Word} word The word to replace
+ * @param {string} replacement The replacement word to impose.
+ */
+function replaceWordInMessage(word, replacement) {
+  const original = messageInput.input.value;
+  const newValue = replaceWord(original, replacement, word);
+  messageInput.input.value = newValue;
+  messageInput.setSelectionRange(word.start + replacement.length);
+}
 //#endregion
 
 //#region Autocomplete
@@ -359,16 +373,70 @@ function parseFilledCommand() {
 }
 
 /**
+ * Pick a command to autocomplete the first word.
+ * @param {CommandDefinition} command The command to autocomplete.
+ */
+function pickCommand(command) {
+  const word = messageInput.words[0];
+  // Add a space in the replacement so we don't keep offering autocomplete.
+  replaceWordInMessage(word, command.command + " ");
+}
+
+/**
+ * Make an autocomplete option for a command.
+ *
+ * @param {CommandDefinition} command The command to make an option for.
+ */
+function makeCommandAutocompleteOption(command) {
+  return template(`
+    <li class="li-command">
+      <span class="command">${command.command}</span>
+      <span class="label">${command.annotation}</span>
+    </li>
+  `);
+}
+
+/**
+ * Provide autocomplete options for the current command we're entering.
+ */
+function autocompleteCommand() {
+  const word = messageInput.words[0];
+  const options =
+    word.segment === "/"
+      ? COMMANDS
+      : COMMANDS.filter((c) => {
+          if (c.command.startsWith(word.segment)) {
+            return true;
+          }
+          if (c.aliases) {
+            if (c.aliases.find((a) => a.startsWith(word.segment))) {
+              return true;
+            }
+          }
+          return false;
+        });
+
+  options.forEach((option) => {
+    const li = makeCommandAutocompleteOption(option);
+    autocomplete.list.appendChild(li);
+    li.addEventListener("click", () => {
+      pickCommand(word, option);
+    });
+  });
+}
+
+/**
  * Parse the current command.
  */
 function parseCommand() {
-  if (messageInput.currentWord.index > 0) {
+  if (messageInput.currentWord?.index > 0) {
     // If the first word matches a command, that command is locked in.
     parseFilledCommand();
   }
 
-  if (messageInput.currentWord.index === 0) {
+  if (messageInput.currentWord?.index === 0) {
     // Autocomplete the command.
+    autocompleteCommand();
   }
 }
 //#endregion
@@ -383,14 +451,11 @@ function parseCommand() {
  * @param {EmojiDefinition} emojiDef The emoji picked to autocomplete that word.
  */
 function pickEmoji(word, emojiDef) {
-  const original = messageInput.input.value;
-  const emoji = emojiDef.emoji;
-  const replacement = replaceWord(original, emoji, word);
-  messageInput.input.value = replacement;
-  messageInput.setSelectionRange(word.start + emoji.length);
+  replaceWordInMessage(word, emojiDef.emoji);
 }
 
 /**
+ * Make an autocomplete option for an emoji.
  *
  * @param {EmojiDefinition} emoji The emoji to make an option for.
  */
@@ -472,7 +537,7 @@ function parseMessageInput() {
   if (messageInput.input.value.startsWith("/")) {
     parseCommand();
   }
-  if (messageInput.currentWord.startsWith(":")) {
+  if (messageInput.currentWord?.startsWith(":")) {
     parseEmoji();
   }
 }
