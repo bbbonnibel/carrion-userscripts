@@ -29,11 +29,120 @@ installStyle(mainCss, "autocomplete", "main.css");
 //#endregion
 
 //#region Data
+/**
+ * @typedef {object} CommandDefinition
+ * @prop {string} command The command text, including slash.
+ * @prop {[fulltext]} fulltext The full text of the command including parameters.
+ * @prop {string} annotation A human-friendly explanation of the command.
+ */
+
+/** @type {CommandDefinition[]} */
 const COMMANDS = [
   {
-    command: "/me",
-    fulltext: "/me [text]",
-    annotation: "Send emote text",
+    command: "/invite",
+    annotation: `Get the invite link for this channel`,
+  },
+  {
+    command: "/claim",
+    annotation: `Claim ownership of an orphaned channel (must be alone in room)`,
+  },
+  {
+    command: "/reclaim",
+    annotation: `Reclaim ownership using existing server affiliation (for migrating to new system)`,
+  },
+  {
+    command: "/listmods",
+    annotation: `Show moderators for this channel (requires owner or mod access)`,
+  },
+  {
+    command: "/help",
+    fulltext: `/help [command]`,
+    annotation: `Show available commands or help for a specific command`,
+  },
+  {
+    command: "/purge",
+    annotation: `Permanently delete this DM conversation and all its messages from your device`,
+  },
+  {
+    command: "/broadcast",
+    fulltext: `/broadcast <message>`,
+    annotation: `Send a site-wide announcement to all connected users (staff only)`,
+  },
+  {
+    command: "/mod",
+    fulltext: `/mod "username"`,
+    annotation: `Grant moderator status to a user (owner only)`,
+  },
+  {
+    command: "/unmod",
+    fulltext: `/unmod "username"`,
+    annotation: `Remove moderator status from a user (owner only)`,
+  },
+  {
+    command: "/transfer",
+    fulltext: `/transfer "username"`,
+    annotation: `Transfer channel ownership to another user (owner only)`,
+  },
+  {
+    command: "/theme",
+    fulltext: `/theme [CSS] or /theme clear`,
+    annotation: `Set channel theme CSS (owner only). Use /theme clear to remove.`,
+  },
+  {
+    command: "/newtab",
+    fulltext: `/newtab "Tab Name"`,
+    aliases: ["/tab"],
+    annotation: `Create a new tab. In DMs: partner must accept. In channels: owner/mod/admin only.`,
+  },
+  {
+    command: "/nick",
+    fulltext: `/nick <new name>`,
+    annotation: `Change your display name in this blind chat room.`,
+  },
+  {
+    command: "/renametab",
+    fulltext: `/renametab "Old Name" "New Name"`,
+    annotation: `Rename an existing tab. In channels: owner/mod/admin only.`,
+  },
+  {
+    command: "/deletetab",
+    fulltext: `/deletetab "Tab Name"`,
+    annotation: `Delete a tab (cannot delete General tab). In channels: owner/mod/admin only.`,
+  },
+  {
+    command: "/unread",
+    fulltext: `/unread`,
+    annotation: `Mark the current room as unread. Useful for coming back to a conversation later.`,
+  },
+  {
+    command: "/unanswered",
+    fulltext: `/unanswered`,
+    annotation: `Toggle the "unanswered" shade on DMs where the other person sent the last message.`,
+  },
+  {
+    command: "/refer",
+    fulltext: `/refer`,
+    annotation: `Show your referral link. Share it to earn Recruiter badges when people sign up.`,
+  },
+  {
+    command: "/modmute",
+    fulltext: `/modmute "name" <duration|perm> [reason]`,
+    annotation: `Site-wide mute that blocks public chat. Duration: 5m, 2h, 1d, 3d (janitor max), 30d, or "perm" (mod+ only). Janitors capped at 72h. Append --account to apply across all alts. Mod-tier only.`,
+  },
+  {
+    command: "/modban",
+    fulltext: `/modban "name" [duration|perm] [reason]`,
+    annotation: `Site-wide read-only timeout. Duration: 5m, 2h, 1d, 3d (janitor max), 30d. Omit or pass "perm" for open-ended (mod+ only). Janitors capped at 72h. Append --account to apply across all alts. Mod-tier only.`,
+  },
+  {
+    command: "/modwarn",
+    fulltext: `/modwarn "name" [reason]`,
+    annotation: `Issue a warning to a user. Visible to them; no enforcement. Mod-tier only.`,
+  },
+  {
+    command: "/moddel",
+    fulltext: `/moddel <message_id> [reason]`,
+    annotation: `Delete a single message from the current channel by ID. Works in any channel (default or user-created). Mod-tier only.`,
   },
 ];
 
