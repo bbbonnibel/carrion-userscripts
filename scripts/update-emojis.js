@@ -14,23 +14,10 @@ const path = require("path");
 
 /** @type {EmojiBank} */
 const EMOJIS = {
-  all: {},
-  prefix2: {},
-  prefix3: {},
+  definitions: {},
+  byShortcode: {},
+  shortcodes: [],
 };
-
-/**
- * Put an emoji into an emoji record.
- * @param {Record<string, Emoji[]>} record The record to alter
- * @param {string} key The record key
- * @param {Emoji} value The value to insert
- */
-function putEmoji(record, key, value) {
-  if (!(key in record)) {
-    record[key] = [];
-  }
-  record[key]?.push(value);
-}
 
 function assertIntegrity(json) {
   if (!Array.isArray(json)) {
@@ -52,6 +39,30 @@ function assertIntegrity(json) {
 }
 
 /**
+ * Apply local overrides to certain emoji definitions.
+ *
+ * @param {EmojiDefinition} emoji The emoji definition to modify
+ */
+function applyOverrides(emoji) {
+  function updateShortcodes(emoji, shortcodes) {
+    emoji.shortcodes = shortcodes;
+    emoji.default = shortcodes[0];
+  }
+  emoji = { ...emoji };
+  switch (emoji.emoji) {
+    case "💥":
+      updateShortcodes(emoji, [
+        ":bang:",
+        ":boom:",
+        ":explosion:",
+        ":collison:",
+      ]);
+      break;
+  }
+  return emoji;
+}
+
+/**
  * Convert an external emoji to a local emoji definition.
  *
  * @param {EmojiFamily.Emoji} jsonEmoji The external emoji to convert
@@ -65,21 +76,8 @@ function convertToEmoji(jsonEmoji) {
     hexcode: jsonEmoji.hexcode,
     shortcodes: jsonEmoji.shortcodes,
   };
-  function updateShortcodes(emoji, shortcodes) {
-    emoji.shortcodes = shortcodes;
-    emoji.default = shortcodes[0];
-  }
-  switch (emoji.emoji) {
-    case "💥":
-      updateShortcodes(emoji, [
-        ":bang:",
-        ":boom:",
-        ":explosion:",
-        ":collison:",
-      ]);
-      break;
-  }
-  return emoji;
+  const override = applyOverrides(emoji);
+  return override;
 }
 
 /** Load emojis into the emoji record. */
@@ -97,11 +95,11 @@ async function loadEmojis() {
   for (const item of json) {
     const emoji = convertToEmoji(item);
 
-    EMOJIS.all[emoji.emoji] = emoji;
-    for (const shortcode of emoji.shortcodes) {
-      const shortDef = { emoji: emoji.emoji, shortcode: shortcode };
-      putEmoji(EMOJIS.prefix2, shortcode.slice(0, 2), shortDef);
-      putEmoji(EMOJIS.prefix3, shortcode.slice(0, 3), shortDef);
+    EMOJIS.definitions[emoji.emoji] = emoji;
+    for (let shortcode of emoji.shortcodes) {
+      shortcode = shortcode.replaceAll(":", "");
+      EMOJIS.byShortcode[shortcode] = emoji;
+      EMOJIS.shortcodes.push(shortcode);
     }
   }
 }

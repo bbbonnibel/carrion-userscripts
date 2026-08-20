@@ -150,28 +150,33 @@ function makeEmojiAutocompleteOption(emoji) {
  * Get emoji options that match a piece of text.
  *
  * @param {string} text The word we're looking at
- * @returns {Emoji[]} Emojis that match the text
+ * @returns Emojis that match the text, sorted by best to worst.
  */
 function getEmojiOptions(text) {
   if (text.length < 2) {
     return [];
   }
-  /** @type {EmojiShortDefinition[]} */
-  let options = [];
-  if (text.length === 2) {
-    options = EMOJIS.prefix2[text] ?? [];
-  } else if (text.length >= 3) {
-    options = EMOJIS.prefix3[text.slice(0, 3)] ?? [];
-  }
-  options = options.filter(
-    (option) =>
-      option.shortcode.startsWith(text) ||
-      option.shortcode.replaceAll("-", "").startsWith(text),
-  );
+  const raw = text.replaceAll(":", "");
+  const options = EMOJIS.shortcodes
+    .filter((s) => s.includes(raw))
+    .map((shortcode) => {
+      // Lower score is better.
+      let score = shortcode.length;
+      if (!shortcode.startsWith(raw)) {
+        score + 100;
+      }
+      return { shortcode, score };
+    });
   return options
     .slice(0, 10)
-    .sort((a, b) => a.shortcode.length - b.shortcode.length)
-    .map((o) => EMOJIS.all[o.emoji]);
+    .toSorted((a, b) => {
+      a.score - b.score;
+    })
+    .map((o) => {
+      const rawEmoji = EMOJIS.byShortcode[o.shortcode];
+      const emojiDef = EMOJIS.definitions[rawEmoji];
+      return emojiDef;
+    });
 }
 
 /**
@@ -185,15 +190,15 @@ function parseEmoji(messageInput, words) {
     return;
   }
   const cursorPosition = messageInput.selectionEnd;
-  const emojiWords = words
-    .filter((w) => w.segment.startsWith(":")) // begins with emoji marker
-    .filter((w) => !w.segment.startsWith("::")) // details marker
-    .filter((w) => !w.segment.endsWith(":")); // not a complete emoji
-  // The current word, *if* it's an emoji.
-  const currentWord = emojiWords.find(
+  const currentWord = words.find(
     (w) => cursorPosition >= w.start && cursorPosition <= w.end,
   );
-  if (!currentWord) {
+  const isEmoji =
+    currentWord &&
+    currentWord.segment.startsWith(":") && // begins with emoji marker
+    !currentWord.segment.startsWith("::") && // not a details marker
+    !currentWord.segment.endsWith(":"); // if it's already a complete emoji, we're not intersted
+  if (!isEmoji) {
     return;
   }
 
