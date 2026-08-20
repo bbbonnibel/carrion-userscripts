@@ -1,8 +1,7 @@
 const mainCss = $import("./main.scss");
 const PREFIX = "[Autocomplete]";
-/** @type {EmojiBank} */
-const EMOJIS = $import("../data/emojis.json");
 
+//#region Bootstrap
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -27,8 +26,9 @@ function installStyle(css, origin, filename) {
 }
 
 installStyle(mainCss, "autocomplete", "main.css");
+//#endregion
 
-//#region Commands
+//#region Data
 const COMMANDS = [
   {
     command: "/me",
@@ -36,15 +36,106 @@ const COMMANDS = [
     annotation: "Send emote text",
   },
 ];
+
+/** @type {EmojiBank} */
+const EMOJIS = $import("../data/emojis.json");
 //#endregion
 
-//#region Page
-const PAGE = Object.freeze({
-  /** @type {() => HTMLDivElement} */
-  inputArea: () => document.querySelector(".input-area"),
-  /** @type {() => HTMLInputElement} */
-  messageInput: () => document.querySelector("#message-input"),
-});
+//#region Words
+/**
+ * @typedef {object} Word
+ * @prop {string} segment The word itself
+ * @prop {number} start The start index within the text
+ * @prop {number} end The end index within the text
+ */
+
+/**
+ * Get each word in a string.
+ *
+ * A word is any text surrounded by word boundaries.
+ *
+ * @param {string} text The text to read
+ * @returns Each individual word in the text
+ */
+function getWords(text) {
+  const wordRegex = /(?<=(^|\s))(.+?)(?=($|\s))/g;
+  const words = [...text.matchAll(wordRegex)].map((match) => {
+    /** @type {string} */
+    const segment = match[0];
+    /** @type {number} */
+    const start = match.index;
+    const end = start + segment.length;
+    return { segment, start, end };
+  });
+  return words;
+}
+//#endregion
+
+//#region Message input management
+class MessageInputManager {
+  constructor() {
+    /**
+     * The message input field.
+     * @public
+     * @type {HTMLTextAreaElement}
+     */
+    this.input = document.querySelector(".input-area");
+
+    /**
+     * The containing message input area.
+     * @public
+     * @type {HTMLDivElement}
+     */
+    this.inputArea = document.querySelector("#message-input");
+
+    /**
+     * The words in the input.
+     * @public
+     * @type {Word[]}
+     */
+    this.words = [];
+
+    /**
+     * The current word that contains the curser in the input.
+     *
+     * It's possible for there to be multiple words, but none are the current word.
+     * This can happen if the user has a span of text selected, or the text cursor is in whitespace.
+     *
+     * @public
+     * @type {Word | undefined}
+     */
+    this.word = undefined;
+  }
+
+  /**
+   * Update this with the current state of the input.
+   * @public
+   */
+  update() {
+    this.words = getWords(this.input.value);
+    this.currentWord = undefined;
+
+    // If the selectionStart and selectionEnd match, we're in a neutral text cursor state.
+    if (this.input.selectionStart === this.input.selectionEnd) {
+      const cursorPosition = this.input.selectionEnd;
+      for (const word of this.words) {
+        if (cursorPosition <= word.start) {
+          // This word is too early.
+          continue;
+        }
+        if (cursorPosition >= word.end) {
+          // This word is too late. Word not found if we're here.
+          break;
+        }
+        if (cursorPosition >= word.start && cursorPosition <= word.end) {
+          this.currentWord = word;
+        }
+      }
+    }
+  }
+}
+
+const messageInput = new MessageInputManager();
 //#endregion
 
 //#region Autocomplete
@@ -73,7 +164,7 @@ class Autocomplete {
 const autocomplete = new Autocomplete();
 
 function insertAutocomplete() {
-  const inputArea = PAGE.inputArea();
+  const inputArea = messageInput.inputArea;
   inputArea.appendChild(autocomplete.element);
   autocomplete.list.appendChild(
     template(`<li><span>autocomplete here</span></li>`),
@@ -81,8 +172,8 @@ function insertAutocomplete() {
 }
 
 function updateAutocompletePosition() {
-  const input = PAGE.messageInput();
-  const inputArea = PAGE.inputArea();
+  const input = messageInput.input;
+  const inputArea = messageInput.inputArea;
 
   const inputBB = input.getBoundingClientRect();
   const inputAreaBB = inputArea.getBoundingClientRect();
@@ -98,7 +189,7 @@ function updateAutocompletePosition() {
 }
 
 function watchAutocompletePosition() {
-  const input = PAGE.messageInput();
+  const input = messageInput.input;
   const observer = new ResizeObserver(() => {
     updateAutocompletePosition();
   });
@@ -109,10 +200,8 @@ function watchAutocompletePosition() {
 //#region Parse command
 /**
  * Parse the current command.
- * @param {HTMLTextAreaElement} messageInput
- * @param {Words} words
  */
-function parseCommand(messageInput, words) {
+function parseCommand() {
   // if ()
 }
 //#endregion
@@ -136,18 +225,17 @@ function replaceWord(original, insert, span) {
  *
  * This will modify the message input by replacing the given word with the autocompleted emoji.
  *
- * @param {HTMLTextAreaElement} messageInput The message input being modified
- * @param {Word} word The current word
+ * @param {Word} word The word to replace
  * @param {EmojiDefinition} emojiDef The emoji picked to autocomplete that word.
  */
-function pickEmoji(messageInput, word, emojiDef) {
-  const value = messageInput.value;
+function pickEmoji(word, emojiDef) {
+  const value = messageInput.input.value;
   const emoji = emojiDef.emoji;
   const replacement = replaceWord(value, emoji, {
     start: word.start,
     end: word.end,
   });
-  messageInput.value = replacement;
+  messageInput.input.value = replacement;
   messageInput.setSelectionRange(word.start + emoji.length);
 }
 
@@ -199,18 +287,9 @@ function getEmojiOptions(text) {
 
 /**
  * Parse the current emoji, if any.
- * @param {HTMLTextAreaElement} messageInput
- * @param {Words} words
  */
-function parseEmoji(messageInput, words) {
-  if (messageInput.selectionStart !== messageInput.selectionEnd) {
-    // The user is actually selecting text, so let's not do any emoji autocomplete.
-    return;
-  }
-  const cursorPosition = messageInput.selectionEnd;
-  const currentWord = words.find(
-    (w) => cursorPosition >= w.start && cursorPosition <= w.end,
-  );
+function parseEmoji() {
+  const currentWord = messageInput.currentWord;
   const isEmoji =
     currentWord &&
     currentWord.segment.startsWith(":") && // begins with emoji marker
@@ -228,70 +307,36 @@ function parseEmoji(messageInput, words) {
     const li = makeEmojiAutocompleteOption(option);
     autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
-      pickEmoji(messageInput, currentWord, option);
+      pickEmoji(currentWord, option);
     });
   });
 }
 //#endregion
 
 //#region Parse message
-/**
- * @typedef {object} Word
- * @prop {string} segment The word itself
- * @prop {number} start The start index within the text
- * @prop {number} end The end index within the text
- */
-/**
- * @typedef {Array<Word>} Words
- */
-
-/**
- * Get each word in a string.
- *
- * A word is any text surrounded by word boundaries.
- *
- * @param {string} text The text to read
- * @returns Each individual word in the text
- */
-function getWords(text) {
-  const wordRegex = /(?<=(^|\s))(.+?)(?=($|\s))/g;
-  const words = [...text.matchAll(wordRegex)].map((match) => {
-    /** @type {string} */
-    const segment = match[0];
-    /** @type {number} */
-    const start = match.index;
-    const end = start + segment.length;
-    return { segment, start, end };
-  });
-  return words;
-}
-
 function parseMessageInput() {
   autocomplete.clear();
-  const messageInput = PAGE.messageInput();
-  const words = getWords(messageInput.value);
+  messageInput.update();
 
-  if (messageInput.value.startsWith("/")) {
-    parseCommand(messageInput, words);
+  if (messageInput.input.value.startsWith("/")) {
+    parseCommand();
   }
-  if (words.find((w) => w.segment.startsWith(":"))) {
-    parseEmoji(messageInput, words);
+  if (messageInput.currentWord.startsWith(":")) {
+    parseEmoji();
   }
 }
 
 function watchMessageInput() {
-  const messageInput = PAGE.messageInput();
+  const input = messageInput.input;
   const options = { passive: true };
-  messageInput.addEventListener("blur", () => autocomplete.clear(), options);
-  messageInput.addEventListener("focus", () => parseMessageInput(), options);
-  messageInput.addEventListener(
-    "selectionchange",
-    () => parseMessageInput(),
-    options,
-  );
+  // TODO at some point we need ESC to clear the autocomplete, just for the current word.
+  input.addEventListener("blur", () => autocomplete.clear(), options);
+  input.addEventListener("focus", () => parseMessageInput(), options);
+  input.addEventListener("selectionchange", () => parseMessageInput(), options);
 }
 //#endregion
 
+//#region Main
 function mainUi() {
   insertAutocomplete();
   updateAutocompletePosition();
@@ -312,3 +357,4 @@ async function main() {
 }
 
 main();
+//#endregion
