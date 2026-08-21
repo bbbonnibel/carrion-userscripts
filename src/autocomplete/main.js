@@ -574,3 +574,7 @@ async function main() {
 
 main();
 //#endregion
+
+// TODO
+// Keyboard controls — up/down/tab/(enter?)
+// Escape to close for the current command
