@@ -58,7 +58,7 @@ const COMMANDS = [
   },
   {
     command: "/help",
-    fulltext: `/help [command]`,
+    fulltext: `/help [optional: command]`,
     annotation: `Show available commands (/help) or help for a specific command`,
   },
   {
@@ -67,7 +67,7 @@ const COMMANDS = [
   },
   {
     command: "/broadcast",
-    fulltext: `/broadcast <message>`,
+    fulltext: `/broadcast [message]`,
     annotation: `Send a site-wide announcement to all connected users (staff only)`,
   },
   {
@@ -87,7 +87,7 @@ const COMMANDS = [
   },
   {
     command: "/theme",
-    fulltext: `/theme [CSS] or /theme clear`,
+    fulltext: `/theme [CSS|clear]`,
     annotation: `Set channel theme CSS (owner only). Use /theme clear to remove.`,
   },
   {
@@ -98,7 +98,7 @@ const COMMANDS = [
   },
   {
     command: "/nick",
-    fulltext: `/nick <new name>`,
+    fulltext: `/nick [new name]`,
     annotation: `Change your display name in this blind chat room.`,
   },
   {
@@ -113,38 +113,41 @@ const COMMANDS = [
   },
   {
     command: "/unread",
-    fulltext: `/unread`,
+    aliases: ["/markunread"],
     annotation: `Mark the current room as unread. Useful for coming back to a conversation later.`,
   },
   {
     command: "/unanswered",
-    fulltext: `/unanswered`,
+    aliases: ["/markunanswered"],
     annotation: `Toggle the "unanswered" shade on DMs where the other person sent the last message.`,
   },
   {
     command: "/refer",
-    fulltext: `/refer`,
     annotation: `Show your referral link. Share it to earn Recruiter badges when people sign up.`,
   },
   {
     command: "/modmute",
-    fulltext: `/modmute "name" [duration|perm] [reason]`,
-    annotation: `Site-wide mute that blocks public chat. Duration: 5m, 2h, 1d, 3d (janitor max), 30d, or "perm" (mod+ only). Janitors capped at 72h. Append --account to apply across all alts. Mod-tier only.`,
+    fulltext: `/modmute "name" [duration: 5m|2h|1d|3d|30d|perm] [reason] [optional: --account]`,
+    mod: true,
+    annotation: `Site-wide mute that blocks public chat. Append Mod-tier only.`,
   },
   {
     command: "/modban",
-    fulltext: `/modban "name" [duration|perm] [reason]`,
-    annotation: `Site-wide read-only timeout. Duration: 5m, 2h, 1d, 3d (janitor max), 30d. Omit or pass "perm" for open-ended (mod+ only). Janitors capped at 72h. Append --account to apply across all alts. Mod-tier only.`,
+    fulltext: `/modban "name" [duration: 5m|2h|1d|3d|30d|perm] [reason] [optional: --account]`,
+    mod: true,
+    annotation: `Site-wide read-only timeout. Mod-tier only.`,
   },
   {
     command: "/modwarn",
     fulltext: `/modwarn "name" [reason]`,
+    mod: true,
     annotation: `Issue a warning to a user. Visible to them; no enforcement. Mod-tier only.`,
   },
   {
     command: "/moddel",
-    fulltext: `/moddel <message_id> [reason]`,
-    annotation: `Delete a single message from the current channel by ID. Works in any channel (default or user-created). Mod-tier only.`,
+    fulltext: `/moddel [message_id] [reason]`,
+    mod: true,
+    annotation: `Delete a single message from the current channel by ID. Mod-tier only.`,
   },
 ];
 
@@ -390,7 +393,7 @@ function pickCommand(command) {
 function makeCommandAutocompleteOption(command) {
   return template(`
     <li class="li-command">
-      <span class="command">${command.command}</span>
+      <span class="figure">${command.command}</span>
       <span class="label">${command.annotation}</span>
     </li>
   `);
@@ -462,7 +465,7 @@ function pickEmoji(word, emojiDef) {
 function makeEmojiAutocompleteOption(emoji) {
   return template(`
     <li class="li-emoji">
-      <span class="emoji">${emoji.emoji}</span>
+      <span class="figure">${emoji.emoji}</span>
       <span class="label">${emoji.default}</span>
     </li>
   `);
