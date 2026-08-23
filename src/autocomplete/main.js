@@ -511,8 +511,7 @@ function parseEmoji() {
   const currentWord = messageInput.currentWord;
   const isEmoji =
     currentWord &&
-    currentWord.segment.startsWith(":") && // begins with emoji marker
-    !currentWord.segment.startsWith("::") && // not a details marker
+    currentWord.segment.match(/^:\w+/) && // begins with emoji marker
     !currentWord.segment.endsWith(":"); // if it's already a complete emoji, we're not intersted
   if (!isEmoji) {
     return;
