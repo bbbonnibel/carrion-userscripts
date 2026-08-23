@@ -526,6 +526,64 @@ function parseEmoji() {
     autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
       pickEmoji(currentWord, option);
+//#endregion
+
+//#region Mentions
+/**
+ * Pick an emoji from autocomplete.
+ *
+ * This will modify the message input by replacing the given word with the autocompleted emoji.
+ *
+ * @param {Word} word The word to replace
+ * @param {string} user The user picked to autocomplete that word
+ */
+function pickUser(word, user) {
+  replaceWordInMessage(word, `@[${user}]`);
+}
+
+/**
+ * Make an autocomplete option for an emoji.
+ *
+ * @param {EmojiDefinition} emoji The emoji to make an option for.
+ */
+function makeUsernameAutocompleteOption(username) {
+  const avatarUrl = `https://carrion.chat/api/v1/characters/by-name/${encodeURIComponent(username)}/avatar/`;
+  return template(`
+    <li class="li-username">
+      <span class="figure">
+        <img class="avatar" src="${avatarUrl}">
+      </span>
+      <span class="label">${username}</span>
+    </li>
+  `);
+}
+
+function parseMention() {
+  const word = messageInput.currentWord;
+  /** @type {Carrion.Bookmark[]} */
+  const bookmarks = window.socialManager.getBookmarks();
+  /** @type {string[]} */
+  const onlineUsers = window.drakensberg.getOnlineUsers();
+
+  /** The set of users available for autocomplete. */
+  const users = new Set([...bookmarks.map((b) => b.name), ...onlineUsers]);
+
+  const mention = word.segment.slice(1);
+  const options = [...users.values()]
+    .filter((u) => u.includes(mention))
+    .map((user) => {
+      let score = user.length;
+      if (!user.startsWith(word)) {
+        score += 100;
+      }
+      return { user, score };
+    });
+
+  options.forEach((option) => {
+    const li = makeUsernameAutocompleteOption(option);
+    autocomplete.list.appendChild(li);
+    li.addEventListener("click", () => {
+      pickUser(word, option);
     });
   });
 }
@@ -541,6 +599,9 @@ function parseMessageInput() {
   }
   if (messageInput.currentWord?.startsWith(":")) {
     parseEmoji();
+  }
+  if (messageInput.currentWord?.startsWith("@")) {
+    parseMention();
   }
 }
 
