@@ -209,20 +209,6 @@ function replaceWord(original, insert, span) {
 class MessageInputManager {
   constructor() {
     /**
-     * The message input field.
-     * @public
-     * @type {HTMLTextAreaElement}
-     */
-    this.input = document.querySelector(".input-area");
-
-    /**
-     * The containing message input area.
-     * @public
-     * @type {HTMLDivElement}
-     */
-    this.inputArea = document.querySelector("#message-input");
-
-    /**
      * The words in the input.
      * @public
      * @type {Word[]}
@@ -242,6 +228,24 @@ class MessageInputManager {
   }
 
   /**
+   * The message input field.
+   * @public
+   * @type {HTMLTextAreaElement}
+   */
+  get input() {
+    return document.querySelector("#message-input");
+  }
+
+  /**
+   * The containing message input area.
+   * @public
+   * @type {HTMLDivElement}
+   */
+  get inputArea() {
+    return document.querySelector(".input-area");
+  }
+
+  /**
    * Update this with the current state of the input.
    * @public
    */
@@ -253,19 +257,20 @@ class MessageInputManager {
     if (this.input.selectionStart === this.input.selectionEnd) {
       const cursorPosition = this.input.selectionEnd;
       for (const word of this.words) {
-        if (cursorPosition <= word.start) {
-          // This word is too early.
-          continue;
-        }
-        if (cursorPosition >= word.end) {
-          // This word is too late. Word not found if we're here.
-          break;
-        }
         if (cursorPosition >= word.start && cursorPosition <= word.end) {
           this.currentWord = word;
+          break;
+        }
+        if (word.start >= cursorPosition) {
+          // We've enumerated all the words and passed the cursor. It must be in whitespace.
+          break;
         }
       }
     }
+    console.debug(PREFIX, "messageInput update:", {
+      words: this.words,
+      currentWord: this.currentWord,
+    });
   }
 }
 
@@ -498,8 +503,8 @@ function getEmojiOptions(text) {
     })
     .slice(0, 10)
     .map((o) => {
-      const rawEmoji = EMOJIS.byShortcode[o.shortcode];
-      const emojiDef = EMOJIS.definitions[rawEmoji];
+      const shortDef = EMOJIS.byShortcode[o.shortcode];
+      const emojiDef = EMOJIS.definitions[shortDef.emoji];
       return emojiDef;
     });
 }
@@ -603,10 +608,10 @@ function parseMessageInput() {
   if (messageInput.input.value.startsWith("/")) {
     parseCommand();
   }
-  if (messageInput.currentWord?.startsWith(":")) {
+  if (messageInput.currentWord?.segment.startsWith(":")) {
     parseEmoji();
   }
-  if (messageInput.currentWord?.startsWith("@")) {
+  if (messageInput.currentWord?.segment.startsWith("@")) {
     parseMention();
   }
 }
