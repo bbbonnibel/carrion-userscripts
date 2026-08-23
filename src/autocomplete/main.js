@@ -493,10 +493,10 @@ function getEmojiOptions(text) {
       return { shortcode, score };
     });
   return options
-    .slice(0, 10)
     .toSorted((a, b) => {
       a.score - b.score;
     })
+    .slice(0, 10)
     .map((o) => {
       const rawEmoji = EMOJIS.byShortcode[o.shortcode];
       const emojiDef = EMOJIS.definitions[rawEmoji];
@@ -508,16 +508,19 @@ function getEmojiOptions(text) {
  * Parse the current emoji, if any.
  */
 function parseEmoji() {
-  const currentWord = messageInput.currentWord;
+  const word = messageInput.currentWord;
+  if (!word) {
+    return;
+  }
+
   const isEmoji =
-    currentWord &&
-    currentWord.segment.match(/^:\w+/) && // begins with emoji marker
-    !currentWord.segment.endsWith(":"); // if it's already a complete emoji, we're not intersted
+    word.segment.match(/^:\w+/) && // begins with emoji marker
+    !word.segment.endsWith(":"); // if it's already a complete emoji, we're not intersted
   if (!isEmoji) {
     return;
   }
 
-  const options = getEmojiOptions(currentWord.segment);
+  const options = getEmojiOptions(word.segment);
   if (options.length > 0) {
     autocomplete.show();
   }
@@ -525,7 +528,10 @@ function parseEmoji() {
     const li = makeEmojiAutocompleteOption(option);
     autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
-      pickEmoji(currentWord, option);
+      pickEmoji(word, option);
+    });
+  });
+}
 //#endregion
 
 //#region Mentions

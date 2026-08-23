@@ -69,14 +69,18 @@ function applyOverrides(emoji) {
  * @returns {EmojiDefinition} The locally defined emoji
  */
 function convertToEmoji(jsonEmoji) {
+  let { emoji, hexcode, shortcodes } = jsonEmoji;
+  shortcodes = shortcodes.map((s) => s.toLowerCase()); // some emoji.family shortcodes contain uppercase, e.g. "Ophiuchus", for some reason
+  shortcodes = shortcodes.filter((s) => !s.match(/^:\d/)); // remove shortcodes that start with numbers
+
   /** @type {EmojiDefinition} */
-  const emoji = {
-    emoji: jsonEmoji.emoji,
-    default: jsonEmoji.shortcodes[0],
-    hexcode: jsonEmoji.hexcode,
-    shortcodes: jsonEmoji.shortcodes,
+  const def = {
+    emoji,
+    default: shortcodes[0],
+    hexcode,
+    shortcodes,
   };
-  const override = applyOverrides(emoji);
+  const override = applyOverrides(def);
   return override;
 }
 
