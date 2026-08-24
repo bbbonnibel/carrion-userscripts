@@ -400,17 +400,20 @@ class Autocomplete {
 
   /**
    *
-   * @param {HTMLLIElement} options
+   * @param {HTMLLIElement[]} options
    */
   setOptions(options) {
-    if (options.length > 0) {
-      autocomplete.show();
+    autocomplete.list.innerHTML = "";
+    if (options.length === 0) {
+      return;
     }
+    autocomplete.show();
     autocomplete.list.append(...options);
     autocomplete.list.scrollTo({
       top: autocomplete.list.scrollHeight,
       behavior: "instant",
     });
+    options.at(0).classList.add("has-keyboard-focus");
   }
 }
 const autocomplete = new Autocomplete();
@@ -433,6 +436,14 @@ function updateAutocompletePosition() {
     "style",
     [`left: ${inset}px`, `right: ${inset}px`, `bottom: ${bottom}px`].join("; "),
   );
+}
+
+function makeAutocompleteTab() {
+  return `
+    <div class="autocomplete-tab / if-keyboard-focus">
+      <span class="tab-icon">↹ Tab</span>
+    </div>
+  `;
 }
 
 function watchAutocompletePosition() {
@@ -484,6 +495,7 @@ function makeCommandAutocompleteOption(command) {
       <button type="button" class="option option-command">
         <span class="figure">${command.command}</span>
         <span class="label">${command.annotation}</span>
+        ${makeAutocompleteTab()}
       </button>
     </li>
   `);
@@ -559,6 +571,7 @@ function makeEmojiAutocompleteOption(emoji) {
       <button type="button" class="option option-emoji">
         <span class="figure">${emoji.emoji}</span>
         <span class="label">${emoji.primary}</span>
+        ${makeAutocompleteTab()}
       </button>
     </li>
   `);
@@ -649,6 +662,7 @@ function makeUsernameAutocompleteOption(username) {
           <img class="avatar" data-found="${Boolean(avatarUrl)}" src="${avatarUrl}">
         </span>
         <span class="label">${username}</span>
+        ${makeAutocompleteTab()}
       </button>
     </li>
   `);
