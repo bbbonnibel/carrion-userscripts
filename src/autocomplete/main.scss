@@ -20,6 +20,8 @@
     flex-flow: column-reverse;
     align-items: stretch;
     gap: 4px;
+    max-height: calc(5 * 24px);
+    overflow-y: scroll;
   }
 
   .options li {

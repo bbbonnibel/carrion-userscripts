@@ -44,19 +44,93 @@ function assertIntegrity(json) {
  * @param {EmojiDefinition} emoji The emoji definition to modify
  */
 function applyOverrides(emoji) {
-  function updateShortcodes(emoji, shortcodes) {
+  function replaceShortcodes(emoji, shortcodes) {
     emoji.shortcodes = shortcodes;
-    emoji.default = shortcodes[0];
+  }
+  function addShortcodes(emoji, shortcodes) {
+    emoji.shortcodes = [...emoji.shortcodes, ...shortcodes];
   }
   emoji = { ...emoji };
   switch (emoji.emoji) {
     case "💥":
-      updateShortcodes(emoji, [
+      replaceShortcodes(emoji, [
         ":bang:",
         ":boom:",
         ":explosion:",
         ":collison:",
       ]);
+      break;
+    case "♠️":
+      replaceShortcodes(emoji, [":spades:", ":suite-spades:"]);
+      break;
+    case "♥️":
+      replaceShortcodes(emoji, [":hearts:", ":suite-hearts:"]);
+      break;
+    case "♦️":
+      replaceShortcodes(emoji, [":diamonds:", ":suite-diamonds:"]);
+      break;
+    case "♣️":
+      replaceShortcodes(emoji, [":clubs:", ":suite-clubs:"]);
+      break;
+    case "💝":
+      addShortcodes(emoji, [":heart-gift:"]);
+      break;
+    case "💖":
+      addShortcodes(emoji, [":heart-sparkling:"]);
+      break;
+    case "💗":
+      addShortcodes(emoji, [":heart-pulse:"]);
+      break;
+    case "💓":
+      addShortcodes(emoji, [":heart-beating:"]);
+      break;
+    case "💔":
+      addShortcodes(emoji, [":heart-broken:"]);
+      break;
+    case "❤️‍🔥":
+      addShortcodes(emoji, [":heart-fire:"]);
+      break;
+    case "❤️‍🩹":
+      addShortcodes(emoji, [":heart-bandaged:"]);
+      break;
+    case "❤️":
+      replaceShortcodes(emoji, [":heart:", ":red-heart:", ":heart-red:"]);
+      break;
+    case "🩷":
+      addShortcodes(emoji, [":heart-pink:"]);
+      break;
+    case "🧡":
+      addShortcodes(emoji, [":heart-orange:"]);
+      break;
+    case "💛":
+      addShortcodes(emoji, [":heart-yellow:"]);
+      break;
+    case "💚":
+      addShortcodes(emoji, [":heart-green:"]);
+      break;
+    case "💙":
+      addShortcodes(emoji, [":heart-blue:"]);
+      break;
+    case "🩵":
+      addShortcodes(emoji, [":light-blue-heart:"]);
+      break;
+    case "💜":
+      addShortcodes(emoji, [":heart-purple:"]);
+      break;
+    case "🤎":
+      addShortcodes(emoji, [":heart-brown:"]);
+      break;
+    case "🖤":
+      addShortcodes(emoji, [":heart-black:"]);
+      break;
+    case "🩶":
+      addShortcodes(emoji, [":heart-grey:"]);
+      break;
+    case "🤍":
+      addShortcodes(emoji, [":heart-white:"]);
+      break;
+    case "#️⃣":
+      addShortcodes(emoji, [":hash:"]);
       break;
   }
   return emoji;
@@ -102,7 +176,7 @@ async function loadEmojis() {
     EMOJIS.definitions[emoji.emoji] = emoji;
     for (let shortcode of emoji.shortcodes) {
       shortcode = shortcode.replaceAll(":", "");
-      EMOJIS.byShortcode[shortcode] = emoji;
+      EMOJIS.byShortcode[shortcode] = emoji.emoji;
       EMOJIS.shortcodes.push(shortcode);
     }
   }

@@ -18,6 +18,7 @@ export default defineConfig([
         GM_setValue: "readonly",
         GM_getValue: "readonly",
         $import: "readonly",
+        unsafeWindow: "readonly",
         ...globals.browser,
       },
     },

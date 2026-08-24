@@ -336,9 +336,20 @@ class Autocomplete {
     this.currentCommand.innerHTML = "";
     this.hide();
   }
+
+  /**
+   *
+   * @param {HTMLLIElement} options
+   */
+  setOptions(options) {
+    autocomplete.list.append(...options);
+    autocomplete.list.scrollTo({
+      top: autocomplete.list.scrollHeight,
+      behavior: "instant",
+    });
+  }
 }
 const autocomplete = new Autocomplete();
-
 function insertAutocomplete() {
   const inputArea = messageInput.inputArea;
   inputArea.appendChild(autocomplete.element);
@@ -434,13 +445,14 @@ function autocompleteCommand() {
           return false;
         });
 
-  options.forEach((option) => {
+  const elements = options.map((option) => {
     const li = makeCommandAutocompleteOption(option);
-    autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
       pickCommand(word, option);
     });
+    return li;
   });
+  autocomplete.setOptions(elements);
 }
 
 /**
@@ -475,14 +487,14 @@ function pickEmoji(word, emojiDef) {
 /**
  * Make an autocomplete option for an emoji.
  *
- * @param {EmojiDefinition} emoji The emoji to make an option for.
+ * @param {EmojiDefinition & { score: number, primary: string }} emoji The emoji to make an option for.
  */
 function makeEmojiAutocompleteOption(emoji) {
   return template(`
-    <li class="li-emoji">
+    <li class="li-emoji" data-score="${emoji.score}">
       <button type="button" class="option option-emoji">
         <span class="figure">${emoji.emoji}</span>
-        <span class="label">${emoji.default}</span>
+        <span class="label">${emoji.primary}</span>
       </button>
     </li>
   `);
@@ -499,26 +511,25 @@ function getEmojiOptions(text) {
     return [];
   }
   const raw = text.replaceAll(":", "");
-  const options = EMOJIS.shortcodes
-    .filter((s) => s.includes(raw))
-    .map((shortcode) => {
-      // Lower score is better.
-      let score = shortcode.length;
-      if (!shortcode.startsWith(raw)) {
-        score + 100;
-      }
-      return { shortcode, score };
-    });
-  return options
-    .toSorted((a, b) => {
-      a.score - b.score;
+  /** @type {Map<RawEmoji, EmojiDefinition>} */
+  const matchingEmojis = new Map();
+  const matchingShortcodes = EMOJIS.shortcodes.filter((s) => s.includes(raw));
+  for (const shortcode of matchingShortcodes) {
+    const rawEmoji = EMOJIS.byShortcode[shortcode];
+    const emojiDef = EMOJIS.definitions[rawEmoji];
+    matchingEmojis.set(rawEmoji, emojiDef);
+  }
+  const options = [...matchingEmojis.values()]
+    .map((emojiDef) => {
+      return {
+        ...emojiDef,
+        primary: emojiDef.shortcodes[0],
+        score: emojiDef.shortcodes[0].length,
+      };
     })
-    .slice(0, 10)
-    .map((o) => {
-      const shortDef = EMOJIS.byShortcode[o.shortcode];
-      const emojiDef = EMOJIS.definitions[shortDef.emoji];
-      return emojiDef;
-    });
+    .toSorted((a, b) => a.score - b.score);
+  // console.debug("Matching emojis:", options);
+  return options;
 }
 
 /**
@@ -530,7 +541,7 @@ function parseEmoji() {
     return;
   }
 
-  const isEmoji = word.segment.match(/^:\w+/); // begins with emoji marker
+  const isEmoji = word.segment.match(/^:[^:]+/); // begins with emoji marker
   if (!isEmoji) {
     return;
   }
@@ -539,13 +550,14 @@ function parseEmoji() {
   if (options.length > 0) {
     autocomplete.show();
   }
-  options.forEach((option) => {
+  const elements = options.map((option) => {
     const li = makeEmojiAutocompleteOption(option);
-    autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
       pickEmoji(word, option);
     });
+    return li;
   });
+  autocomplete.setOptions(elements);
 }
 //#endregion
 
@@ -584,9 +596,9 @@ function makeUsernameAutocompleteOption(username) {
 function parseMention() {
   const word = messageInput.currentWord;
   /** @type {Carrion.Bookmark[]} */
-  const bookmarks = window.socialManager.getBookmarks();
+  const bookmarks = unsafeWindow.socialManager.getBookmarks();
   /** @type {string[]} */
-  const onlineUsers = window.drakensberg.getOnlineUsers();
+  const onlineUsers = unsafeWindow.drakensberg.getOnlineUsers();
 
   /** The set of users available for autocomplete. */
   const users = new Set([...bookmarks.map((b) => b.name), ...onlineUsers]);
@@ -602,13 +614,15 @@ function parseMention() {
       return { user, score };
     });
 
-  options.forEach((option) => {
+  const elements = options.map((option) => {
     const li = makeUsernameAutocompleteOption(option);
     autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
       pickUser(word, option);
     });
+    return li;
   });
+  autocomplete.setOptions(elements);
 }
 //#endregion
 
