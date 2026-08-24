@@ -69,12 +69,21 @@
   }
 
   .option-username {
+    .figure {
+      width: 24px;
+      aspect-ratio: 1/1;
+    }
+
     .avatar {
       border-radius: 50%;
       width: 24px;
       aspect-ratio: 1/1;
       object-fit: cover;
       object-position: center;
+
+      &[data-found="false"] {
+        display: none;
+      }
     }
   }
 

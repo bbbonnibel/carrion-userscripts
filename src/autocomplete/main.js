@@ -28,6 +28,37 @@ function installStyle(css, origin, filename) {
 installStyle(mainCss, "autocomplete", "main.css");
 //#endregion
 
+//#region Utilities
+/**
+ * Feed this to an `Array.filter` call to filter the array down to only unique elements.
+ *
+ * @example
+ * ["a", "b", "c", "b"].filter(filterUnique) // ["a", "b", "c"]
+ */
+function filterUnique(value, index, array) {
+  return array.indexOf(value) === index;
+}
+
+/**
+ * Sort strings alphabetically.
+ *
+ * @example
+ * [].sort(sortAlphabetic)
+ *
+ * @param {string} a The first string
+ * @param {string} b The second string
+ */
+function sortAlphabetic(a, b) {
+  if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return 0;
+}
+//#endregion
+
 //#region Data
 /**
  * @typedef {object} CommandDefinition
@@ -342,6 +373,9 @@ class Autocomplete {
    * @param {HTMLLIElement} options
    */
   setOptions(options) {
+    if (options.length > 0) {
+      autocomplete.show();
+    }
     autocomplete.list.append(...options);
     autocomplete.list.scrollTo({
       top: autocomplete.list.scrollHeight,
@@ -547,9 +581,6 @@ function parseEmoji() {
   }
 
   const options = getEmojiOptions(word.segment);
-  if (options.length > 0) {
-    autocomplete.show();
-  }
   const elements = options.map((option) => {
     const li = makeEmojiAutocompleteOption(option);
     li.addEventListener("click", () => {
@@ -575,17 +606,17 @@ function pickUser(word, user) {
 }
 
 /**
- * Make an autocomplete option for an emoji.
+ * Make an autocomplete option for a username.
  *
- * @param {EmojiDefinition} emoji The emoji to make an option for.
+ * @param {string} username The username (or character name) to make an option for.
  */
 function makeUsernameAutocompleteOption(username) {
-  const avatarUrl = `https://carrion.chat/api/v1/characters/by-name/${encodeURIComponent(username)}/avatar/`;
+  const avatarUrl = unsafeWindow.drakensberg.getAvatar(username) ?? "";
   return template(`
     <li class="li-username">
       <button type="button" class="option option-username">
         <span class="figure">
-          <img class="avatar" src="${avatarUrl}">
+          <img class="avatar" data-found="${Boolean(avatarUrl)}" src="${avatarUrl}">
         </span>
         <span class="label">${username}</span>
       </button>
@@ -595,24 +626,34 @@ function makeUsernameAutocompleteOption(username) {
 
 function parseMention() {
   const word = messageInput.currentWord;
-  /** @type {Carrion.Bookmark[]} */
-  const bookmarks = unsafeWindow.socialManager.getBookmarks();
+  if (word.segment.length < 2) {
+    return;
+  }
+  if (word.segment.endsWith("]"));
+
+  /** @type {string[]} */
+  const bookmarks = unsafeWindow.socialManager
+    .getBookmarks()
+    .map((b) => b.name);
   /** @type {string[]} */
   const onlineUsers = unsafeWindow.drakensberg.getOnlineUsers();
 
   /** The set of users available for autocomplete. */
-  const users = new Set([...bookmarks.map((b) => b.name), ...onlineUsers]);
+  const users = [...bookmarks, ...onlineUsers].filter(filterUnique);
 
-  const mention = word.segment.slice(1);
-  const options = [...users.values()]
-    .filter((u) => u.includes(mention))
-    .map((user) => {
-      let score = user.length;
-      if (!user.startsWith(word)) {
-        score += 100;
-      }
-      return { user, score };
-    });
+  let mention = word.segment.slice(1).toLowerCase();
+  if (mention.startsWith("[")) {
+    mention = mention.slice(1);
+  }
+
+  const options = users
+    .filter((u) => u.toLowerCase().replaceAll(" ", "").includes(mention))
+    .toSorted(sortAlphabetic);
+  console.debug(
+    PREFIX,
+    "Mention options:",
+    options.map((o) => o.user),
+  );
 
   const elements = options.map((option) => {
     const li = makeUsernameAutocompleteOption(option);
