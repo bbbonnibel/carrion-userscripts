@@ -81,5 +81,10 @@
     form[action^="/delete"] {
       display: none !important;
     }
+
+    // "Sync history (vault)"
+    .dashboard-vault-btn {
+      display: none !important;
+    }
   }
 }
