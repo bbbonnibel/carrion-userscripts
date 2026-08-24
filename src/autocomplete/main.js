@@ -30,6 +30,11 @@ installStyle(mainCss, "autocomplete", "main.css");
 
 //#region Utilities
 /**
+ * Convert a class `string` to a class selector `.string`
+ */
+const cls = (str) => `.${str}`;
+
+/**
  * Feed this to an `Array.filter` call to filter the array down to only unique elements.
  *
  * @example
@@ -359,6 +364,9 @@ function replaceWordInMessage(word, replacement) {
 //#endregion
 
 //#region Autocomplete
+const HAS_KEYBOARD_FOCUS = "has-keyboard-focus";
+const HAS_KEYBOARD_FOCUS_SELECTOR = cls(HAS_KEYBOARD_FOCUS);
+
 class Autocomplete {
   constructor() {
     /**
@@ -384,6 +392,20 @@ class Autocomplete {
     this.element.appendChild(this.currentCommand);
   }
 
+  /**
+   * Is autocomplete open?
+   */
+  get isOpen() {
+    return this.element.classList.contains("open");
+  }
+
+  /**
+   * Does autocomplete have options listed?
+   */
+  get hasOptions() {
+    return this.list.innerHTML !== "";
+  }
+
   show() {
     this.element.classList.add("open");
   }
@@ -396,6 +418,55 @@ class Autocomplete {
     this.list.innerHTML = "";
     this.currentCommand.innerHTML = "";
     this.hide();
+  }
+
+  /**
+   * Move keyboard focus up through the options.
+   */
+  keyboardFocusUp() {
+    // Since this is an inverted list, up is the next sibling.
+    const hasFocus = this.list.querySelector(HAS_KEYBOARD_FOCUS_SELECTOR);
+    /** @type {HTMLLIElement | null} */
+    const next = hasFocus.nextElementSibling();
+    if (next) {
+      hasFocus.classList.remove(HAS_KEYBOARD_FOCUS);
+      next.classList.add(HAS_KEYBOARD_FOCUS);
+      next.scrollIntoView({
+        behavior: "instant",
+        block: "nearest",
+        container: "nearest",
+      });
+    }
+  }
+
+  /**
+   * Move keyboard focus down through the options.
+   */
+  keyboardFocusDown() {
+    // Since this is an inverted list, down is the previous sibling.
+    const hasFocus = this.list.querySelector(HAS_KEYBOARD_FOCUS_SELECTOR);
+    /** @type {HTMLLIElement | null} */
+    const next = hasFocus.previousElementSibling();
+    if (next) {
+      hasFocus.classList.remove(HAS_KEYBOARD_FOCUS);
+      next.classList.add(HAS_KEYBOARD_FOCUS);
+      next.scrollIntoView({
+        behavior: "instant",
+        block: "nearest",
+        container: "nearest",
+      });
+    }
+  }
+
+  /**
+   * Pick the current option that has keyboard focus.
+   */
+  pickFocusedOption() {
+    const hasFocus = this.list.querySelector(HAS_KEYBOARD_FOCUS_SELECTOR);
+    if (hasFocus) {
+      const button = hasFocus.querySelector("button");
+      button.click();
+    }
   }
 
   /**
@@ -413,15 +484,22 @@ class Autocomplete {
       top: autocomplete.list.scrollHeight,
       behavior: "instant",
     });
-    options.at(0).classList.add("has-keyboard-focus");
+    options.at(0).classList.add(HAS_KEYBOARD_FOCUS);
   }
 }
 const autocomplete = new Autocomplete();
+
+/**
+ * Insert the autocomplete element onto the page.
+ */
 function insertAutocomplete() {
   const inputArea = messageInput.inputArea;
   inputArea.appendChild(autocomplete.element);
 }
 
+/**
+ * Reposition and resize the autocomplete element.
+ */
 function updateAutocompletePosition() {
   const input = messageInput.input;
   const inputArea = messageInput.inputArea;
@@ -429,7 +507,7 @@ function updateAutocompletePosition() {
   const inputBB = input.getBoundingClientRect();
   const inputAreaBB = inputArea.getBoundingClientRect();
 
-  const inset = 10;
+  const inset = 40;
   const bottom = Math.abs(inputBB.top - inputAreaBB.bottom) + 4;
 
   autocomplete.element.setAttribute(
@@ -438,10 +516,14 @@ function updateAutocompletePosition() {
   );
 }
 
+/**
+ * Return the text for the tab symbol associated with autocomplete via keyboard.
+ * @returns {string}
+ */
 function makeAutocompleteTab() {
   return `
     <div class="autocomplete-tab / if-keyboard-focus">
-      <span class="tab-icon">↹ Tab</span>
+      <span class="tab-icon">⭾ Tab</span>
     </div>
   `;
 }
@@ -711,7 +793,7 @@ function parseMention() {
 }
 //#endregion
 
-//#region Parse message
+//#region Message input handling
 function parseMessageInput() {
   autocomplete.clear();
   messageInput.update();
@@ -727,7 +809,7 @@ function parseMessageInput() {
   }
 }
 
-function watchMessageInput() {
+function bindPassiveEvents() {
   const input = messageInput.input;
   const options = { passive: true };
   // TODO at some point we need ESC to clear the autocomplete, just for the current word.
@@ -744,8 +826,48 @@ function watchMessageInput() {
     },
     options,
   );
+  autocomplete.element.addEventListener("focus", () => input.focus(), options);
   input.addEventListener("focus", () => parseMessageInput(), options);
   input.addEventListener("selectionchange", () => parseMessageInput(), options);
+}
+
+function bindKeyboardManagementEvents() {
+  const input = messageInput.input;
+
+  input.addEventListener("keypress", (event) => {
+    if (!autocomplete.isOpen) {
+      return;
+    }
+
+    if (event.altKey || event.ctrlKey || event.shiftKey || event.metaKey) {
+      return;
+    }
+
+    if (autocomplete.hasOptions) {
+      // These events only get handled when we have options to move through.
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          autocomplete.keyboardFocusDown();
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          autocomplete.keyboardFocusUp();
+          break;
+        case "Tab":
+          event.preventDefault();
+          autocomplete.pickFocusedOption();
+          break;
+      }
+
+      switch (event.key) {
+        case "Escape":
+          event.preventDefault();
+          autocomplete.hide();
+          break;
+      }
+    }
+  });
 }
 //#endregion
 
@@ -754,7 +876,8 @@ function mainUi() {
   insertAutocomplete();
   updateAutocompletePosition();
   watchAutocompletePosition();
-  watchMessageInput();
+  bindPassiveEvents();
+  bindKeyboardManagementEvents();
 }
 
 async function main() {
