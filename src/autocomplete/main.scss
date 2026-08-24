@@ -18,11 +18,20 @@
   .options {
     display: flex;
     flex-flow: column-reverse;
+    align-items: stretch;
     gap: 4px;
   }
 
   .options li {
+    display: flex;
+    flex-flow: row;
+    justify-content: stretch;
+  }
+
+  .option {
     font-size: 14px;
+    background: transparent;
+    border: none;
     color: #848484;
     cursor: pointer;
     display: flex;
@@ -45,19 +54,19 @@
     }
   }
 
-  .li-command {
+  .option-command {
     .figure {
       font-weight: bold;
     }
   }
 
-  .li-emoji {
+  .option-emoji {
     .label {
       font-family: monospace;
     }
   }
 
-  .li-username {
+  .option-username {
     .avatar {
       border-radius: 50%;
       width: 24px;

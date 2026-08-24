@@ -281,12 +281,19 @@ const messageInput = new MessageInputManager();
  *
  * @param {Word} word The word to replace
  * @param {string} replacement The replacement word to impose.
+ * @param {string} length The length of the replacement word. For emojis, overwrite this with `1`.
  */
 function replaceWordInMessage(word, replacement) {
   const original = messageInput.input.value;
   const newValue = replaceWord(original, replacement, word);
   messageInput.input.value = newValue;
-  messageInput.setSelectionRange(word.start + replacement.length);
+  messageInput.input.focus();
+  const selectionPosition = word.start + replacement.length;
+  messageInput.input.setSelectionRange(selectionPosition, selectionPosition);
+  console.debug(PREFIX, "messageInput selection updated:", {
+    length: newValue.length,
+    selectionPosition,
+  });
 }
 //#endregion
 
@@ -297,7 +304,9 @@ class Autocomplete {
      * The autocomplete element itself.
      * @type {HTMLDivElement}
      */
-    this.element = template(`<div class="bbb-chat-autocomplete"></div>`);
+    this.element = template(
+      `<div id="bbb-chat-autocomplete" class="bbb-chat-autocomplete" tabindex="0"></div>`,
+    );
     /**
      * The list of autocomplete options.
      * @type {HTMLOListElement}
@@ -342,13 +351,12 @@ function updateAutocompletePosition() {
   const inputBB = input.getBoundingClientRect();
   const inputAreaBB = inputArea.getBoundingClientRect();
 
-  const left = inputBB.left - inputAreaBB.left;
-  const width = inputBB.width;
-  const bottom = Math.abs(inputBB.top - inputAreaBB.bottom) - 1;
+  const inset = 10;
+  const bottom = Math.abs(inputBB.top - inputAreaBB.bottom) - 4;
 
   autocomplete.element.setAttribute(
     "style",
-    [`left: ${left}px`, `width: ${width}px`, `bottom: ${bottom}px`].join("; "),
+    [`left: ${inset}px`, `right: ${inset}px`, `bottom: ${bottom}px`].join("; "),
   );
 }
 
@@ -398,8 +406,10 @@ function pickCommand(command) {
 function makeCommandAutocompleteOption(command) {
   return template(`
     <li class="li-command">
-      <span class="figure">${command.command}</span>
-      <span class="label">${command.annotation}</span>
+      <button type="button" class="option option-command">
+        <span class="figure">${command.command}</span>
+        <span class="label">${command.annotation}</span>
+      </button>
     </li>
   `);
 }
@@ -470,8 +480,10 @@ function pickEmoji(word, emojiDef) {
 function makeEmojiAutocompleteOption(emoji) {
   return template(`
     <li class="li-emoji">
-      <span class="figure">${emoji.emoji}</span>
-      <span class="label">${emoji.default}</span>
+      <button type="button" class="option option-emoji">
+        <span class="figure">${emoji.emoji}</span>
+        <span class="label">${emoji.default}</span>
+      </button>
     </li>
   `);
 }
@@ -561,10 +573,12 @@ function makeUsernameAutocompleteOption(username) {
   const avatarUrl = `https://carrion.chat/api/v1/characters/by-name/${encodeURIComponent(username)}/avatar/`;
   return template(`
     <li class="li-username">
-      <span class="figure">
-        <img class="avatar" src="${avatarUrl}">
-      </span>
-      <span class="label">${username}</span>
+      <button type="button" class="option option-username">
+        <span class="figure">
+          <img class="avatar" src="${avatarUrl}">
+        </span>
+        <span class="label">${username}</span>
+      </button>
     </li>
   `);
 }
@@ -620,7 +634,19 @@ function watchMessageInput() {
   const input = messageInput.input;
   const options = { passive: true };
   // TODO at some point we need ESC to clear the autocomplete, just for the current word.
-  input.addEventListener("blur", () => autocomplete.clear(), options);
+  input.addEventListener(
+    "blur",
+    (event) => {
+      if (
+        event.relatedTarget === autocomplete.element ||
+        autocomplete.element.contains(event.relatedTarget)
+      ) {
+        return;
+      }
+      autocomplete.clear();
+    },
+    options,
+  );
   input.addEventListener("focus", () => parseMessageInput(), options);
   input.addEventListener("selectionchange", () => parseMessageInput(), options);
 }
@@ -652,3 +678,4 @@ main();
 // TODO
 // Keyboard controls — up/down/tab/(enter?)
 // Escape to close for the current command
+// Tab to insert the closest autocomplete
