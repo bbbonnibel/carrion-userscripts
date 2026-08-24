@@ -731,16 +731,52 @@ function pickUser(word, user) {
 }
 
 /**
+ * Generate a unique two-color gradient from a username.
+ * Uses a simple hash to derive two hue values for a consistent,
+ * personalized placeholder avatar.
+ *
+ * @see "message-renderer.js" This function was stolen directly from carrion's code.
+ *
+ * @param {string} username - The username to hash
+ * @returns {string} CSS gradient string
+ */
+function generateUsernameGradient(username) {
+  if (!username) {
+    return "linear-gradient(135deg, #3a3a4a 0%, #2a2a3a 100%)";
+  }
+
+  // Simple hash function (djb2-like)
+  let hash1 = 5381;
+  let hash2 = 52711;
+  for (let i = 0; i < username.length; i++) {
+    const char = username.charCodeAt(i);
+    hash1 = ((hash1 << 5) + hash1) ^ char;
+    hash2 = ((hash2 << 5) + hash2) ^ char;
+  }
+
+  // Convert to positive values and get hue (0-360)
+  const hue1 = Math.abs(hash1) % 360;
+  const hue2 = Math.abs(hash2) % 360;
+
+  // Use HSL for nice colors - moderate saturation, darker for visibility on dark bg
+  const color1 = `hsl(${hue1}, 45%, 35%)`;
+  const color2 = `hsl(${hue2}, 45%, 25%)`;
+
+  return `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+}
+
+/**
  * Make an autocomplete option for a username.
  *
  * @param {string} username The username (or character name) to make an option for.
  */
 function makeUsernameAutocompleteOption(username) {
   const avatarUrl = unsafeWindow.drakensberg.getAvatar(username) ?? "";
+  const gradient = generateUsernameGradient(username);
   return template(`
     <li class="li-username">
       <button type="button" class="option option-username">
-        <span class="figure">
+        <span class="figure" style="background: ${gradient};">
           <img class="avatar" data-found="${Boolean(avatarUrl)}" src="${avatarUrl}">
         </span>
         <span class="label">${username}</span>
