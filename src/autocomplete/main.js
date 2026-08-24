@@ -530,9 +530,7 @@ function parseEmoji() {
     return;
   }
 
-  const isEmoji =
-    word.segment.match(/^:\w+/) && // begins with emoji marker
-    !word.segment.endsWith(":"); // if it's already a complete emoji, we're not intersted
+  const isEmoji = word.segment.match(/^:\w+/); // begins with emoji marker
   if (!isEmoji) {
     return;
   }
