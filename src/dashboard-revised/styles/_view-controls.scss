@@ -1,18 +1,18 @@
-.drv-view-controls {
+.bbb-dashboard-view-controls {
   display: flex;
 
-  .drv-button:not(:first-child) {
+  .bbb-dashboard-button:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: 0;
   }
-  .drv-button:not(:last-child) {
+  .bbb-dashboard-button:not(:last-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 }
 
-.drv-button {
+.bbb-dashboard-button {
   padding: 6px 10px;
   border-radius: 4px;
   border: 1px solid #444;
@@ -22,16 +22,16 @@
   cursor: pointer;
 }
 
-.drv-button.drv-inactive {
-  background: var(--drv-button-depressed);
+.bbb-dashboard-button.bbb-dashboard-inactive {
+  background: var(--bbb-dashboard-button-depressed);
 
-  .drv-icon {
+  .bbb-dashboard-icon {
     opacity: 50%;
   }
 }
 
-.drv-icon-view-compact,
-.drv-icon-view-standard {
+.bbb-dashboard-icon-view-compact,
+.bbb-dashboard-icon-view-standard {
   display: grid;
   gap: 1px;
 
@@ -48,12 +48,12 @@
   }
 }
 
-.drv-icon-view-compact {
+.bbb-dashboard-icon-view-compact {
   grid-template-columns: repeat(3, 4px);
   grid-template-rows: repeat(3, 4px);
 }
 
-.drv-icon-view-standard {
+.bbb-dashboard-icon-view-standard {
   grid-template-columns: repeat(2, 7px);
   grid-template-rows: repeat(2, 7px);
 }

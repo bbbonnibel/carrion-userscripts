@@ -1,11 +1,11 @@
-.character-grid:not(.drv-as-compact) {
-  .drv-when-in-compact {
+.character-grid:not(.bbb-dashboard-as-compact) {
+  .bbb-dashboard-when-in-compact {
     display: none;
   }
 }
 
-.character-grid.drv-as-compact {
-  .drv-when-not-in-compact {
+.character-grid.bbb-dashboard-as-compact {
+  .bbb-dashboard-when-not-in-compact {
     display: none;
   }
 

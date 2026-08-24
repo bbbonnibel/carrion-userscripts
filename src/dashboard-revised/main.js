@@ -65,29 +65,29 @@ const PAGE = (() => {
 })();
 
 function setViewAsCompact() {
-  PAGE.characterGrid.classList.add("drv-as-compact");
-  viewAsCompact.classList.remove("drv-inactive");
-  viewAsStandard.classList.add("drv-inactive");
+  PAGE.characterGrid.classList.add("bbb-dashboard-as-compact");
+  viewAsCompact.classList.remove("bbb-dashboard-inactive");
+  viewAsStandard.classList.add("bbb-dashboard-inactive");
   GM_setValue("view", "compact");
 }
 
 function setViewAsStandard() {
-  PAGE.characterGrid.classList.remove("drv-as-compact");
-  viewAsStandard.classList.remove("drv-inactive");
-  viewAsCompact.classList.add("drv-inactive");
+  PAGE.characterGrid.classList.remove("bbb-dashboard-as-compact");
+  viewAsStandard.classList.remove("bbb-dashboard-inactive");
+  viewAsCompact.classList.add("bbb-dashboard-inactive");
   GM_setValue("view", "standard");
 }
 
 /** @type {HTMLDivElement} */
 const viewControls = template(`
-<div class="drv-view-controls">
-  <button type="button" class="drv-button drv-view-compact">
-    <span class="drv-icon drv-icon-view-compact">
+<div class="bbb-dashboard-view-controls">
+  <button type="button" class="bbb-dashboard-button bbb-dashboard-view-compact">
+    <span class="bbb-dashboard-icon bbb-dashboard-icon-view-compact">
       ${repeatStr(9, "<span></span>")}
     </span>
   </button>
-  <button type="button" class="drv-button drv-view-standard">
-    <span class="drv-icon drv-icon-view-standard">
+  <button type="button" class="bbb-dashboard-button bbb-dashboard-view-standard">
+    <span class="bbb-dashboard-icon bbb-dashboard-icon-view-standard">
       ${repeatStr(4, "<span></span>")}
     </span>
   </button>
@@ -95,9 +95,11 @@ const viewControls = template(`
 `);
 
 /** @type {HTMLDivElement} */
-const viewAsCompact = viewControls.querySelector(".drv-view-compact");
+const viewAsCompact = viewControls.querySelector(".bbb-dashboard-view-compact");
 /** @type {HTMLDivElement} */
-const viewAsStandard = viewControls.querySelector(".drv-view-standard");
+const viewAsStandard = viewControls.querySelector(
+  ".bbb-dashboard-view-standard",
+);
 
 viewAsCompact.addEventListener("click", setViewAsCompact);
 viewAsStandard.addEventListener("click", setViewAsStandard);
@@ -112,18 +114,18 @@ function createNotifControls() {
 
   /** @type {HTMLButtonElement} */
   const notifControl = template(`
-    <button type="button" class="drv-button drv-focus-btn">
+    <button type="button" class="bbb-dashboard-button bbb-dashboard-focus-btn">
       <span>Focus</span>
     </button>
   `);
 
   notifControl.addEventListener("click", () => {
-    if (notifControl.classList.contains("drv-on")) {
-      notifControl.classList.remove("drv-on");
-      PAGE.characterGrid.classList.remove("drv-focus-notifs");
+    if (notifControl.classList.contains("bbb-dashboard-on")) {
+      notifControl.classList.remove("bbb-dashboard-on");
+      PAGE.characterGrid.classList.remove("bbb-dashboard-focus-notifs");
     } else {
-      notifControl.classList.add("drv-on");
-      PAGE.characterGrid.classList.add("drv-focus-notifs");
+      notifControl.classList.add("bbb-dashboard-on");
+      PAGE.characterGrid.classList.add("bbb-dashboard-focus-notifs");
     }
   });
 
@@ -139,8 +141,8 @@ function createCompactChatButtons() {
   ];
   for (const chatButton of chatButtons) {
     const clone = chatButton.cloneNode();
-    chatButton.classList.add("drv-when-not-in-compact");
-    clone.classList.add("drv-when-in-compact");
+    chatButton.classList.add("bbb-dashboard-when-not-in-compact");
+    clone.classList.add("bbb-dashboard-when-in-compact");
     clone.innerText = "Chat";
     chatButton.insertAdjacentElement("afterend", clone);
   }
