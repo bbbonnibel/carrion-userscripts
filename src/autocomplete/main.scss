@@ -41,6 +41,7 @@
     justify-content: flex-start;
     padding: 2px 4px;
     gap: 8px;
+    max-width: 100%;
 
     .figure {
       // The choice being exhibited.
@@ -52,13 +53,16 @@
     .label {
       // User-friendly text explaining the choice.
       flex: 1;
+      white-space: nowrap;
       text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 
   .option-command {
     .figure {
       font-weight: bold;
+      min-width: 80px;
     }
   }
 

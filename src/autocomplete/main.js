@@ -117,6 +117,36 @@ const COMMANDS = [
     annotation: `Transfer channel ownership to another user (owner only)`,
   },
   {
+    command: "/kick",
+    fulltext: "/kick [username]",
+    annotation: "Remove user from channel (owner/mod only)",
+  },
+  {
+    command: "/ban",
+    fulltext: "/ban [username]",
+    annotation: "Permanently ban user (owner/mod only)",
+  },
+  {
+    command: "/unban",
+    fulltext: "/unban [username]",
+    annotation: "Remove a ban (owner/mod only)",
+  },
+  {
+    command: "/mute",
+    fulltext: "/mute [username]",
+    annotation: "Prevent user from chatting (owner/mod only)",
+  },
+  {
+    command: "/unmute",
+    fulltext: "/unmute [username]",
+    annotation: "Allow user to chat again (owner/mod only)",
+  },
+  {
+    command: "/topic",
+    fulltext: "/topic [new topic]",
+    annotation: "Set channel topic (owner only)",
+  },
+  {
     command: "/theme",
     fulltext: `/theme [CSS|clear]`,
     annotation: `Set channel theme CSS (owner only). Use /theme clear to remove.`,
