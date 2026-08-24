@@ -427,7 +427,7 @@ function updateAutocompletePosition() {
   const inputAreaBB = inputArea.getBoundingClientRect();
 
   const inset = 10;
-  const bottom = Math.abs(inputBB.top - inputAreaBB.bottom) - 4;
+  const bottom = Math.abs(inputBB.top - inputAreaBB.bottom) + 4;
 
   autocomplete.element.setAttribute(
     "style",
