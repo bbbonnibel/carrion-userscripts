@@ -1,5 +1,6 @@
 const mainCss = $import("./main.scss");
 const PREFIX = "[Autocomplete]";
+const DEBUG = false;
 
 //#region Bootstrap
 /**
@@ -340,10 +341,13 @@ class MessageInputManager {
         }
       }
     }
-    console.debug(PREFIX, "messageInput update:", {
-      words: this.words,
-      currentWord: this.currentWord,
-    });
+
+    if (DEBUG) {
+      console.debug(PREFIX, "messageInput update:", {
+        words: this.words,
+        currentWord: this.currentWord,
+      });
+    }
   }
 }
 
@@ -363,10 +367,6 @@ function replaceWordInMessage(word, replacement) {
   messageInput.input.focus();
   const selectionPosition = word.start + replacement.length;
   messageInput.input.setSelectionRange(selectionPosition, selectionPosition);
-  console.debug(PREFIX, "messageInput selection updated:", {
-    length: newValue.length,
-    selectionPosition,
-  });
 }
 //#endregion
 
@@ -706,7 +706,6 @@ function getEmojiOptions(text) {
     .filter(filterUnique)
     .map((rawEmoji) => EMOJIS.definitions[rawEmoji]);
 
-  // console.debug("Matching emojis:", matchingEmojis);
   return matchingEmojis;
 }
 
@@ -833,11 +832,6 @@ function parseMention() {
   const options = users
     .filter((u) => u.toLowerCase().replaceAll(" ", "").includes(mention))
     .toSorted(sortAlphabetic);
-  console.debug(
-    PREFIX,
-    "Mention options:",
-    options.map((o) => o.user),
-  );
 
   const elements = options.map((option) => {
     const li = makeUsernameAutocompleteOption(option);
