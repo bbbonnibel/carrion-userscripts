@@ -71,6 +71,8 @@ function sortAlphabetic(a, b) {
  * @prop {string[]} [aliases] A possible list of aliases for the comamnd.
  * @prop {string} [fulltext] The full text of the command including parameters.
  * @prop {string} annotation A human-friendly explanation of the command.
+ * @prop {boolean} staff Is this a staff-only command?
+ * @prop {boolean} ignore Should this command be ignored universally?
  */
 
 /** @type {CommandDefinition[]} */
@@ -87,10 +89,11 @@ const COMMANDS = [
   {
     command: "/reclaim",
     annotation: `Reclaim ownership using existing server affiliation (for migrating to new system)`,
+    ignore: true,
   },
   {
     command: "/listmods",
-    annotation: `Show moderators for this channel (requires owner or mod access)`,
+    annotation: `Show moderators for this channel (owner/mod only)`,
   },
   {
     command: "/help",
@@ -99,12 +102,14 @@ const COMMANDS = [
   },
   {
     command: "/purge",
-    annotation: `Permanently delete this DM conversation and all its messages from your device`,
+    annotation: `Permanently delete this DM and all its messages`,
+    ignore: true,
   },
   {
     command: "/broadcast",
     fulltext: `/broadcast [message]`,
     annotation: `Send a site-wide announcement to all connected users (staff only)`,
+    staff: true,
   },
   {
     command: "/mod",
@@ -154,38 +159,40 @@ const COMMANDS = [
   {
     command: "/theme",
     fulltext: `/theme [CSS|clear]`,
-    annotation: `Set channel theme CSS (owner only). Use /theme clear to remove.`,
+    annotation: `Set channel theme CSS. Use /theme clear to remove. (owner only)`,
   },
   {
     command: "/newtab",
     fulltext: `/newtab "Tab Name"`,
     aliases: ["/tab"],
-    annotation: `Create a new tab. In DMs: partner must accept. In channels: owner/mod/admin only.`,
+    annotation: `Create a new tab. (DM only, or owner/mod only)`,
   },
   {
     command: "/nick",
     fulltext: `/nick [new name]`,
     annotation: `Change your display name in this blind chat room.`,
+    ignore: true,
   },
   {
     command: "/renametab",
     fulltext: `/renametab "Old Name" "New Name"`,
-    annotation: `Rename an existing tab. In channels: owner/mod/admin only.`,
+    annotation: `Rename an existing tab. (DM only, or owner/mod only)`,
   },
   {
     command: "/deletetab",
     fulltext: `/deletetab "Tab Name"`,
-    annotation: `Delete a tab (cannot delete General tab). In channels: owner/mod/admin only.`,
+    annotation: `Delete a tab. (DM only, or owner/mod only)`,
   },
   {
     command: "/unread",
-    aliases: ["/markunread"],
-    annotation: `Mark the current room as unread. Useful for coming back to a conversation later.`,
+    // aliases: ["/markunread"],
+    annotation: `Mark the current room as unread.`,
   },
   {
     command: "/unanswered",
     aliases: ["/markunanswered"],
     annotation: `Toggle the "unanswered" shade on DMs where the other person sent the last message.`,
+    ignore: true,
   },
   {
     command: "/refer",
@@ -194,26 +201,26 @@ const COMMANDS = [
   {
     command: "/modmute",
     fulltext: `/modmute "name" [duration: 5m|2h|1d|3d|30d|perm] [reason] [optional: --account]`,
-    mod: true,
-    annotation: `Site-wide mute that blocks public chat. Append Mod-tier only.`,
+    annotation: `Site-wide mute that blocks public chat. (mod only)`,
+    staff: true,
   },
   {
     command: "/modban",
     fulltext: `/modban "name" [duration: 5m|2h|1d|3d|30d|perm] [reason] [optional: --account]`,
-    mod: true,
-    annotation: `Site-wide read-only timeout. Mod-tier only.`,
+    annotation: `Site-wide read-only timeout. (mod only)`,
+    staff: true,
   },
   {
     command: "/modwarn",
     fulltext: `/modwarn "name" [reason]`,
-    mod: true,
-    annotation: `Issue a warning to a user. Visible to them; no enforcement. Mod-tier only.`,
+    annotation: `Issue a warning to a user. Visible to them; no enforcement. (mod only)`,
+    staff: true,
   },
   {
     command: "/moddel",
     fulltext: `/moddel [message_id] [reason]`,
-    mod: true,
-    annotation: `Delete a single message from the current channel by ID. Mod-tier only.`,
+    annotation: `Delete a single message from the current channel by ID. (mod only)`,
+    staff: true,
   },
 ];
 
@@ -558,12 +565,13 @@ function parseFilledCommand() {
 
 /**
  * Pick a command to autocomplete the first word.
- * @param {CommandDefinition} command The command to autocomplete.
+ * @param {Word} word The word to replace
+ * @param {string} command The command word to autocomplete.
  */
-function pickCommand(command) {
-  const word = messageInput.words[0];
+function pickCommand(word, command) {
   // Add a space in the replacement so we don't keep offering autocomplete.
-  replaceWordInMessage(word, command.command + " ");
+  replaceWordInMessage(word, `${command} `);
+  messageInput.input.focus();
 }
 
 /**
@@ -584,29 +592,46 @@ function makeCommandAutocompleteOption(command) {
 }
 
 /**
+ * Get the commands that can autocomplete for a word.
+ *
+ * @param {Word} word The word to autocomplete commands for
+ * @returns {CommandDefinition[]} Available commands for autocomplete
+ */
+function getCommandOptions(word) {
+  const ignore = ["/", "/m", "/me"];
+  if (ignore.includes(word.segment)) {
+    return [];
+  }
+
+  if (word.segment === "/?") {
+    return COMMANDS.filter((c) => !c.ignore && !c.staff);
+  }
+
+  return COMMANDS.filter((c) => !c.ignore && !c.staff).filter((c) => {
+    if (c.command.startsWith(word.segment)) {
+      return true;
+    }
+    if (c.aliases) {
+      if (c.aliases.find((a) => a.startsWith(word.segment))) {
+        return true;
+      }
+    }
+    return false;
+  });
+}
+
+/**
  * Provide autocomplete options for the current command we're entering.
  */
 function autocompleteCommand() {
   const word = messageInput.words[0];
-  const options =
-    word.segment === "/"
-      ? COMMANDS
-      : COMMANDS.filter((c) => {
-          if (c.command.startsWith(word.segment)) {
-            return true;
-          }
-          if (c.aliases) {
-            if (c.aliases.find((a) => a.startsWith(word.segment))) {
-              return true;
-            }
-          }
-          return false;
-        });
+
+  let options = getCommandOptions(word);
 
   const elements = options.map((option) => {
     const li = makeCommandAutocompleteOption(option);
     li.addEventListener("click", () => {
-      pickCommand(word, option);
+      pickCommand(word, option.command);
     });
     return li;
   });
@@ -640,6 +665,7 @@ function parseCommand() {
  */
 function pickEmoji(word, emojiDef) {
   replaceWordInMessage(word, emojiDef.emoji);
+  messageInput.input.focus();
 }
 
 /**
@@ -728,6 +754,7 @@ function parseEmoji() {
  */
 function pickUser(word, user) {
   replaceWordInMessage(word, `@[${user}]`);
+  messageInput.input.focus();
 }
 
 /**
@@ -870,7 +897,7 @@ function bindPassiveEvents() {
 function bindKeyboardManagementEvents() {
   const input = messageInput.input;
 
-  input.addEventListener("keypress", (event) => {
+  input.addEventListener("keydown", (event) => {
     if (!autocomplete.isOpen) {
       return;
     }
