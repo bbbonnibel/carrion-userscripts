@@ -434,7 +434,7 @@ class Autocomplete {
     // Since this is an inverted list, up is the next sibling.
     const hasFocus = this.list.querySelector(HAS_KEYBOARD_FOCUS_SELECTOR);
     /** @type {HTMLLIElement | null} */
-    const next = hasFocus.nextElementSibling();
+    const next = hasFocus.nextElementSibling;
     if (next) {
       hasFocus.classList.remove(HAS_KEYBOARD_FOCUS);
       next.classList.add(HAS_KEYBOARD_FOCUS);
@@ -453,7 +453,7 @@ class Autocomplete {
     // Since this is an inverted list, down is the previous sibling.
     const hasFocus = this.list.querySelector(HAS_KEYBOARD_FOCUS_SELECTOR);
     /** @type {HTMLLIElement | null} */
-    const next = hasFocus.previousElementSibling();
+    const next = hasFocus.previousElementSibling;
     if (next) {
       hasFocus.classList.remove(HAS_KEYBOARD_FOCUS);
       next.classList.add(HAS_KEYBOARD_FOCUS);
@@ -571,7 +571,7 @@ function parseFilledCommand() {
 function pickCommand(word, command) {
   // Add a space in the replacement so we don't keep offering autocomplete.
   replaceWordInMessage(word, `${command} `);
-  messageInput.input.focus();
+  autocomplete.clear();
 }
 
 /**
@@ -603,11 +603,13 @@ function getCommandOptions(word) {
     return [];
   }
 
+  const availableCommands = COMMANDS.filter((c) => !c.ignore && !c.staff);
+
   if (word.segment === "/?") {
-    return COMMANDS.filter((c) => !c.ignore && !c.staff);
+    return availableCommands;
   }
 
-  return COMMANDS.filter((c) => !c.ignore && !c.staff).filter((c) => {
+  return availableCommands.filter((c) => {
     if (c.command.startsWith(word.segment)) {
       return true;
     }
@@ -664,8 +666,8 @@ function parseCommand() {
  * @param {EmojiDefinition} emojiDef The emoji picked to autocomplete that word.
  */
 function pickEmoji(word, emojiDef) {
-  replaceWordInMessage(word, emojiDef.emoji);
-  messageInput.input.focus();
+  replaceWordInMessage(word, `${emojiDef.emoji} `);
+  autocomplete.clear();
 }
 
 /**
@@ -753,8 +755,8 @@ function parseEmoji() {
  * @param {string} user The user picked to autocomplete that word
  */
 function pickUser(word, user) {
-  replaceWordInMessage(word, `@[${user}]`);
-  messageInput.input.focus();
+  replaceWordInMessage(word, `@[${user}] `);
+  autocomplete.clear();
 }
 
 /**
@@ -818,7 +820,9 @@ function parseMention() {
   if (word.segment.length < 2) {
     return;
   }
-  if (word.segment.endsWith("]"));
+  if (word.segment.endsWith("]")) {
+    return;
+  }
 
   /** @type {string[]} */
   const bookmarks = unsafeWindow.socialManager
@@ -959,6 +963,4 @@ main();
 //#endregion
 
 // TODO
-// Keyboard controls — up/down/tab/(enter?)
 // Escape to close for the current command
-// Tab to insert the closest autocomplete
