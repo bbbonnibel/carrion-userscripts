@@ -680,7 +680,7 @@ function makeEmojiAutocompleteOption(emoji) {
     <li class="li-emoji" data-score="${emoji.score}">
       <button type="button" class="option option-emoji">
         <span class="figure">${emoji.emoji}</span>
-        <span class="label">${emoji.primary}</span>
+        <span class="label">${emoji.shortcodes[0]}</span>
         ${makeAutocompleteTab()}
       </button>
     </li>
@@ -698,25 +698,16 @@ function getEmojiOptions(text) {
     return [];
   }
   const raw = text.replaceAll(":", "");
-  /** @type {Map<RawEmoji, EmojiDefinition>} */
-  const matchingEmojis = new Map();
-  const matchingShortcodes = EMOJIS.shortcodes.filter((s) => s.includes(raw));
-  for (const shortcode of matchingShortcodes) {
-    const rawEmoji = EMOJIS.byShortcode[shortcode];
-    const emojiDef = EMOJIS.definitions[rawEmoji];
-    matchingEmojis.set(rawEmoji, emojiDef);
-  }
-  const options = [...matchingEmojis.values()]
-    .map((emojiDef) => {
-      return {
-        ...emojiDef,
-        primary: emojiDef.shortcodes[0],
-        score: emojiDef.shortcodes[0].length,
-      };
-    })
-    .toSorted((a, b) => a.score - b.score);
-  // console.debug("Matching emojis:", options);
-  return options;
+  const matchingShortcodes = EMOJIS.shortcodes
+    .filter((s) => s.includes(raw))
+    .sort((a, b) => a.length - b.length);
+  const matchingEmojis = matchingShortcodes
+    .map((shortcode) => EMOJIS.byShortcode[shortcode])
+    .filter(filterUnique)
+    .map((rawEmoji) => EMOJIS.definitions[rawEmoji]);
+
+  // console.debug("Matching emojis:", matchingEmojis);
+  return matchingEmojis;
 }
 
 /**
