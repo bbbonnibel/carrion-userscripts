@@ -952,6 +952,3 @@ async function main() {
 
 main();
 //#endregion
-
-// TODO
-// Escape to close for the current command
