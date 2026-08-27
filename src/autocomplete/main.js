@@ -603,7 +603,9 @@ function getCommandOptions(word) {
     return [];
   }
 
-  const availableCommands = COMMANDS.filter((c) => !c.ignore && !c.staff);
+  const availableCommands = COMMANDS.filter((c) => !c.ignore && !c.staff).sort(
+    (a, b) => sortAlphabetic(a.command, b.command),
+  );
 
   if (word.segment === "/?") {
     return availableCommands;
