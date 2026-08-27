@@ -75,5 +75,3 @@ function main() {
 }
 
 main();
-
-// TODO activeCharacter doesn't seem to be getting set (except to Anonymous) at this stage.
