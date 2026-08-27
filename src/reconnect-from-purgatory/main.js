@@ -26,34 +26,52 @@ function installStyle(css, origin, filename) {
 
 installStyle(mainCss, "reconnect-from-purgatory", "main.css");
 
-function main() {
-  console.debug(LOG_PREFIX, "Started");
+const reconnect = template(`
+  <div class="bbb-reconnect-from-purgatory">
+    <a href="/chat/?character=">Reconnect as <span class="name"></span></a>
+  </div>
+`);
 
-  const purgatory = document.getElementById("chat-purgatory");
-  const selector = document.getElementById("site-character-selector");
-
+function getActiveCharacter() {
   /**
    * @type {HTMLOptionElement}
    * @example <option value="1265" data-name="Bonnibel" data-avatar="(url)">
    */
-  const activeCharacter = selector.querySelector(":checked");
+  const option = document.querySelector("#site-character-selector :checked");
+  const characterId = option?.value || undefined;
+  const characterName = option?.getAttribute("data-name") ?? undefined;
+  return { characterId, characterName };
+}
 
-  if (!activeCharacter) {
-    return;
+function updateReconnect() {
+  const { characterId, characterName } = getActiveCharacter();
+
+  if (characterId && characterName) {
+    reconnect.classList.remove("hide");
+    reconnect
+      .querySelector("a")
+      .setAttribute("href", `/chat/?character=${characterId}`);
+    reconnect.querySelector(".name").innerText = characterName;
+  } else {
+    reconnect.classList.add("hide");
   }
+}
 
-  const characterId = activeCharacter.value;
-  const characterName = activeCharacter.getAttribute("data-name");
+function main() {
+  console.debug(LOG_PREFIX, "Started");
 
+  const purgatory = document.getElementById("chat-purgatory");
   const content = purgatory.querySelector(".purgatory-content");
-
-  const reconnect = template(`
-    <div style="text-align: center; margin: 20px 0;">
-      <a href="/chat/?character=${characterId}">Reconnect as <span class="name"></span></a>
-    </div>
-  `);
-  reconnect.querySelector(".name").innerText = characterName;
   content.appendChild(reconnect);
+
+  const selector = document.getElementById("site-character-selector");
+  const observer = new MutationObserver(() => updateReconnect());
+  observer.watch(selector, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+  });
+  updateReconnect();
 }
 
 main();
