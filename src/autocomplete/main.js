@@ -909,6 +909,7 @@ function bindKeyboardManagementEvents() {
           autocomplete.keyboardFocusUp();
           break;
         case "Tab":
+        case "Enter":
           event.preventDefault();
           autocomplete.pickFocusedOption();
           break;
