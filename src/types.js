@@ -10,6 +10,5 @@
 /**
  * @typedef {object} EmojiDefinition
  * @prop {RawEmoji} emoji The emoji itself, e.g. "😀"
- * @prop {string} hexcode The unicode hexcode, e.g. "1f600"
  * @prop {string[]} shortcodes Shortcodes for the emoji, e.g. [":smile:"]
  */

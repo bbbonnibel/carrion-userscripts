@@ -87,6 +87,37 @@ const OVERRIDES = {
 };
 
 /**
+ * Emojis altogether missing from emojifamily.
+ * @type {EmojiDefinition[]}
+ */
+const MISSING_EMOJIS = [
+  {
+    emoji: "🏴‍☠️",
+    shortcodes: [
+      ":pirate-flag:",
+      ":skull-and-crossbones-flag:",
+      ":jolly-roger:",
+    ],
+  },
+  {
+    emoji: "🚩",
+    shortcodes: [":red-flag:"],
+  },
+  {
+    emoji: "🏁",
+    shortcodes: [":checkered-flag:"],
+  },
+  {
+    emoji: "🏳️‍🌈",
+    shortcodes: [":rainbow-flag:", ":pride-flag:", ":lgbt-flag:"],
+  },
+  {
+    emoji: "🏳️‍⚧️",
+    shortcodes: [":trans-flag:", ":transgender-flag:"],
+  },
+];
+
+/**
  * Apply local overrides to certain emoji definitions.
  *
  * @param {EmojiDefinition} emoji The emoji definition to modify
@@ -94,7 +125,7 @@ const OVERRIDES = {
 function applyOverrides(emoji) {
   const override = OVERRIDES[emoji.emoji];
   if (!override) {
-    return;
+    return emoji;
   }
 
   const actionKeys = Object.keys(override).filter((k) =>
@@ -130,14 +161,13 @@ function applyOverrides(emoji) {
  * @returns {EmojiDefinition} The locally defined emoji
  */
 function convertToEmoji(jsonEmoji) {
-  let { emoji, hexcode, shortcodes } = jsonEmoji;
+  let { emoji, shortcodes } = jsonEmoji;
   shortcodes = shortcodes.map((s) => s.toLowerCase()); // some emoji.family shortcodes contain uppercase, e.g. "Ophiuchus", for some reason
   shortcodes = shortcodes.filter((s) => !s.match(/^:\d/)); // remove shortcodes that start with numbers
 
   /** @type {EmojiDefinition} */
   let def = {
     emoji,
-    hexcode,
     shortcodes,
   };
   try {
@@ -149,21 +179,38 @@ function convertToEmoji(jsonEmoji) {
   return def;
 }
 
-/** Load emojis into the emoji record. */
-async function loadEmojis() {
+/**
+ * Get emoji JSON from the API.
+ */
+async function getEmojiJson() {
   const response = await fetch("https://www.emoji.family/api/emojis", {
     cache: "default",
     headers: {
       Accept: "application/json",
     },
   });
-  /** @type {EmojiFamily.Emoji} */
+  /** @type {EmojiFamily.Emoji[]} */
   const json = await response.json();
   assertIntegrity(json);
+  return json;
+}
 
-  for (const item of json) {
-    const emoji = convertToEmoji(item);
+/** Load emojis into the emoji record. */
+async function processEmojis() {
+  const json = await getEmojiJson();
+  console.log("Retrieved emoji JSON.", json.length, "entries.");
+  let emojis = json.map((j) => convertToEmoji(j));
+  emojis = [...emojis, ...MISSING_EMOJIS];
 
+  console.log(
+    "Working with",
+    emojis.length,
+    "entries, including",
+    MISSING_EMOJIS.length,
+    "missing entries",
+  );
+
+  for (const emoji of emojis) {
     EMOJIS.definitions[emoji.emoji] = emoji;
     for (let shortcode of emoji.shortcodes) {
       shortcode = shortcode.replaceAll(":", "");
@@ -182,7 +229,7 @@ function saveEmojis() {
 }
 
 async function main() {
-  await loadEmojis();
+  await processEmojis();
   saveEmojis();
 }
 
