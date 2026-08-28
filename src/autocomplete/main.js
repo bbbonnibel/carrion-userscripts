@@ -32,6 +32,9 @@ installStyle(mainCss, "autocomplete", "main.css");
 //#region Levenshtein distance
 /**
  * Calculate the levenshtein distance between two words.
+ *
+ * This implementation is from https://github.com/gustf/js-levenshtein/blob/master/index.js
+ *
  * @param {string} a
  * @param {string} b
  * @returns {number} The levenshtein distance between `a` and `b`.
