@@ -52,6 +52,9 @@ function applyOverrides(emoji) {
   }
   emoji = { ...emoji };
   switch (emoji.emoji) {
+    case "🎉":
+      addShortcodes(emoji, [":tada:"]);
+      break;
     case "💥":
       replaceShortcodes(emoji, [
         ":bang:",
