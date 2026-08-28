@@ -11,6 +11,18 @@ Each userscript focuses on doing one specific thing, so you can install only the
 
 _These scripts introduce new features to your carrion experience._
 
+### [Autocomplete](https://bbbonnibel.github.io/carrion-userscripts/script/autocomplete/autocomplete.user.js) (Beta)
+
+Your chat messages now have an optional autocomplete for emojis, commands, and mentions.
+
+The autocomplete automatically pops up as you start writing a `@mention` or a `/command`. It will also offer autocomplete for emojis by writing `:shortcodes:`, such as `:heart:`. It won't actually modify your message unless you tell it to.
+
+⚠️ Autocomplete by pressing **Tab**, or by picking the option. **Enter won't work**, because chat responds to that key first by sending your message.
+
+Coming soon:
+
+- Autocomplete for commands needs a bit more work.
+- Autocomplete for rooms.
 
 ### [Character Pins](https://bbbonnibel.github.io/carrion-userscripts/script/character-pins/character-pins.user.js)
 
