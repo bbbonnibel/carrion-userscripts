@@ -13,11 +13,11 @@ _These scripts introduce new features to your carrion experience._
 
 ### [Autocomplete](https://bbbonnibel.github.io/carrion-userscripts/script/autocomplete/autocomplete.user.js) (Beta)
 
-Your chat messages now have an optional autocomplete for emojis, commands, and mentions.
+Your chat messages now have an optional autocomplete for emojis, commands, and mentions. This is not autocorrect, it won't actually modify your message unless you tell it to. Autocomplete with <kbd>**⭾ Tab**</kbd> (not Enter).
 
-The autocomplete automatically pops up as you start writing a `@mention` or a `/command`. It will also offer autocomplete for emojis by writing `:shortcodes:`, such as `:heart:`. It won't actually modify your message unless you tell it to.
-
-⚠️ Autocomplete by pressing **Tab**, or by picking the option. **Enter won't work**, because chat responds to that key first by sending your message.
+- Autocompletes `@mentions`.
+- Autocompletes `/commands`. Start typing your command and it'll list matching commands. This script will never autocomplete `/me`, it's assumed if you're using this script you don't need help with that & it'd be a nuisance.
+- Autocompletes emojis by typing their name like this: `:heart:`
 
 Coming soon:
 
