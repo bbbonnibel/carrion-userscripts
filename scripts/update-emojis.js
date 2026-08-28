@@ -39,103 +39,87 @@ function assertIntegrity(json) {
 }
 
 /**
+ * @typedef {object} AddOverride
+ * @prop {string[]} add A list of shortcodes to add to the end of the list.
+ */
+
+/**
+ * @typedef {object} PreferOverride
+ * @prop {string[]} prefer A list of shortcodes to add to the *front* of the list, meaning the first of these will be the preferred alias.
+ */
+
+/**
+ * @typedef {object} ReplaceOverride
+ * @prop {string[]} replace A list of shortcodes to completely replace the original shortcodes with.
+ */
+
+/**
+ * Our list of overrides to apply.
+ * @type {Record<string, (AddOverride | PreferOverride | ReplaceOverride)>}
+ */
+const OVERRIDES = {
+  "🎉": { add: [":tada:"] },
+  "💥": { prefer: [":bang:", ":boom:", ":explosion:"] },
+  "♠️": { replace: [":spades:", ":suite-spades:"] },
+  "♥️": { replace: [":hearts:", ":suite-hearts:"] },
+  "♦️": { replace: [":diamonds:", ":suite-diamonds:"] },
+  "♣️": { replace: [":clubs:", ":suite-clubs:"] },
+  "💝": { add: [":heart-gift:"] },
+  "💖": { add: [":heart-sparkling:"] },
+  "💗": { add: [":heart-pulse:"] },
+  "💓": { add: [":heart-beating:"] },
+  "💔": { add: [":heart-broken:"] },
+  "❤️‍🔥": { add: [":heart-fire:"] },
+  "❤️‍🩹": { add: [":heart-bandaged:"] },
+  "❤️": { prefer: [":heart:", ":heart-red:"] },
+  "🩷": { add: [":heart-pink:"] },
+  "🧡": { add: [":heart-orange:"] },
+  "💛": { add: [":heart-yellow:"] },
+  "💚": { add: [":heart-green:"] },
+  "💙": { add: [":heart-blue:"] },
+  "🩵": { add: [":light-blue-heart:"] },
+  "💜": { add: [":heart-purple:"] },
+  "🤎": { add: [":heart-brown:"] },
+  "🖤": { add: [":heart-black:"] },
+  "🩶": { add: [":heart-grey:"] },
+  "🤍": { add: [":heart-white:"] },
+  "#️⃣": { add: [":hash:"] },
+};
+
+/**
  * Apply local overrides to certain emoji definitions.
  *
  * @param {EmojiDefinition} emoji The emoji definition to modify
  */
 function applyOverrides(emoji) {
-  function replaceShortcodes(emoji, shortcodes) {
-    emoji.shortcodes = shortcodes;
+  const override = OVERRIDES[emoji.emoji];
+  if (!override) {
+    return;
   }
-  function addShortcodes(emoji, shortcodes) {
-    emoji.shortcodes = [...emoji.shortcodes, ...shortcodes];
+
+  const actionKeys = Object.keys(override).filter((k) =>
+    ["add", "prefer", "replace"].includes(k),
+  );
+  if (actionKeys.length !== 1) {
+    console.error(
+      "An emoji override should have exactly one of add, prefer, or replace. You defined an override with zero, two, or more:",
+      emoji.emoji,
+      "=",
+      override,
+    );
+    throw Error("Override error");
   }
-  emoji = { ...emoji };
-  switch (emoji.emoji) {
-    case "🎉":
-      addShortcodes(emoji, [":tada:"]);
-      break;
-    case "💥":
-      replaceShortcodes(emoji, [
-        ":bang:",
-        ":boom:",
-        ":explosion:",
-        ":collison:",
-      ]);
-      break;
-    case "♠️":
-      replaceShortcodes(emoji, [":spades:", ":suite-spades:"]);
-      break;
-    case "♥️":
-      replaceShortcodes(emoji, [":hearts:", ":suite-hearts:"]);
-      break;
-    case "♦️":
-      replaceShortcodes(emoji, [":diamonds:", ":suite-diamonds:"]);
-      break;
-    case "♣️":
-      replaceShortcodes(emoji, [":clubs:", ":suite-clubs:"]);
-      break;
-    case "💝":
-      addShortcodes(emoji, [":heart-gift:"]);
-      break;
-    case "💖":
-      addShortcodes(emoji, [":heart-sparkling:"]);
-      break;
-    case "💗":
-      addShortcodes(emoji, [":heart-pulse:"]);
-      break;
-    case "💓":
-      addShortcodes(emoji, [":heart-beating:"]);
-      break;
-    case "💔":
-      addShortcodes(emoji, [":heart-broken:"]);
-      break;
-    case "❤️‍🔥":
-      addShortcodes(emoji, [":heart-fire:"]);
-      break;
-    case "❤️‍🩹":
-      addShortcodes(emoji, [":heart-bandaged:"]);
-      break;
-    case "❤️":
-      replaceShortcodes(emoji, [":heart:", ":red-heart:", ":heart-red:"]);
-      break;
-    case "🩷":
-      addShortcodes(emoji, [":heart-pink:"]);
-      break;
-    case "🧡":
-      addShortcodes(emoji, [":heart-orange:"]);
-      break;
-    case "💛":
-      addShortcodes(emoji, [":heart-yellow:"]);
-      break;
-    case "💚":
-      addShortcodes(emoji, [":heart-green:"]);
-      break;
-    case "💙":
-      addShortcodes(emoji, [":heart-blue:"]);
-      break;
-    case "🩵":
-      addShortcodes(emoji, [":light-blue-heart:"]);
-      break;
-    case "💜":
-      addShortcodes(emoji, [":heart-purple:"]);
-      break;
-    case "🤎":
-      addShortcodes(emoji, [":heart-brown:"]);
-      break;
-    case "🖤":
-      addShortcodes(emoji, [":heart-black:"]);
-      break;
-    case "🩶":
-      addShortcodes(emoji, [":heart-grey:"]);
-      break;
-    case "🤍":
-      addShortcodes(emoji, [":heart-white:"]);
-      break;
-    case "#️⃣":
-      addShortcodes(emoji, [":hash:"]);
-      break;
+
+  if ("add" in override) {
+    emoji.shortcodes = [...emoji.shortcodes, ...override.add];
   }
+  if ("prefer" in override) {
+    emoji.shortcodes = [...override.prefer, ...emoji.shortcodes];
+  }
+  if ("replace" in override) {
+    emoji.shortcodes = [...override.replace];
+  }
+
   return emoji;
 }
 
@@ -151,14 +135,18 @@ function convertToEmoji(jsonEmoji) {
   shortcodes = shortcodes.filter((s) => !s.match(/^:\d/)); // remove shortcodes that start with numbers
 
   /** @type {EmojiDefinition} */
-  const def = {
+  let def = {
     emoji,
-    default: shortcodes[0],
     hexcode,
     shortcodes,
   };
-  const override = applyOverrides(def);
-  return override;
+  try {
+    const override = applyOverrides(def);
+    def = { ...def, ...override };
+  } catch (ex) {
+    console.error("Calculating overrides failed", { def, jsonEmoji, ex });
+  }
+  return def;
 }
 
 /** Load emojis into the emoji record. */
