@@ -4,7 +4,7 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
   {
-    files: ["build/**/*.{js,mjs,cjs}"],
+    files: ["build/**/*.{js,mjs,cjs}", "scripts/**/*.{js,mjs,cjs}"],
     plugins: { js },
     extends: ["js/recommended"],
     languageOptions: { globals: { ...globals.node } },
@@ -18,6 +18,7 @@ export default defineConfig([
         GM_setValue: "readonly",
         GM_getValue: "readonly",
         $import: "readonly",
+        unsafeWindow: "readonly",
         ...globals.browser,
       },
     },

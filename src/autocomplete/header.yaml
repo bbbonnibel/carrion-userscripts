@@ -1,0 +1,12 @@
+---
+name: Autocomplete
+namespace: bbbonnibel
+description: Autocomplete for emojis, mentions, and commands in chat.
+author: Bonnibel
+grant:
+  - GM_getValue
+  - GM_setValue
+  - unsafeWindow
+match:
+  - https://*.carrion.chat/chat/*
+run-at: document-start
