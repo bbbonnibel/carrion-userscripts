@@ -2,6 +2,16 @@ const fs = require("fs-extra");
 const path = require("path");
 
 /**
+ * Feed this to an `Array.filter` call to filter the array down to only unique elements.
+ *
+ * @example
+ * ["a", "b", "c", "b"].filter(filterUnique) // ["a", "b", "c"]
+ */
+function filterUnique(value, index, array) {
+  return array.indexOf(value) === index;
+}
+
+/**
  * @typedef {object} EmojiFamily.Emoji
  * @prop {string} emoji The emoji itself, e.g. "😀"
  * @prop {string} hexcode The unicode hexcode, e.g. "1f600"
@@ -151,6 +161,8 @@ function applyOverrides(emoji) {
     emoji.shortcodes = [...override.replace];
   }
 
+  emoji.shortcodes = emoji.shortcodes.filter(filterUnique);
+
   return emoji;
 }
 
@@ -195,12 +207,40 @@ async function getEmojiJson() {
   return json;
 }
 
+/**
+ * Merge mulitple emoji definition lists.
+ * @param {EmojiDefinition[][]} lists Emoji definition lists
+ * @param {(emoji) => void} conflictCallback A callback to call when there's a conflict
+ * @return The merged definition lists
+ */
+function mergeEmojiLists(lists, conflictCallback) {
+  /** @type {Map<string, EmojiDefinition>} */
+  const map = new Map();
+  for (const list of lists) {
+    for (const def of list) {
+      if (map.has(def.emoji)) {
+        const existing = map.get(def.emoji);
+        existing.shortcodes = [
+          ...existing.shortcodes,
+          ...def.shortcodes,
+        ].filter(filterUnique);
+        conflictCallback(def.emoji);
+      } else {
+        map.set(def.emoji, def);
+      }
+    }
+  }
+  return [...map.values()];
+}
+
 /** Load emojis into the emoji record. */
 async function processEmojis() {
   const json = await getEmojiJson();
   console.log("Retrieved emoji JSON.", json.length, "entries.");
-  let emojis = json.map((j) => convertToEmoji(j));
-  emojis = [...emojis, ...MISSING_EMOJIS];
+  const emojis = mergeEmojiLists(
+    [json.map((j) => convertToEmoji(j)), MISSING_EMOJIS],
+    (emoji) => console.warn("Emoji", emoji, "was in both lists."),
+  );
 
   console.log(
     "Working with",
