@@ -74,8 +74,12 @@ function assertIntegrity(json) {
  */
 
 /**
+ * @typedef {(AddOverride | PreferOverride | ReplaceOverride)} Override
+ */
+
+/**
  * Our list of overrides to apply.
- * @type {Record<string, (AddOverride | PreferOverride | ReplaceOverride)>}
+ * @type {Record<string, Override>}
  */
 const OVERRIDES = {
   "🎉": { add: ["tada"] },
@@ -104,78 +108,54 @@ const OVERRIDES = {
   "🩶": { add: ["heart-grey"] },
   "🤍": { add: ["heart-white"] },
   "#️⃣": { add: ["hash"] },
+  "🏴‍☠️": { prefer: ["pirate-flag", "skull-and-crossbones-flag", "jolly-roger"] },
+  "🚩": { prefer: ["red-flag"] },
+  "🏁": { prefer: ["checkered-flag"] },
+  "🏳️‍🌈": { prefer: ["rainbow-flag", "pride-flag", "lgbt-flag", "queer-flag"] },
+  "🏳️‍⚧️": { prefer: ["trans-flag", "transgender-flag"] },
 };
 
-/**
- * Emojis altogether missing from emojifamily.
- * @type {EmojiDefinition[]}
- */
-const MISSING_EMOJIS = [
-  {
-    emoji: "🏴‍☠️",
-    shortcodes: ["pirate-flag", "skull-and-crossbones-flag", "jolly-roger"],
-  },
-  {
-    emoji: "🚩",
-    shortcodes: ["red-flag"],
-  },
-  {
-    emoji: "🏁",
-    shortcodes: ["checkered-flag"],
-  },
-  {
-    emoji: "🏳️‍🌈",
-    shortcodes: ["rainbow-flag", "pride-flag", "lgbt-flag", "queer-flag"],
-  },
-  {
-    emoji: "🏳️‍⚧️",
-    shortcodes: ["trans-flag", "transgender-flag"],
-  },
-].map((def) => {
-  def.shortcodes = def.shortcodes.map(wrapColons);
-  return def;
-});
-
-/**
- * Apply local overrides to certain emoji definitions.
- *
- * @param {EmojiDefinition} emoji The emoji definition to modify
- */
-function applyOverrides(emoji) {
-  const override = OVERRIDES[emoji.emoji];
-  if (!override) {
-    return emoji;
-  }
-
+// Validate overrides
+for (const [key, override] of Object.entries(OVERRIDES)) {
+  if (!Object.hasOwn(OVERRIDES, key)) continue;
   const actionKeys = Object.keys(override).filter((k) =>
     ["add", "prefer", "replace"].includes(k),
   );
+
   if (actionKeys.length !== 1) {
     console.error(
       "An emoji override should have exactly one of add, prefer, or replace. You defined an override with zero, two, or more:",
-      emoji.emoji,
+      key,
       "=",
       override,
     );
     throw Error("Override error");
   }
+}
+
+/**
+ * Apply a local override to an emoji definition.
+ *
+ * @param {EmojiDefinition} def The emoji definition to modify
+ * @param {Override} override The override to apply
+ * @returns {EmojiDefinition} A modified emoji definition
+ */
+function applyOverride(def, override) {
+  def = { ...def, shortcodes: [...def.shortcodes] };
 
   if ("add" in override) {
-    emoji.shortcodes = [...emoji.shortcodes, ...override.add.map(wrapColons)];
+    def.shortcodes = [...def.shortcodes, ...override.add.map(wrapColons)];
   }
   if ("prefer" in override) {
-    emoji.shortcodes = [
-      ...override.prefer.map(wrapColons),
-      ...emoji.shortcodes,
-    ];
+    def.shortcodes = [...override.prefer.map(wrapColons), ...def.shortcodes];
   }
   if ("replace" in override) {
-    emoji.shortcodes = [...override.replace.map(wrapColons)];
+    def.shortcodes = [...override.replace.map(wrapColons)];
   }
 
-  emoji.shortcodes = emoji.shortcodes.filter(filterUnique);
+  def.shortcodes = def.shortcodes.filter(filterUnique);
 
-  return emoji;
+  return def;
 }
 
 /**
@@ -189,18 +169,10 @@ function convertToEmoji(jsonEmoji) {
   shortcodes = shortcodes.map((s) => s.toLowerCase()); // some emoji.family shortcodes contain uppercase, e.g. "Ophiuchus", for some reason
   shortcodes = shortcodes.filter((s) => !s.match(/^:\d/)); // remove shortcodes that start with numbers
 
-  /** @type {EmojiDefinition} */
-  let def = {
+  return {
     emoji,
     shortcodes,
   };
-  try {
-    const override = applyOverrides(def);
-    def = { ...def, ...override };
-  } catch (ex) {
-    console.error("Calculating overrides failed", { def, jsonEmoji, ex });
-  }
-  return def;
 }
 
 /**
@@ -220,45 +192,40 @@ async function getEmojiJson() {
 }
 
 /**
- * Merge mulitple emoji definition lists.
- * @param {EmojiDefinition[][]} lists Emoji definition lists
- * @param {(emoji) => void} conflictCallback A callback to call when there's a conflict
- * @return The merged definition lists
+ * Create the emoji list.
+ * @param {EmojiDefinition[]} apiEmojis Emojis from the API.
  */
-function mergeEmojiLists(lists, conflictCallback) {
+function buildEmojiList(apiEmojis) {
   /** @type {Map<string, EmojiDefinition>} */
   const map = new Map();
-  for (const list of lists) {
-    for (const def of list) {
-      if (map.has(def.emoji)) {
-        const existing = map.get(def.emoji);
-        existing.shortcodes = [...existing.shortcodes, ...def.shortcodes]
-          .map(wrapColons)
-          .filter(filterUnique);
-        conflictCallback(def.emoji);
-      } else {
-        map.set(def.emoji, def);
-      }
-    }
+
+  for (const def of apiEmojis) {
+    map.set(def.emoji, def);
   }
+
+  for (const [key, override] of Object.entries(OVERRIDES)) {
+    /** @type {EmojiDefinition} */
+    let def = map.get(key) ?? { emoji: key, shortcodes: [] };
+    def = applyOverride(def, override);
+    map.set(key, def);
+  }
+
   return [...map.values()];
 }
 
 /** Load emojis into the emoji record. */
 async function processEmojis() {
   const json = await getEmojiJson();
-  console.log("Retrieved emoji JSON.", json.length, "entries.");
-  const emojis = mergeEmojiLists(
-    [json.map((j) => convertToEmoji(j)), MISSING_EMOJIS],
-    (emoji) => console.warn("Emoji", emoji, "was in both lists."),
-  );
+  console.log("Retrieved emoji JSON with", json.length, "entries.");
+  const apiEmojis = json.map((j) => convertToEmoji(j));
+  const emojis = buildEmojiList(apiEmojis);
 
   console.log(
     "Working with",
     emojis.length,
     "entries, including",
-    MISSING_EMOJIS.length,
-    "missing entries",
+    Object.keys(OVERRIDES).length,
+    "overrides",
   );
 
   for (const emoji of emojis) {
