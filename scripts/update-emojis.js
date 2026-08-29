@@ -12,6 +12,16 @@ function filterUnique(value, index, array) {
 }
 
 /**
+ * Wrap a string in colons safely, `heart` --> `:heart:`
+ * @param {string} s
+ */
+function wrapColons(s) {
+  s = `:${s}:`;
+  s = s.replaceAll("::", ":");
+  return s;
+}
+
+/**
  * @typedef {object} EmojiFamily.Emoji
  * @prop {string} emoji The emoji itself, e.g. "😀"
  * @prop {string} hexcode The unicode hexcode, e.g. "1f600"
@@ -68,32 +78,32 @@ function assertIntegrity(json) {
  * @type {Record<string, (AddOverride | PreferOverride | ReplaceOverride)>}
  */
 const OVERRIDES = {
-  "🎉": { add: [":tada:"] },
-  "💥": { prefer: [":bang:", ":boom:", ":explosion:"] },
-  "♠️": { replace: [":spades:", ":suite-spades:"] },
-  "♥️": { replace: [":hearts:", ":suite-hearts:"] },
-  "♦️": { replace: [":diamonds:", ":suite-diamonds:"] },
-  "♣️": { replace: [":clubs:", ":suite-clubs:"] },
-  "💝": { add: [":heart-gift:"] },
-  "💖": { add: [":heart-sparkling:"] },
-  "💗": { add: [":heart-pulse:"] },
-  "💓": { add: [":heart-beating:"] },
-  "💔": { add: [":heart-broken:"] },
-  "❤️‍🔥": { add: [":heart-fire:"] },
-  "❤️‍🩹": { add: [":heart-bandaged:"] },
-  "❤️": { prefer: [":heart:", ":heart-red:"] },
-  "🩷": { add: [":heart-pink:"] },
-  "🧡": { add: [":heart-orange:"] },
-  "💛": { add: [":heart-yellow:"] },
-  "💚": { add: [":heart-green:"] },
-  "💙": { add: [":heart-blue:"] },
-  "🩵": { add: [":light-blue-heart:"] },
-  "💜": { add: [":heart-purple:"] },
-  "🤎": { add: [":heart-brown:"] },
-  "🖤": { add: [":heart-black:"] },
-  "🩶": { add: [":heart-grey:"] },
-  "🤍": { add: [":heart-white:"] },
-  "#️⃣": { add: [":hash:"] },
+  "🎉": { add: ["tada"] },
+  "💥": { prefer: ["bang", "boom", "explosion"] },
+  "♠️": { replace: ["spades", "suite-spades"] },
+  "♥️": { replace: ["hearts", "suite-hearts"] },
+  "♦️": { replace: ["diamonds", "suite-diamonds"] },
+  "♣️": { replace: ["clubs", "suite-clubs"] },
+  "💝": { add: ["heart-gift"] },
+  "💖": { add: ["heart-sparkling"] },
+  "💗": { add: ["heart-pulse"] },
+  "💓": { add: ["heart-beating"] },
+  "💔": { add: ["heart-broken"] },
+  "❤️‍🔥": { add: ["heart-fire"] },
+  "❤️‍🩹": { add: ["heart-bandaged"] },
+  "❤️": { prefer: ["heart", "heart-red"] },
+  "🩷": { add: ["heart-pink"] },
+  "🧡": { add: ["heart-orange"] },
+  "💛": { add: ["heart-yellow"] },
+  "💚": { add: ["heart-green"] },
+  "💙": { add: ["heart-blue"] },
+  "🩵": { add: ["light-blue-heart"] },
+  "💜": { add: ["heart-purple"] },
+  "🤎": { add: ["heart-brown"] },
+  "🖤": { add: ["heart-black"] },
+  "🩶": { add: ["heart-grey"] },
+  "🤍": { add: ["heart-white"] },
+  "#️⃣": { add: ["hash"] },
 };
 
 /**
@@ -103,29 +113,28 @@ const OVERRIDES = {
 const MISSING_EMOJIS = [
   {
     emoji: "🏴‍☠️",
-    shortcodes: [
-      ":pirate-flag:",
-      ":skull-and-crossbones-flag:",
-      ":jolly-roger:",
-    ],
+    shortcodes: ["pirate-flag", "skull-and-crossbones-flag", "jolly-roger"],
   },
   {
     emoji: "🚩",
-    shortcodes: [":red-flag:"],
+    shortcodes: ["red-flag"],
   },
   {
     emoji: "🏁",
-    shortcodes: [":checkered-flag:"],
+    shortcodes: ["checkered-flag"],
   },
   {
     emoji: "🏳️‍🌈",
-    shortcodes: [":rainbow-flag:", ":pride-flag:", ":lgbt-flag:"],
+    shortcodes: ["rainbow-flag", "pride-flag", "lgbt-flag", "queer-flag"],
   },
   {
     emoji: "🏳️‍⚧️",
-    shortcodes: [":trans-flag:", ":transgender-flag:"],
+    shortcodes: ["trans-flag", "transgender-flag"],
   },
-];
+].map((def) => {
+  def.shortcodes = def.shortcodes.map(wrapColons);
+  return def;
+});
 
 /**
  * Apply local overrides to certain emoji definitions.
@@ -152,13 +161,16 @@ function applyOverrides(emoji) {
   }
 
   if ("add" in override) {
-    emoji.shortcodes = [...emoji.shortcodes, ...override.add];
+    emoji.shortcodes = [...emoji.shortcodes, ...override.add.map(wrapColons)];
   }
   if ("prefer" in override) {
-    emoji.shortcodes = [...override.prefer, ...emoji.shortcodes];
+    emoji.shortcodes = [
+      ...override.prefer.map(wrapColons),
+      ...emoji.shortcodes,
+    ];
   }
   if ("replace" in override) {
-    emoji.shortcodes = [...override.replace];
+    emoji.shortcodes = [...override.replace.map(wrapColons)];
   }
 
   emoji.shortcodes = emoji.shortcodes.filter(filterUnique);
@@ -220,10 +232,9 @@ function mergeEmojiLists(lists, conflictCallback) {
     for (const def of list) {
       if (map.has(def.emoji)) {
         const existing = map.get(def.emoji);
-        existing.shortcodes = [
-          ...existing.shortcodes,
-          ...def.shortcodes,
-        ].filter(filterUnique);
+        existing.shortcodes = [...existing.shortcodes, ...def.shortcodes]
+          .map(wrapColons)
+          .filter(filterUnique);
         conflictCallback(def.emoji);
       } else {
         map.set(def.emoji, def);
