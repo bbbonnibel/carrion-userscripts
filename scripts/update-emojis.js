@@ -233,7 +233,6 @@ async function processEmojis() {
     for (let shortcode of emoji.shortcodes) {
       shortcode = shortcode.replaceAll(":", "");
       EMOJIS.byShortcode[shortcode] = emoji.emoji;
-      EMOJIS.shortcodes.push(shortcode);
     }
   }
 }
