@@ -1,5 +1,5 @@
 const mainCss = $import("./main.scss");
-const PREFIX = "[Autocomplete]";
+const LOG_PREFIX = "[Autocomplete]";
 const DEBUG = false;
 
 //#region Bootstrap
@@ -25,8 +25,6 @@ function installStyle(css, origin, filename) {
   e.innerText = css;
   document.head.appendChild(e);
 }
-
-installStyle(mainCss, "autocomplete", "main.css");
 //#endregion
 
 //#region Levenshtein distance
@@ -462,7 +460,7 @@ class MessageInputManager {
     }
 
     if (DEBUG) {
-      console.debug(PREFIX, "messageInput update:", {
+      console.debug(LOG_PREFIX, "messageInput update:", {
         words: this.words,
         currentWord: this.currentWord,
       });
@@ -1089,7 +1087,8 @@ function bindKeyboardManagementEvents() {
 //#endregion
 
 //#region Main
-function mainUi() {
+function main() {
+  installStyle(mainCss, "autocomplete", "main.css");
   insertAutocomplete();
   updateAutocompletePosition();
   watchAutocompletePosition();
@@ -1097,17 +1096,12 @@ function mainUi() {
   bindKeyboardManagementEvents();
 }
 
-async function main() {
-  console.debug(PREFIX, "Started");
-  window.addEventListener("chat-ready", () => {
-    console.debug(PREFIX, "Chat ready. Starting UI.");
-    try {
-      mainUi();
-    } catch (ex) {
-      console.error(PREFIX, "Main UI failed to load:", ex);
-    }
-  });
-}
-
-main();
+window.addEventListener("chat-ready", () => {
+  try {
+    main();
+    console.debug(LOG_PREFIX, "Started.");
+  } catch (ex) {
+    console.error(LOG_PREFIX, "Failed to start:", ex);
+  }
+});
 //#endregion

@@ -147,8 +147,6 @@ function installStyle(css, origin, filename) {
   document.head.appendChild(e);
 }
 
-installStyle(mainCss, "chat-unread-indicator", "main.css");
-
 const PAGE = Object.freeze({
   /** @returns {HTMLDivElement} */
   sidebar: () => document.querySelector("#sidebar"),
@@ -445,7 +443,7 @@ function insertUnreadIndicators() {
   });
 }
 function main() {
-  console.debug(LOG_PREFIX, "Started");
+  installStyle(mainCss, "chat-unread-indicator", "main.css");
   insertUnreadIndicators();
   recalculateRooms();
   manageIndicators();
@@ -456,5 +454,10 @@ function main() {
 }
 
 window.addEventListener("chat-ready", () => {
-  main();
+  try {
+    main();
+    console.debug(LOG_PREFIX, "Started.");
+  } catch (ex) {
+    console.error(LOG_PREFIX, "Failed to start:", ex);
+  }
 });
