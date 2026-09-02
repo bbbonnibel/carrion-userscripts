@@ -2,7 +2,6 @@
  * @typedef {object} EmojiBank
  * @prop {Record<RawEmoji, EmojiDefinition>} definitions All emojis, indexed by the text representation of the emoji itself: e.g. "😀" is a key.
  * @prop {Record<string, RawEmoji>} byShortcode Emojis, mapped by their shortcode (minus colons), e.g. "smile" -> "😀"
- * @prop {string[]} shortcodes The full list of shortcodes, with colons stripped.
  */
 
 /** @typedef {"🩷" | "💛"} RawEmoji An actual emoji, e.g. "😀" */

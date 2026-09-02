@@ -339,6 +339,13 @@ const COMMANDS = [
 
 /** @type {EmojiBank} */
 const EMOJIS = $import("../data/emojis.json");
+/** @type {string[]} */
+const EMOJI_SHORTCODES = Object.keys(EMOJIS.byShortcode);
+/**
+ * A cache of previously-seen emoji lookups.
+ * @type {Map<string, EmojiDefinition[]>}
+ */
+const EMOJI_LOOKUP_CACHE = new Map();
 //#endregion
 
 //#region Words and text
@@ -811,14 +818,22 @@ function getEmojiOptions(text) {
   if (text.length < 2) {
     return [];
   }
+
+  const cached = EMOJI_LOOKUP_CACHE.get(text);
+  if (cached) {
+    return cached;
+  }
+
   const raw = text.replaceAll(":", "");
-  const matchingShortcodes = EMOJIS.shortcodes
-    .filter((s) => s.includes(raw))
-    .sort((a, b) => a.length - b.length);
+  const matchingShortcodes = EMOJI_SHORTCODES.filter((s) =>
+    s.includes(raw),
+  ).sort((a, b) => a.length - b.length);
   const matchingEmojis = matchingShortcodes
     .map((shortcode) => EMOJIS.byShortcode[shortcode])
     .filter(filterUnique)
     .map((rawEmoji) => EMOJIS.definitions[rawEmoji]);
+
+  EMOJI_LOOKUP_CACHE.set(text, matchingEmojis);
 
   return matchingEmojis;
 }
