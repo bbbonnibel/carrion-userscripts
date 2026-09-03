@@ -94,6 +94,7 @@ const OVERRIDES = {
   "🦿": { add: ["leg-robot"] },
   "🎉": { add: ["tada"] },
   "💥": { prefer: ["bang", "boom", "explosion"] },
+  "🗯️": { prefer: ["exclamation-bubble"] },
   "♠️": { replace: ["spades", "suite-spades"] },
   "♥️": { replace: ["hearts", "suite-hearts"] },
   "♦️": { replace: ["diamonds", "suite-diamonds"] },
