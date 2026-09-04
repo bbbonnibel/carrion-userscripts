@@ -1,6 +1,7 @@
 const path = require("node:path");
 const fs = require("fs-extra");
 const css = require("./lib/css");
+const jsonMinify = require("node-json-minify");
 
 const RESOLUTION_LOGGING = false;
 
@@ -31,6 +32,7 @@ async function resolveImportReference(filepath) {
       content = fs.readFileSync(filepath, {
         encoding: "utf-8",
       });
+      content = jsonMinify(content);
     } else {
       RESOLUTION_LOGGING && console.log("Resolving as plaintext");
       content = fs.readFileSync(filepath, {

@@ -36,7 +36,6 @@ function wrapColons(s) {
 const EMOJIS = {
   definitions: {},
   byShortcode: {},
-  shortcodes: [],
 };
 
 function assertIntegrity(json) {
@@ -250,7 +249,7 @@ async function processEmojis() {
 
 /** Save emojis to disk. */
 function saveEmojis() {
-  const json = JSON.stringify(EMOJIS);
+  const json = JSON.stringify(EMOJIS, null, 2);
   fs.writeFileSync(path.join(process.cwd(), "src/data/emojis.json"), json, {
     encoding: "utf-8",
   });
