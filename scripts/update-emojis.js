@@ -81,6 +81,7 @@ function assertIntegrity(json) {
  * @type {Record<string, Override>}
  */
 const OVERRIDES = {
+  "😭": { prefer: ["sob"] },
   "😇": { add: ["innocent"] },
   "👆️": { replace: ["point-up-2"] },
   "☝️": { replace: ["point-up", "index-finger"] },
