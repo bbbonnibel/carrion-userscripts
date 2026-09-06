@@ -1,6 +1,6 @@
 const path = require("node:path");
 const fs = require("fs-extra");
-const css = require("./lib/css");
+const css = require("./css");
 const jsonMinify = require("node-json-minify");
 
 const RESOLUTION_LOGGING = false;
