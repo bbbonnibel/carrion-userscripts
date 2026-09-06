@@ -19,8 +19,9 @@ const DIST_SCRIPT = path.join(dir.DIST, "script");
 
 async function buildUserscript(folder) {
   console.log(`Building ${folder}`);
+  const SCRIPT_DIR = path.join(dir.SCRIPT, folder);
 
-  const config = yaml.readYamlFile(path.join(dir.SRC, folder, "build.yaml"));
+  const config = yaml.readYamlFile(path.join(SCRIPT_DIR, "build.yaml"));
   const version = config.version ?? "0.0.0";
   const headerFile = config.header ?? "header.yaml";
   const mainFile = config.main ?? "main.js";
@@ -32,7 +33,7 @@ async function buildUserscript(folder) {
 
   console.log(`Version ${version}`);
 
-  const headerYaml = yaml.readYamlFile(path.join(dir.SRC, folder, headerFile));
+  const headerYaml = yaml.readYamlFile(path.join(SCRIPT_DIR, headerFile));
   const header = greasemonkey.compileHeader({
     ...headerYaml,
     version,
@@ -44,7 +45,7 @@ async function buildUserscript(folder) {
     icon64: PROJECT.icon64,
   });
 
-  const mainFilePath = path.join(dir.SRC, folder, mainFile);
+  const mainFilePath = path.join(SCRIPT_DIR, mainFile);
   let script = fs.readFileSync(mainFilePath, {
     encoding: "utf-8",
   });
@@ -84,10 +85,10 @@ async function series(folders) {
  */
 function getUserscriptFolders() {
   return fs
-    .readdirSync(dir.SRC)
+    .readdirSync(dir.SCRIPT)
     .map((folderName) => {
       const hasBuildYaml = fs.existsSync(
-        path.join(dir.SRC, folderName, "build.yaml"),
+        path.join(dir.SCRIPT, folderName, "build.yaml"),
       );
       if (!hasBuildYaml) {
         return undefined;
