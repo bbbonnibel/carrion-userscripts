@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs-extra");
 const showdown = require("showdown");
-const dir = require("./dir.js");
+const dir = require("./lib/dir.js");
 const css = require("./lib/css.js");
 const { JSDOM } = require("jsdom");
 
@@ -82,6 +82,4 @@ async function build() {
   process.stdout.write(` ✓ Built docs\n`);
 }
 
-module.exports = {
-  build,
-};
+build();

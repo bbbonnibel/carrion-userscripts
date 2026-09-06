@@ -1,7 +1,7 @@
 const path = require("node:path");
 const fs = require("fs-extra");
-const imports = require("./imports.js");
-const dir = require("./dir.js");
+const imports = require("./lib/imports.js");
+const dir = require("./lib/dir.js");
 const yaml = require("./lib/yaml.js");
 const greasemonkey = require("./lib/greasemonkey.js");
 
@@ -103,6 +103,4 @@ async function build() {
   await series(folders);
 }
 
-module.exports = {
-  build,
-};
+build();
