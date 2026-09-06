@@ -336,7 +336,7 @@ const COMMANDS = [
 ];
 
 /** @type {EmojiBank} */
-const EMOJIS = $import("../data/emojis.json");
+const EMOJIS = $import("../../data/emojis.json");
 /** @type {string[]} */
 const EMOJI_SHORTCODES = Object.keys(EMOJIS.byShortcode);
 /**

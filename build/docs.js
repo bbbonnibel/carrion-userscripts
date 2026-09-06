@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs-extra");
 const showdown = require("showdown");
-const dir = require("./dir.js");
+const dir = require("./lib/dir.js");
 const css = require("./lib/css.js");
 const { JSDOM } = require("jsdom");
 
@@ -72,7 +72,7 @@ async function build() {
   process.stdout.write(`Building docs...\n`);
 
   fs.ensureDirSync(dir.DIST);
-  fs.copySync(path.join(dir.CWD, "docs"), dir.DIST);
+  fs.copySync(dir.DOCS, dir.DIST);
   fs.ensureDirSync(path.join(dir.DIST, "styles"));
   fs.emptyDirSync(path.join(dir.DIST, "styles"));
 
@@ -82,6 +82,4 @@ async function build() {
   process.stdout.write(` ✓ Built docs\n`);
 }
 
-module.exports = {
-  build,
-};
+build();
