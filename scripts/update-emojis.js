@@ -36,7 +36,6 @@ function wrapColons(s) {
 const EMOJIS = {
   definitions: {},
   byShortcode: {},
-  shortcodes: [],
 };
 
 function assertIntegrity(json) {
@@ -82,6 +81,7 @@ function assertIntegrity(json) {
  * @type {Record<string, Override>}
  */
 const OVERRIDES = {
+  "😭": { prefer: ["sob"] },
   "😇": { add: ["innocent"] },
   "👆️": { replace: ["point-up-2"] },
   "☝️": { replace: ["point-up", "index-finger"] },
@@ -95,6 +95,7 @@ const OVERRIDES = {
   "🎉": { add: ["tada"] },
   "💥": { prefer: ["bang", "boom", "explosion"] },
   "🗯️": { prefer: ["exclamation-bubble"] },
+  "🦠": { prefer: ["germ"] },
   "♠️": { replace: ["spades", "suite-spades"] },
   "♥️": { replace: ["hearts", "suite-hearts"] },
   "♦️": { replace: ["diamonds", "suite-diamonds"] },
@@ -250,7 +251,7 @@ async function processEmojis() {
 
 /** Save emojis to disk. */
 function saveEmojis() {
-  const json = JSON.stringify(EMOJIS);
+  const json = JSON.stringify(EMOJIS, null, 2);
   fs.writeFileSync(path.join(process.cwd(), "src/data/emojis.json"), json, {
     encoding: "utf-8",
   });
