@@ -175,7 +175,19 @@ function sortAlphabetic(a, b) {
 }
 //#endregion
 
-//#region Data
+//#region Data: Emojis
+/** @type {EmojiBank} */
+const EMOJIS = $import("../../data/emojis.json");
+/** @type {string[]} */
+const EMOJI_SHORTCODES = Object.keys(EMOJIS.byShortcode);
+/**
+ * A cache of previously-seen emoji lookups.
+ * @type {Map<string, EmojiDefinition[]>}
+ */
+const EMOJI_LOOKUP_CACHE = new Map();
+//#endregion
+
+//#region Data: Commands
 /**
  * @typedef {object} CommandDefinition
  * @prop {string} command The command text, including slash.
@@ -334,16 +346,6 @@ const COMMANDS = [
     staff: true,
   },
 ];
-
-/** @type {EmojiBank} */
-const EMOJIS = $import("../../data/emojis.json");
-/** @type {string[]} */
-const EMOJI_SHORTCODES = Object.keys(EMOJIS.byShortcode);
-/**
- * A cache of previously-seen emoji lookups.
- * @type {Map<string, EmojiDefinition[]>}
- */
-const EMOJI_LOOKUP_CACHE = new Map();
 //#endregion
 
 //#region Words and text
@@ -862,7 +864,7 @@ function parseEmoji() {
 }
 //#endregion
 
-//#region Mentions
+//#region Parse mentions
 /**
  * Pick an emoji from autocomplete.
  *
@@ -932,30 +934,57 @@ function makeUsernameAutocompleteOption(username) {
   `);
 }
 
-function parseMention() {
-  const word = messageInput.currentWord;
-  if (word.segment.length < 2) {
-    return;
-  }
-  if (word.segment.endsWith("]")) {
-    return;
-  }
+/**
+ * Get the names of all bookmarked characters.
+ *
+ * @returns {string[]}
+ */
+function getBookmarkedCharacters() {
+  const list = unsafeWindow.socialManager?.getBookmarks?.() ?? [];
+  const bookmarks = list.map((b) => b.name);
+  return bookmarks;
+}
 
-  /** The normalized mention being entered. */
-  let mention = word.segment.slice(1).toLowerCase();
-  if (mention.startsWith("[")) {
-    mention = mention.slice(1);
+/**
+ * Get the list of names of characters currently online.
+ *
+ * @returns {string[]}
+ */
+function getOnlineCharacters() {
+  return unsafeWindow.drakensberg?.getOnlineUsers?.() ?? [];
+}
+
+/**
+ * Get the list of characters you have.
+ *
+ * @returns {string[]}
+ */
+function getYourCharacters() {
+  /** @type {HTMLSelectElement | undefined} */
+  const characterSwitcher = document.querySelector("#site-character-selector");
+  if (!characterSwitcher) {
+    return [];
   }
+  /** @type {HTMLOptionElement[]} */
+  const characterOptions = [
+    ...characterSwitcher.querySelectorAll("option"),
+  ].filter((option) => option.value);
+  return characterOptions.map((o) => o.getAttribute("data-name"));
+}
 
-  /** @type {string[]} The list of names the user has bookmarked. */
-  const bookmarks = unsafeWindow.socialManager
-    .getBookmarks()
-    .map((b) => b.name);
-  /** @type {string[]} The list of names of people online. */
-  const onlineUsers = unsafeWindow.drakensberg.getOnlineUsers();
+/**
+ * Get user options that match the current preference.
+ *
+ * @param {string} mention The name being mentioned
+ * @returns Names matching that mention, sorted by preference
+ */
+function getUserOptions(mention) {
+  const bookmarks = getBookmarkedCharacters();
+  const onlineUsers = getOnlineCharacters();
+  const yourCharacters = getYourCharacters();
 
-  /** The set of users available for autocomplete. */
-  const users = [...bookmarks, ...onlineUsers]
+  /** The set of characters available for autocomplete. */
+  const characters = [...bookmarks, ...onlineUsers, ...yourCharacters]
     .filter(filterUnique)
     .map((name) => {
       return {
@@ -966,14 +995,14 @@ function parseMention() {
 
   const near = [];
   const far = [];
-  for (const user of users) {
-    if (!user.normalized.includes(mention)) {
+  for (const character of characters) {
+    if (!character.normalized.includes(mention)) {
       continue;
     }
-    if (user.normalized.length - mention.length <= 8) {
-      near.push(user.name);
+    if (character.normalized.length - mention.length <= 8) {
+      near.push(character.name);
     } else {
-      far.push(user.name);
+      far.push(character.name);
     }
   }
 
@@ -995,6 +1024,26 @@ function parseMention() {
       .map((record) => record.name),
     ...far.toSorted(sortAlphabetic),
   ];
+  return options;
+}
+
+function parseMention() {
+  const word = messageInput.currentWord;
+  if (word.segment.length < 2) {
+    return;
+  }
+  if (word.segment.endsWith("]")) {
+    return;
+  }
+
+  /** The normalized mention being entered. */
+  let mention = word.segment.slice(1).toLowerCase();
+  if (mention.startsWith("[")) {
+    mention = mention.slice(1);
+  }
+
+  /** @type {string[]} The list of names the user has bookmarked. */
+  const options = getUserOptions(mention);
 
   const elements = options.map((option) => {
     const li = makeUsernameAutocompleteOption(option);
@@ -1006,6 +1055,7 @@ function parseMention() {
   });
   autocomplete.setOptions(elements);
 }
+
 //#endregion
 
 //#region Message input handling
