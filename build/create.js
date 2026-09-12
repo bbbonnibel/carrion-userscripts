@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs-extra");
-const dir = require("./dir.js");
+const dir = require("./lib/dir.js");
 
 const TEMPLATE = path.join(dir.CWD, "build/template");
 
@@ -13,7 +13,7 @@ function getDatestamp(date) {
 }
 
 function createUserscript(name) {
-  const outFolder = path.join(dir.SRC, name);
+  const outFolder = path.join(dir.SCRIPT, name);
 
   console.log(`Creating "${name}" ...`);
 
