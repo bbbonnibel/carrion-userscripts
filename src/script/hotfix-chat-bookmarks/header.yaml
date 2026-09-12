@@ -3,8 +3,7 @@ name: "Hotfix: Chat Bookmarks"
 namespace: bbbonnibel
 description: Bookmarks in chat now only appear on hover.
 author: Bonnibel
-tag:
-  - hotfix
+tag: hotfix
 grant:
   - GM_getValue
   - GM_setValue

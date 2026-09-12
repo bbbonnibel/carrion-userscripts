@@ -1,0 +1,12 @@
+---
+name: "Hotfix: Profile Character Lists"
+namespace: bbbonnibel
+description: Characters lists in a profile now show up alongside other profile attributes.
+author: Bonnibel
+tag: hotfix
+grant:
+  - GM_getValue
+  - GM_setValue
+match:
+  - https://*.carrion.chat/character/*
+run-at: document-end

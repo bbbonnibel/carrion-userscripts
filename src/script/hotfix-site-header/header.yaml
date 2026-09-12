@@ -3,6 +3,7 @@ name: "Hotfix: Site Header"
 namespace: bbbonnibel
 description: Move the references button in the site header.
 author: Bonnibel
+tag: hotfix
 grant:
   - GM_getValue
   - GM_setValue

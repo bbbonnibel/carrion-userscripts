@@ -15,3 +15,5 @@ function installStyle(css, origin, filename) {
 }
 
 installStyle(mainCss, "hotfix-bookmarks", "main.css");
+
+console.log("[BBB Hotfix] Chat Bookmarks running");

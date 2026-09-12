@@ -15,3 +15,5 @@ function installStyle(css, origin, filename) {
 }
 
 installStyle(mainCss, "hotfix-site-header", "main.css");
+
+console.log("[BBB Hotfix] Site Header running");
