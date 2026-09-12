@@ -1,0 +1,5 @@
+#bookmarks-list .online-user:not(:hover) {
+  & .bookmark-remove-btn {
+    display: none;
+  }
+}
