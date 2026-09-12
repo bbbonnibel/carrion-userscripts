@@ -83,3 +83,19 @@ This is like what happens on the search and dashboard pages, except for those it
 Carrion intercepts most outgoing links with a “You are now leaving carrion” page. This script makes that page auto-forward if two conditions are met: (1) the link is on carrion's list of trusted image domains, *and* (2) it looks like an image link. Any other kinds of links, or images on any other kind of domain, are not auto-forwarded.
 
 This implements a feature request we consider reasonable in a way that's opt-in. While this technically bypasses a security measure, our reasoning is this: this script is vulnerable if a trusted image host can host malicious files that look like images. If that is true, we should either ban that image host or ban that user. Someone has _already_ clicked on that link, and they're not going to read the URL a second time before they hit “continue”.
+
+## Hotfixes
+
+Hotfixes are temporary fixes. Expect these to last hours/days/weeks at most until a specific issue gets addressed.
+
+### [Hotfix: Profile Lists](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-profile-lists/hotfix-profile-lists.user.js)
+
+A profile's character lists will show up at the end of the profile's attributes (after gender, pronouns, etc) instead of at the top of the page.
+
+### [Hotfix: Site Header](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-site-header/hotfix-site-header.user.js)
+
+Put the Reference icon at the end of the header, just next to settings.
+
+### [Hotfix: Chat Bookmarks](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-chat-bookmarks/hotfix-chat-bookmarks.user.js)
+
+The red X next to your bookmarks no longer shows up unless you're hovering over that bookmark.
