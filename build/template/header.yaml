@@ -7,5 +7,5 @@ grant:
   - GM_getValue
   - GM_setValue
 match:
-  - https://*.carrion.chat/
+  - https://*.carrion.chat/*
 run-at: document-idle
