@@ -88,7 +88,7 @@ This implements a feature request we consider reasonable in a way that's opt-in.
 
 Hotfixes are temporary fixes. Expect these to last hours/days/weeks at most until a specific issue gets addressed.
 
-### [Hotfix: Profile Lists](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-profile-character-lists/hotfix-profile-character-lists.user.js)
+### [Hotfix: Profile Character Lists](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-profile-character-lists/hotfix-profile-character-lists.user.js)
 
 A profile's character lists will show up at the end of the profile's attributes (after gender, pronouns, etc) instead of at the top of the page.
 
