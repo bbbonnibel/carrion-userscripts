@@ -1,0 +1,11 @@
+---
+name: "Hotfix: Site Header"
+namespace: bbbonnibel
+description: Move the references button in the site header.
+author: Bonnibel
+grant:
+  - GM_getValue
+  - GM_setValue
+match:
+  - https://*.carrion.chat/*
+run-at: document-idle

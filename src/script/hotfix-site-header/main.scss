@@ -1,0 +1,13 @@
+#site-nav ul {
+  & li:has(a[href="/reference/"]) {
+    order: 2;
+  }
+
+  & li:has(a[href="/accounts/settings/"]) {
+    order: 3;
+  }
+
+  & li:has(form[action="/accounts/logout/"]) {
+    order: 4;
+  }
+}
