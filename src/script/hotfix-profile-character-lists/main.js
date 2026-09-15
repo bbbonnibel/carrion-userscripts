@@ -23,7 +23,7 @@ function installStyle(css, origin, filename) {
   document.head.appendChild(e);
 }
 
-installStyle(mainCss, "profile-lists", "main.css");
+installStyle(mainCss, "hotfix-profile-lists", "main.css");
 
 const links = document.querySelector(".character-list-links");
 const stats = document.querySelector(".profile-stats-grid");
