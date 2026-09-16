@@ -15,9 +15,10 @@ _These scripts introduce new features to your carrion experience._
 
 Your chat messages now have an optional autocomplete for emojis, commands, and mentions. This is not autocorrect, it won't actually modify your message unless you tell it to. Autocomplete with <kbd>**⭾ Tab**</kbd> (not Enter).
 
-- Autocompletes `@mentions`.
-- Autocompletes `/commands`. Start typing your command and it'll list matching commands. This script will never autocomplete `/me`, it's assumed if you're using this script you don't need help with that & it'd be a nuisance.
 - Autocompletes emojis by typing their name like this: `:heart:`
+- Autocompletes `@mentions` for normal users.
+- Autocompletes `?mentions` for bots.
+- Autocompletes `/commands`. Start typing your command and it'll list matching commands. This script will never autocomplete `/me`, it's assumed if you're using this script you don't need help with that & it'd be a nuisance.
 
 Coming soon:
 
