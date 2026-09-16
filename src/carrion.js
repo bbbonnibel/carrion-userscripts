@@ -19,4 +19,4 @@
  * @prop {(username: string) => Carrion.CharacterBadge[] | undefined} getBadges Get any badge roles related to a user.
  */
 
-/** @typedef {"bot" | "janitor" | "pre-alpha" | "alpha" | "subscriber" | "recruiter-1" | "broke-the-website"} Carrion.CharacterBadge */
+/** @typedef {"bot" | "admin" | "janitor" | "pre-alpha" | "alpha" | "subscriber" | "recruiter-1" | "broke-the-website"} Carrion.CharacterBadge */

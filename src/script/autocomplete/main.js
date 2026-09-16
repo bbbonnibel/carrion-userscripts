@@ -932,14 +932,34 @@ function generateUsernameGradient(username) {
  */
 function makeUsernameAutocompleteOption(username) {
   const avatarUrl = carrion.drakensberg.getAvatar(username) ?? "";
+  const badges = carrion.drakensberg.getBadges(username) ?? [];
+  const displayBadges = badges
+    .map((badge) => {
+      switch (badge) {
+        case "admin":
+          return "⚡";
+        case "janitor":
+          return "🧹";
+        case "bot":
+          return "🤖";
+        default:
+          return undefined;
+      }
+    })
+    .filter(Boolean)
+    .join(" ");
   const gradient = generateUsernameGradient(username);
+  const figureStyle = avatarUrl ? "" : `background: ${gradient};`;
   return template(`
     <li class="li-username">
       <button type="button" class="option option-username">
-        <span class="figure" style="background: ${gradient};">
+        <span class="figure" style="${figureStyle}">
           <img class="avatar" data-found="${Boolean(avatarUrl)}" src="${avatarUrl}">
         </span>
-        <span class="label">${username}</span>
+        <span class="label">
+          <span class="username">${username}</span>
+          <span class="badges">${displayBadges}</span>
+        </span>
         ${makeAutocompleteTab()}
       </button>
     </li>
@@ -1071,8 +1091,7 @@ function parseMention() {
   const options = getUserOptions(mention, findingBots);
 
   const elements = options.map((characterName) => {
-    const displayName = findingBots ? `${characterName} 🤖` : characterName;
-    const li = makeUsernameAutocompleteOption(displayName);
+    const li = makeUsernameAutocompleteOption(characterName);
     autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
       pickUser(word, characterName);
