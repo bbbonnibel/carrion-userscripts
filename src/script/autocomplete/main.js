@@ -27,6 +27,18 @@ function installStyle(css, origin, filename) {
 }
 //#endregion
 
+//#region Carrion
+/** @type {Carrion.ChatWindow} */
+const carrion = {
+  get drakensberg() {
+    return unsafeWindow.drakensberg;
+  },
+  get socialManager() {
+    return unsafeWindow.socialManager;
+  },
+};
+//#endregion
+
 //#region Levenshtein distance
 /**
  * Calculate the levenshtein distance between two words.
@@ -919,7 +931,7 @@ function generateUsernameGradient(username) {
  * @param {string} username The username (or character name) to make an option for.
  */
 function makeUsernameAutocompleteOption(username) {
-  const avatarUrl = unsafeWindow.drakensberg.getAvatar(username) ?? "";
+  const avatarUrl = carrion.drakensberg.getAvatar(username) ?? "";
   const gradient = generateUsernameGradient(username);
   return template(`
     <li class="li-username">
@@ -940,7 +952,7 @@ function makeUsernameAutocompleteOption(username) {
  * @returns {string[]}
  */
 function getBookmarkedCharacters() {
-  const list = unsafeWindow.socialManager?.getBookmarks?.() ?? [];
+  const list = carrion.socialManager?.getBookmarks?.() ?? [];
   const bookmarks = list.map((b) => b.name);
   return bookmarks;
 }
@@ -951,7 +963,7 @@ function getBookmarkedCharacters() {
  * @returns {string[]}
  */
 function getOnlineCharacters() {
-  return unsafeWindow.drakensberg?.getOnlineUsers?.() ?? [];
+  return carrion.drakensberg?.getOnlineUsers?.() ?? [];
 }
 
 /**
@@ -976,9 +988,10 @@ function getYourCharacters() {
  * Get user options that match the current preference.
  *
  * @param {string} mention The name being mentioned
+ * @param {boolean} findBots Whether to find bots. If true, only bots are found. If false, only non-bots are found.
  * @returns Names matching that mention, sorted by preference
  */
-function getUserOptions(mention) {
+function getUserOptions(mention, findBots = false) {
   const bookmarks = getBookmarkedCharacters();
   const onlineUsers = getOnlineCharacters();
   const yourCharacters = getYourCharacters();
@@ -986,6 +999,14 @@ function getUserOptions(mention) {
   /** The set of characters available for autocomplete. */
   const characters = [...bookmarks, ...onlineUsers, ...yourCharacters]
     .filter(filterUnique)
+    .filter((name) => {
+      const isBot = carrion.drakensberg.getBadges(name).includes("bot");
+      if (findBots) {
+        return isBot;
+      } else {
+        return !isBot;
+      }
+    })
     .map((name) => {
       return {
         name,
@@ -1036,6 +1057,10 @@ function parseMention() {
     return;
   }
 
+  /** @type {"@" | "?"} */
+  const mentionSymbol = word.segment[0];
+  const findingBots = mentionSymbol === "?";
+
   /** The normalized mention being entered. */
   let mention = word.segment.slice(1).toLowerCase();
   if (mention.startsWith("[")) {
@@ -1043,13 +1068,14 @@ function parseMention() {
   }
 
   /** @type {string[]} The list of names the user has bookmarked. */
-  const options = getUserOptions(mention);
+  const options = getUserOptions(mention, findingBots);
 
-  const elements = options.map((option) => {
-    const li = makeUsernameAutocompleteOption(option);
+  const elements = options.map((characterName) => {
+    const displayName = findingBots ? `${characterName} 🤖` : characterName;
+    const li = makeUsernameAutocompleteOption(displayName);
     autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
-      pickUser(word, option);
+      pickUser(word, characterName);
     });
     return li;
   });
@@ -1069,7 +1095,10 @@ function parseMessageInput() {
   if (messageInput.currentWord?.segment.startsWith(":")) {
     parseEmoji();
   }
-  if (messageInput.currentWord?.segment.startsWith("@")) {
+  if (
+    messageInput.currentWord?.segment.startsWith("@") ||
+    messageInput.currentWord?.segment.startsWith("?")
+  ) {
     parseMention();
   }
 }
