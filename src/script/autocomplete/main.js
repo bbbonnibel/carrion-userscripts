@@ -1040,7 +1040,10 @@ function getUserOptions(mention, findBots = false) {
     if (!character.normalized.includes(mention)) {
       continue;
     }
-    if (character.normalized.length - mention.length <= 8) {
+    // Only use Lenenshtein past a certain input length & within a certain distance
+    const canUseLevenshtein =
+      mention.length >= 3 && character.normalized.length - mention.length <= 8;
+    if (canUseLevenshtein) {
       near.push(character.name);
     } else {
       far.push(character.name);
@@ -1065,7 +1068,7 @@ function getUserOptions(mention, findBots = false) {
       .map((record) => record.name),
     ...far.toSorted(sortAlphabetic),
   ];
-  return options;
+  return options.slice(0, 20);
 }
 
 function parseMention() {
