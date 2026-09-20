@@ -883,10 +883,13 @@ function parseEmoji() {
  * This will modify the message input by replacing the given word with the autocompleted emoji.
  *
  * @param {Word} word The word to replace
- * @param {string} user The user picked to autocomplete that word
+ * @param {CharacterPingOption} character The character picked to autocomplete that word
  */
-function pickUser(word, user) {
-  replaceWordInMessage(word, `@[${user}] `);
+function pickUser(word, character) {
+  const ping = character.isBot
+    ? `?[${character.name}] `
+    : `@[${character.name}] `;
+  replaceWordInMessage(word, ping);
   autocomplete.clear();
 }
 
@@ -926,13 +929,13 @@ function generateUsernameGradient(username) {
 }
 
 /**
- * Make an autocomplete option for a username.
+ * Make an autocomplete option for a character.
  *
- * @param {string} username The username (or character name) to make an option for.
+ * @param {CharacterPingOption} character The character to make an option for.
  */
-function makeUsernameAutocompleteOption(username) {
-  const avatarUrl = carrion.drakensberg.getAvatar(username) ?? "";
-  const badges = carrion.drakensberg.getBadges(username) ?? [];
+function makeUsernameAutocompleteOption(character) {
+  const avatarUrl = carrion.drakensberg.getAvatar(character.name) ?? "";
+  const badges = character.badges;
   const displayBadges = badges
     .map((badge) => {
       switch (badge) {
@@ -948,7 +951,7 @@ function makeUsernameAutocompleteOption(username) {
     })
     .filter(Boolean)
     .join(" ");
-  const gradient = generateUsernameGradient(username);
+  const gradient = generateUsernameGradient(character.name);
   const figureStyle = avatarUrl ? "" : `background: ${gradient};`;
   return template(`
     <li class="li-username">
@@ -957,7 +960,7 @@ function makeUsernameAutocompleteOption(username) {
           <img class="avatar" data-found="${Boolean(avatarUrl)}" src="${avatarUrl}">
         </span>
         <span class="label">
-          <span class="username">${username}</span>
+          <span class="username">${character.name}</span>
           <span class="badges">${displayBadges}</span>
         </span>
         ${makeAutocompleteTab()}
@@ -1005,11 +1008,19 @@ function getYourCharacters() {
 }
 
 /**
+ * @typedef {object} CharacterPingOption
+ * @prop {string} name The character's original name
+ * @prop {string} normalized The character's normalized name
+ * @prop {Carrion.CharacterBadge[]} The character's badges
+ * @prop {boolean} isBot Is this character a bot?
+ */
+
+/**
  * Get user options that match the current preference.
  *
  * @param {string} mention The name being mentioned
  * @param {boolean} findBots Whether to find bots. If true, only bots are found. If false, only non-bots are found.
- * @returns Names matching that mention, sorted by preference
+ * @returns {CharacterPingOption} Names matching that mention, sorted by preference
  */
 function getUserOptions(mention, findBots = false) {
   const bookmarks = getBookmarkedCharacters();
@@ -1019,19 +1030,21 @@ function getUserOptions(mention, findBots = false) {
   /** The set of characters available for autocomplete. */
   const characters = [...bookmarks, ...onlineUsers, ...yourCharacters]
     .filter(filterUnique)
-    .filter((name) => {
-      const isBot = carrion.drakensberg.getBadges(name).includes("bot");
-      if (findBots) {
-        return isBot;
-      } else {
-        return !isBot;
-      }
-    })
     .map((name) => {
+      const badges = carrion.drakensberg.getBadges(name);
       return {
         name,
         normalized: name.toLowerCase().replaceAll(" ", ""),
+        badges,
+        isBot: badges.includes("bot"),
       };
+    })
+    .filter((character) => {
+      if (findBots) {
+        return character.isBot;
+      } else {
+        return !character.isBot;
+      }
     });
 
   const near = [];
@@ -1044,18 +1057,18 @@ function getUserOptions(mention, findBots = false) {
     const canUseLevenshtein =
       mention.length >= 3 && character.normalized.length - mention.length <= 8;
     if (canUseLevenshtein) {
-      near.push(character.name);
+      near.push(character);
     } else {
-      far.push(character.name);
+      far.push(character);
     }
   }
 
   const options = [
     ...near
-      .map((name) => {
+      .map((character) => {
         return {
-          name,
-          distance: levenshtein(mention, name.toLowerCase()),
+          ...character,
+          distance: levenshtein(mention, character.name.toLowerCase()),
         };
       })
       .toSorted((a, b) => {
@@ -1064,9 +1077,8 @@ function getUserOptions(mention, findBots = false) {
           return difference;
         }
         return sortAlphabetic(a.name.toLowerCase(), b.name.toLowerCase());
-      })
-      .map((record) => record.name),
-    ...far.toSorted(sortAlphabetic),
+      }),
+    ...far.toSorted((a, b) => sortAlphabetic(a.name, b.name)),
   ];
   return options.slice(0, 20);
 }
@@ -1090,14 +1102,13 @@ function parseMention() {
     mention = mention.slice(1);
   }
 
-  /** @type {string[]} The list of names the user has bookmarked. */
   const options = getUserOptions(mention, findingBots);
 
-  const elements = options.map((characterName) => {
-    const li = makeUsernameAutocompleteOption(characterName);
+  const elements = options.map((character) => {
+    const li = makeUsernameAutocompleteOption(character);
     autocomplete.list.appendChild(li);
     li.addEventListener("click", () => {
-      pickUser(word, characterName);
+      pickUser(word, character);
     });
     return li;
   });
