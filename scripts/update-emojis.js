@@ -83,6 +83,9 @@ function assertIntegrity(json) {
 const OVERRIDES = {
   "😭": { prefer: ["sob"] },
   "😇": { add: ["innocent"] },
+  "🥰": { add: ["smiling-face-with-3-hearts", "3hearts"] },
+  "🙂‍↕️": { add: ["head-shaking-vertically"] },
+  "🙂‍↔️": { add: ["head-shaking-horizontally"] },
   "👆️": { replace: ["point-up-2"] },
   "☝️": { replace: ["point-up", "index-finger"] },
   "👎️": { add: ["-1"] },
