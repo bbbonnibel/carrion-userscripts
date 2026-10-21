@@ -836,7 +836,7 @@ function getEmojiOptions(text) {
     return cached;
   }
 
-  const raw = text.replaceAll(":", "");
+  const raw = text.replaceAll(":", "").replaceAll("_", "-");
   const matchingShortcodes = EMOJI_SHORTCODES.filter((s) =>
     s.includes(raw),
   ).sort((a, b) => a.length - b.length);
