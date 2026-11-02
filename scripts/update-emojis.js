@@ -73,7 +73,13 @@ function assertIntegrity(json) {
  */
 
 /**
- * @typedef {(AddOverride | PreferOverride | ReplaceOverride)} Override
+ * @typedef {object} OverrideProps
+ * @prop {number} weight An default weight modifier for the emoji
+ */
+
+/**
+ * @typedef {(AddOverride | PreferOverride | ReplaceOverride) & OverrideProps} Override
+ *
  */
 
 /**
@@ -103,25 +109,25 @@ const OVERRIDES = {
   "♥️": { replace: ["hearts", "suite-hearts"] },
   "♦️": { replace: ["diamonds", "suite-diamonds"] },
   "♣️": { replace: ["clubs", "suite-clubs"] },
-  "💝": { add: ["heart-gift"] },
-  "💖": { add: ["heart-sparkling"] },
-  "💗": { add: ["heart-pulse"] },
-  "💓": { add: ["heart-beating"] },
-  "💔": { add: ["heart-broken"] },
-  "❤️‍🔥": { add: ["heart-fire"] },
-  "❤️‍🩹": { add: ["heart-bandaged"] },
-  "❤️": { prefer: ["heart", "heart-red"] },
-  "🩷": { add: ["heart-pink"] },
-  "🧡": { add: ["heart-orange"] },
-  "💛": { add: ["heart-yellow"] },
-  "💚": { add: ["heart-green"] },
-  "💙": { add: ["heart-blue"] },
-  "🩵": { add: ["light-blue-heart"] },
-  "💜": { add: ["heart-purple"] },
-  "🤎": { add: ["heart-brown"] },
-  "🖤": { add: ["heart-black"] },
-  "🩶": { add: ["heart-grey"] },
-  "🤍": { add: ["heart-white"] },
+  "💝": { add: ["heart-gift"], weight: -2 },
+  "💖": { add: ["heart-sparkling"], weight: -2 },
+  "💗": { add: ["heart-pulse"], weight: -2 },
+  "💓": { add: ["heart-beating"], weight: -2 },
+  "💔": { add: ["heart-broken"], weight: -2 },
+  "❤️‍🔥": { add: ["heart-fire"], weight: -2 },
+  "❤️‍🩹": { add: ["heart-bandaged"], weight: -2 },
+  "❤️": { prefer: ["heart", "heart-red"], weight: -2 },
+  "🩷": { add: ["heart-pink"], weight: -2 },
+  "🧡": { add: ["heart-orange"], weight: -2 },
+  "💛": { add: ["heart-yellow"], weight: -2 },
+  "💚": { add: ["heart-green"], weight: -2 },
+  "💙": { add: ["heart-blue"], weight: -2 },
+  "🩵": { add: ["light-blue-heart"], weight: -2 },
+  "💜": { add: ["heart-purple"], weight: -2 },
+  "🤎": { add: ["heart-brown"], weight: -2 },
+  "🖤": { add: ["heart-black"], weight: -2 },
+  "🩶": { add: ["heart-grey"], weight: -2 },
+  "🤍": { add: ["heart-white"], weight: -2 },
   "#️⃣": { add: ["hash"] },
   "🏴‍☠️": { prefer: ["pirate-flag", "skull-and-crossbones-flag", "jolly-roger"] },
   "🚩": { prefer: ["red-flag"] },
@@ -169,6 +175,10 @@ function applyOverride(def, override) {
   }
 
   def.shortcodes = def.shortcodes.filter(filterUnique);
+
+  if (override.weight) {
+    def.weight = override.weight;
+  }
 
   return def;
 }

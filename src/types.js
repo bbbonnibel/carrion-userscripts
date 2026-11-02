@@ -9,5 +9,6 @@
 /**
  * @typedef {object} EmojiDefinition
  * @prop {RawEmoji} emoji The emoji itself, e.g. "😀"
+ * @prop {number} [weight] The default weight modifier applied to this emoji
  * @prop {string[]} shortcodes Shortcodes for the emoji, e.g. [":smile:"]
  */
