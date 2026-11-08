@@ -1011,9 +1011,61 @@ function getYourCharacters() {
  * @typedef {object} CharacterPingOption
  * @prop {string} name The character's original name
  * @prop {string} normalized The character's normalized name
- * @prop {Carrion.CharacterBadge[]} The character's badges
+ * @prop {Carrion.CharacterBadge[]} badges The character's badges
  * @prop {boolean} isBot Is this character a bot?
  */
+
+/**
+ * Sort character options.
+ *
+ * @param {string} mention The name being mentions
+ * @param {CharacterPingOption[]} characters The character options to sort
+ * @returns The character options as a sorted list.
+ */
+function charactersToSorted(mention, characters) {
+  characters = characters.filter((character) =>
+    character.normalized.includes(mention),
+  );
+
+  if (mention.length < 3) {
+    return characters.toSorted(
+      (a, b) => a.name.length - b.name.length || sortAlphabetic(a.name, b.name),
+    );
+  }
+
+  const near = [];
+  const far = [];
+  for (const character of characters) {
+    // Only use Lenenshtein past a certain input length & within a certain distance
+    const canUseLevenshtein =
+      mention.length >= 3 && character.normalized.length - mention.length <= 8;
+    if (canUseLevenshtein) {
+      near.push(character);
+    } else {
+      far.push(character);
+    }
+  }
+
+  return [
+    ...near
+      .map((character) => {
+        return {
+          ...character,
+          distance: levenshtein(mention, character.name.toLowerCase()),
+        };
+      })
+      .toSorted((a, b) => {
+        const difference = a.distance - b.distance;
+        if (difference !== 0) {
+          return difference;
+        }
+        return sortAlphabetic(a.name.toLowerCase(), b.name.toLowerCase());
+      }),
+    ...far.toSorted(
+      (a, b) => a.name.length - b.name.length || sortAlphabetic(a.name, b.name),
+    ),
+  ];
+}
 
 /**
  * Get user options that match the current preference.
@@ -1047,39 +1099,8 @@ function getUserOptions(mention, findBots = false) {
       }
     });
 
-  const near = [];
-  const far = [];
-  for (const character of characters) {
-    if (!character.normalized.includes(mention)) {
-      continue;
-    }
-    // Only use Lenenshtein past a certain input length & within a certain distance
-    const canUseLevenshtein =
-      mention.length >= 3 && character.normalized.length - mention.length <= 8;
-    if (canUseLevenshtein) {
-      near.push(character);
-    } else {
-      far.push(character);
-    }
-  }
+  const options = charactersToSorted(mention, characters);
 
-  const options = [
-    ...near
-      .map((character) => {
-        return {
-          ...character,
-          distance: levenshtein(mention, character.name.toLowerCase()),
-        };
-      })
-      .toSorted((a, b) => {
-        const difference = a.distance - b.distance;
-        if (difference !== 0) {
-          return difference;
-        }
-        return sortAlphabetic(a.name.toLowerCase(), b.name.toLowerCase());
-      }),
-    ...far.toSorted((a, b) => sortAlphabetic(a.name, b.name)),
-  ];
   return options.slice(0, 20);
 }
 
