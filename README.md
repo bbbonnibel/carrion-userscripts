@@ -22,8 +22,8 @@ Your chat messages now have an optional autocomplete for emojis, commands, and m
 
 Coming soon:
 
-- Autocomplete for commands needs a bit more work.
-- Autocomplete for rooms.
+- Autocomplete for commands needs a bit more work, and new commands need to be added.
+- Autocomplete for `#rooms`.
 
 ### [Character Pins](https://bbbonnibel.github.io/carrion-userscripts/script/character-pins/character-pins.user.js)
 
@@ -92,10 +92,6 @@ Hotfixes are temporary fixes. Expect these to last hours/days/weeks at most unti
 ### [Hotfix: Profile Character Lists](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-profile-character-lists/hotfix-profile-character-lists.user.js)
 
 A profile's character lists will show up at the end of the profile's attributes (after gender, pronouns, etc) instead of at the top of the page.
-
-### [Hotfix: Site Header](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-site-header/hotfix-site-header.user.js)
-
-Put the Reference icon at the end of the header, just next to settings.
 
 ### [Hotfix: Chat Bookmarks](https://bbbonnibel.github.io/carrion-userscripts/script/hotfix-chat-bookmarks/hotfix-chat-bookmarks.user.js)
 
