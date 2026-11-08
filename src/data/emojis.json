@@ -88,7 +88,9 @@
     "🥰": {
       "emoji": "🥰",
       "shortcodes": [
-        ":heart-face:"
+        ":heart-face:",
+        ":smiling-face-with-3-hearts:",
+        ":3hearts:"
       ]
     },
     "😍": {
@@ -307,13 +309,15 @@
     "🙂‍↔️": {
       "emoji": "🙂‍↔️",
       "shortcodes": [
-        ":head-shake:"
+        ":head-shake:",
+        ":head-shaking-horizontally:"
       ]
     },
     "🙂‍↕️": {
       "emoji": "🙂‍↕️",
       "shortcodes": [
-        ":head-nod:"
+        ":head-nod:",
+        ":head-shaking-vertically:"
       ]
     },
     "😌": {
@@ -568,6 +572,7 @@
     "😭": {
       "emoji": "😭",
       "shortcodes": [
+        ":sob:",
         ":loudly-crying:"
       ]
     },
@@ -808,28 +813,32 @@
       "shortcodes": [
         ":gift-heart:",
         ":heart-gift:"
-      ]
+      ],
+      "weight": -2
     },
     "💖": {
       "emoji": "💖",
       "shortcodes": [
         ":sparkling-heart:",
         ":heart-sparkling:"
-      ]
+      ],
+      "weight": -2
     },
     "💗": {
       "emoji": "💗",
       "shortcodes": [
         ":heart-grow:",
         ":heart-pulse:"
-      ]
+      ],
+      "weight": -2
     },
     "💓": {
       "emoji": "💓",
       "shortcodes": [
         ":beating-heart:",
         ":heart-beating:"
-      ]
+      ],
+      "weight": -2
     },
     "💞": {
       "emoji": "💞",
@@ -860,21 +869,24 @@
       "shortcodes": [
         ":broken-heart:",
         ":heart-broken:"
-      ]
+      ],
+      "weight": -2
     },
     "❤️‍🔥": {
       "emoji": "❤️‍🔥",
       "shortcodes": [
         ":fire-heart:",
         ":heart-fire:"
-      ]
+      ],
+      "weight": -2
     },
     "❤️‍🩹": {
       "emoji": "❤️‍🩹",
       "shortcodes": [
         ":bandaged-heart:",
         ":heart-bandaged:"
-      ]
+      ],
+      "weight": -2
     },
     "❤️": {
       "emoji": "❤️",
@@ -882,83 +894,95 @@
         ":heart:",
         ":heart-red:",
         ":red-heart:"
-      ]
+      ],
+      "weight": -2
     },
     "🩷": {
       "emoji": "🩷",
       "shortcodes": [
         ":pink-heart:",
         ":heart-pink:"
-      ]
+      ],
+      "weight": -2
     },
     "🧡": {
       "emoji": "🧡",
       "shortcodes": [
         ":orange-heart:",
         ":heart-orange:"
-      ]
+      ],
+      "weight": -2
     },
     "💛": {
       "emoji": "💛",
       "shortcodes": [
         ":yellow-heart:",
         ":heart-yellow:"
-      ]
+      ],
+      "weight": -2
     },
     "💚": {
       "emoji": "💚",
       "shortcodes": [
         ":green-heart:",
         ":heart-green:"
-      ]
+      ],
+      "weight": -2
     },
     "💙": {
       "emoji": "💙",
       "shortcodes": [
         ":blue-heart:",
         ":heart-blue:"
-      ]
+      ],
+      "weight": -2
     },
     "🩵": {
       "emoji": "🩵",
       "shortcodes": [
         ":light-blue-heart:"
-      ]
+      ],
+      "weight": -2
     },
     "💜": {
       "emoji": "💜",
       "shortcodes": [
         ":purple-heart:",
         ":heart-purple:"
-      ]
+      ],
+      "weight": -2
     },
     "🤎": {
       "emoji": "🤎",
       "shortcodes": [
         ":brown-heart:",
         ":heart-brown:"
-      ]
+      ],
+      "weight": -2
     },
     "🖤": {
       "emoji": "🖤",
       "shortcodes": [
         ":black-heart:",
         ":heart-black:"
-      ]
+      ],
+      "weight": -2
     },
     "🩶": {
       "emoji": "🩶",
       "shortcodes": [
         ":grey-heart:",
         ":heart-grey:"
-      ]
+      ],
+      "weight": -2
     },
     "🤍": {
       "emoji": "🤍",
       "shortcodes": [
         ":white-heart:",
         ":heart-white:"
-      ]
+      ],
+      "weight": -2
     },
     "💋": {
       "emoji": "💋",
@@ -8807,6 +8831,8 @@
     "halo": "😇",
     "innocent": "😇",
     "heart-face": "🥰",
+    "smiling-face-with-3-hearts": "🥰",
+    "3hearts": "🥰",
     "heart-eyes": "😍",
     "star-struck": "🤩",
     "kissing-heart": "😘",
@@ -8846,7 +8872,9 @@
     "liar": "🤥",
     "shaking-face": "🫨",
     "head-shake": "🙂‍↔️",
+    "head-shaking-horizontally": "🙂‍↔️",
     "head-nod": "🙂‍↕️",
+    "head-shaking-vertically": "🙂‍↕️",
     "relieved": "😌",
     "pensive": "😔",
     "sleepy": "😪",
@@ -8892,6 +8920,7 @@
     "anxious-with-sweat": "😰",
     "concerned": "😥",
     "cry": "😢",
+    "sob": "😭",
     "loudly-crying": "😭",
     "screaming": "😱",
     "scrunched-mouth": "😖",
