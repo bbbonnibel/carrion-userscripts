@@ -1094,9 +1094,8 @@ function getUserOptions(mention, findBots = false) {
     .filter((character) => {
       if (findBots) {
         return character.isBot;
-      } else {
-        return !character.isBot;
       }
+      return character;
     });
 
   const options = charactersToSorted(mention, characters);
