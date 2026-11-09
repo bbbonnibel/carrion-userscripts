@@ -831,6 +831,10 @@ function getEmojiOptions(text) {
     return [];
   }
 
+  if (text === ":3") {
+    return [];
+  }
+
   const cached = EMOJI_LOOKUP_CACHE.get(text);
   if (cached) {
     return cached;
