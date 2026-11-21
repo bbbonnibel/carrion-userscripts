@@ -71,6 +71,15 @@ function getSelectValue(dropdown) {
   return dropdown.getAttribute("data-value") || undefined;
 }
 
+class TestButtonElement extends HTMLElement {
+  connectedCallback() {
+    console.debug("bbb-test-button added");
+    this.addEventListener("click", () => console.log("click!"));
+  }
+}
+
+window.customElements.define("bbb-test-button", TestButtonElement);
+
 /**
  * Put a switch down for a control.
  * @param {HTMLDivElement} control
@@ -83,6 +92,7 @@ function putSwitch(control) {
 
   const kinkSwitch = template(`
     <div class="bbb-kink-switch">
+      <bbb-test-button>Click!</bbb-test-button>
     </div>
   `);
 
@@ -109,7 +119,18 @@ function main() {
   /** @type {HTMLDivElement[]} */
   const kinks = [...document.querySelectorAll(".kink-item:has(.kink-select)")];
 
-  console.debug(LOG_PREFIX, `Applying switches to`, kinks.length, `kinks.`);
+  console.debug(
+    LOG_PREFIX,
+    `Started. Applying switches to`,
+    kinks.length,
+    `kinks.`,
+  );
+
+  document.querySelector("#section-essential .card-header").appendChild(
+    template(`
+      <bbb-test-button>Click!</bbb-test-button>
+  `),
+  );
 
   for (const kink of kinks) {
     const label = kink
