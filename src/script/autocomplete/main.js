@@ -151,6 +151,57 @@ const levenshtein = (function () {
 })();
 //#endregion
 
+//#region Name normalization
+/**
+ * A map of un-normalized names to normalized names.
+ * @type {Map<string, string>}
+ */
+const normalizedNameCache = new Map();
+
+const homoglyphs = new Map([
+  ["a", /[аạąäàáą]/gi],
+  ["c", /[сƈċ]/gi],
+  ["d", /[ԁɗ]/gi],
+  ["e", /[еẹėéè]/gi],
+  ["g", /[ġ]/gi],
+  ["h", /[һ]/gi],
+  ["i", /[іíï]/gi],
+  ["j", /[јʝ]/gi],
+  ["k", /[κ]/gi],
+  ["l", /[ӏḷ]/gi],
+  ["n", /(ո|ñ)/gi],
+  ["o", /[оοօȯọỏơóòö]/gi],
+  ["p", /[р]/gi],
+  ["q", /[զ]/gi],
+  ["s", /[ʂ]/gi],
+  ["u", /[υսüúù]/gi],
+  ["v", /[νѵ]/gi],
+  ["x", /[хҳ]/gi],
+  ["y", /[уý]/gi],
+  ["z", /[ʐż]/gi],
+]);
+
+/**
+ * Normalize a name down to basic lowercase latin text.
+ *
+ * @param {string} name The name to normalize
+ * @returns {string} The normalized name
+ */
+function normalizeName(name) {
+  if (normalizedNameCache.has(name)) {
+    return normalizedNameCache.get(name);
+  }
+  const original = name;
+  name = name.toLowerCase().replaceAll(" ", "");
+  for (const [glyph, hom] of homoglyphs.entries()) {
+    name = name.replaceAll(hom, glyph);
+  }
+  normalizedNameCache.set(original, name);
+  return name;
+}
+
+//#endregion
+
 //#region Utilities
 /**
  * Convert a class `string` to a class selector `.string`
@@ -1090,7 +1141,7 @@ function getUserOptions(mention, findBots = false) {
       const badges = carrion.drakensberg.getBadges(name);
       return {
         name,
-        normalized: name.toLowerCase().replaceAll(" ", ""),
+        normalized: normalizeName(name),
         badges,
         isBot: badges.includes("bot"),
       };
