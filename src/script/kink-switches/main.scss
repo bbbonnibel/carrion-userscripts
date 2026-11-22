@@ -1,8 +1,8 @@
-.kink-select:has(+ .bbb-kink-switch) {
+.kink-select:has(+ bbb-kink-switch) {
   display: none;
 }
 
-.bbb-kink-switch {
+bbb-kink-switch {
   --favorite: #3b82f6;
   --yes: #10b981;
   --maybe: #eab308;
@@ -17,102 +17,103 @@
   position: relative;
   background: var(--background);
   border-radius: var(--border-radius);
+}
 
-  .bbb-kink-button {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    background: var(--background);
-    color: var(--color, inherit);
-    text-transform: capitalize;
-    cursor: pointer;
-    border: 1px solid var(--color-border);
+bbb-kink-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  background: var(--background);
+  color: var(--color, inherit);
+  text-transform: capitalize;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
 
-    &:active {
-      outline: 2px solid var(--accent);
-      outline-offset: -2px;
-      z-index: 1;
-    }
+  &:active {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    z-index: 1;
+  }
 
-    &[data-pref="favorite"] {
-      --accent: var(--favorite);
-    }
-    &[data-pref="yes"] {
-      --accent: var(--yes);
-    }
-    &[data-pref="maybe"] {
-      --accent: var(--maybe);
-    }
-    &[data-pref="no"] {
-      --accent: var(--no);
-    }
+  &[pref="favorite"] {
+    --accent: var(--favorite);
+  }
+  &[pref="yes"] {
+    --accent: var(--yes);
+  }
+  &[pref="maybe"] {
+    --accent: var(--maybe);
+  }
+  &[pref="no"] {
+    --accent: var(--no);
+  }
 
-    &[data-pref="favorite"] {
-      width: 55px;
-    }
-    &[data-pref="yes"] {
-      width: 55px;
-    }
-    &[data-pref="maybe"] {
-      width: 50px; // narrower
-    }
-    &[data-pref="no"] {
-      width: 50px; // narrower
-    }
+  &[pref="favorite"] {
+    width: 55px;
+  }
+  &[pref="yes"] {
+    width: 55px;
+  }
+  &[pref="maybe"] {
+    width: 50px; // narrower
+  }
+  &[pref="no"] {
+    width: 50px; // narrower
+  }
 
-    &:first-of-type {
-      border-top-left-radius: var(--border-radius);
-      border-bottom-left-radius: var(--border-radius);
-    }
+  &:first-of-type {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+  }
 
-    &:last-of-type {
-      border-top-right-radius: var(--border-radius);
-      border-bottom-right-radius: var(--border-radius);
-    }
+  &:last-of-type {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+  }
 
-    &:not(:last-of-type) {
-      border-right: 0;
-    }
+  &:not(:last-of-type) {
+    border-right: 0;
   }
 }
 
-.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch {
+.kink-select:has([value="favorite"]:checked) + bbb-kink-switch {
   --selection: var(--favorite);
 }
-.kink-select:has([value="yes"]:checked) + .bbb-kink-switch {
+.kink-select:has([value="yes"]:checked) + bbb-kink-switch {
   --selection: var(--yes);
 }
-.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch {
+.kink-select:has([value="maybe"]:checked) + bbb-kink-switch {
   --selection: var(--maybe);
 }
-.kink-select:has([value="no"]:checked) + .bbb-kink-switch {
+.kink-select:has([value="no"]:checked) + bbb-kink-switch {
   --selection: var(--no);
 }
 
 //prettier-ignore
-.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="favorite"],
-.kink-select:has([value="yes"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="yes"],
-.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="maybe"],
-.kink-select:has([value="no"]:checked) + .bbb-kink-switch .bbb-kink-button[data-pref="no"] {
+.kink-select:has([value="favorite"]:checked) + bbb-kink-switch bbb-kink-button[pref="favorite"],
+.kink-select:has([value="yes"]:checked) + bbb-kink-switch bbb-kink-button[pref="yes"],
+.kink-select:has([value="maybe"]:checked) + bbb-kink-switch bbb-kink-button[pref="maybe"],
+.kink-select:has([value="no"]:checked) + bbb-kink-switch bbb-kink-button[pref="no"] {
   --background: hsl(from var(--accent) h calc(s * 0.5) calc(l * 0.5));
 }
 
 //prettier-ignore
-.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="favorite"],
-.kink-select:has([value="yes"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="yes"],
-.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="maybe"],
-.kink-select:has([value="no"]:checked) + .bbb-kink-switch.modified .bbb-kink-button[data-pref="no"] {
+.kink-select:has([value="favorite"]:checked) + bbb-kink-switch.modified bbb-kink-button[pref="favorite"],
+.kink-select:has([value="yes"]:checked) + bbb-kink-switch.modified bbb-kink-button[pref="yes"],
+.kink-select:has([value="maybe"]:checked) + bbb-kink-switch.modified bbb-kink-button[pref="maybe"],
+.kink-select:has([value="no"]:checked) + bbb-kink-switch.modified bbb-kink-button[pref="no"] {
   --background: var(--accent);
   --color: black;
   font-weight: bold;
 }
 
 //prettier-ignore
-.kink-select:has([value="favorite"]:checked) + .bbb-kink-switch.modified,
-.kink-select:has([value="yes"]:checked) + .bbb-kink-switch.modified,
-.kink-select:has([value="maybe"]:checked) + .bbb-kink-switch.modified,
-.kink-select:has([value="no"]:checked) + .bbb-kink-switch.modified {
+.kink-select:has([value="favorite"]:checked) + bbb-kink-switch.modified,
+.kink-select:has([value="yes"]:checked) + bbb-kink-switch.modified,
+.kink-select:has([value="maybe"]:checked) + bbb-kink-switch.modified,
+.kink-select:has([value="no"]:checked) + bbb-kink-switch.modified {
   outline: 2px solid var(--selection);
 }

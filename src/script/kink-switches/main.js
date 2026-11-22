@@ -1,6 +1,8 @@
 const mainCss = $import("./main.scss");
 const LOG_PREFIX = "[Kink Switches]";
 
+//#region Boilerplate
+
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -24,21 +26,50 @@ function installStyle(css, origin, filename) {
   document.head.appendChild(e);
 }
 
-/** @typedef {"favorite" | "yes" | "maybe" | "no"} Pref */
+//#endregion
 
-/**
- * Create a kink switch button.
- * @param {Pref} pref
- * @returns {HTMLButtonElement}
- */
-function createButton(pref) {
-  const text = pref === "favorite" ? "fave" : pref;
-  return template(`
-    <button type="button" class="bbb-kink-button" data-pref="${pref}">
-      <span>${text}</span>
-    </button>
-  `);
+//#region Types
+/** @typedef {"favorite" | "yes" | "maybe" | "no"} Pref */
+//#endregion
+
+//#region Element: Kink Button
+class KinkButtonElement extends HTMLElement {
+  static observedAttributes = ["pref"];
+
+  constructor() {
+    super();
+
+    /** @type {Pref} */
+    this.pref = "maybe";
+  }
+
+  connectedCallback() {
+    this.pref = this.getAttribute("pref");
+    this.addEventListener("click", () => this.click());
+  }
+
+  click() {
+    const kinkSwitch = this.parentElement;
+    const dropdown = kinkSwitch.previousElementSibling;
+
+    kinkSwitch.classList.add("modified");
+    const existingValue = getSelectValue(dropdown);
+    if (existingValue === this.pref) {
+      makeSelection(dropdown, undefined); // toggle off
+    } else {
+      makeSelection(dropdown, this.pref);
+    }
+  }
 }
+
+window.customElements.define("bbb-kink-button", KinkButtonElement);
+//#endregion
+
+//#region Element: Kink switch
+class KinkSwitchElement extends HTMLElement {}
+
+window.customElements.define("bbb-kink-switch", KinkSwitchElement);
+//#endregion
 
 /**
  * Select a value from a dropdown.
@@ -71,46 +102,26 @@ function getSelectValue(dropdown) {
   return dropdown.getAttribute("data-value") || undefined;
 }
 
-class TestButtonElement extends HTMLElement {
-  connectedCallback() {
-    console.debug("bbb-test-button added");
-    this.addEventListener("click", () => console.log("click!"));
-  }
-}
-
-window.customElements.define("bbb-test-button", TestButtonElement);
-
 /**
  * Put a switch down for a control.
  * @param {HTMLDivElement} control
  */
 function putSwitch(control) {
-  const prefs = ["favorite", "yes", "maybe", "no"];
-
+  /** @type {HTMLSelectElement} */
   const dropdown = control.querySelector(".kink-select");
   dropdown.setAttribute("data-value", dropdown.value);
 
+  /** @type {KinkSwitchElement} */
   const kinkSwitch = template(`
-    <div class="bbb-kink-switch">
-      <bbb-test-button>Click!</bbb-test-button>
-    </div>
+    <bbb-kink-switch>
+      <bbb-kink-button pref="favorite"><span>Fave</span></bbb-kink-button>
+      <bbb-kink-button pref="yes"><span>Yes</span></bbb-kink-button>
+      <bbb-kink-button pref="maybe"><span>Maybe</span></bbb-kink-button>
+      <bbb-kink-button pref="no"><span>No</span></bbb-kink-button>
+    </bbb-kink-switch>
   `);
 
   dropdown.insertAdjacentElement("afterend", kinkSwitch);
-
-  for (const pref of prefs) {
-    const btn = createButton(pref);
-    kinkSwitch.appendChild(btn);
-    btn.addEventListener("click", () => {
-      kinkSwitch.classList.add("modified");
-      const existingValue = getSelectValue(dropdown);
-      if (existingValue === pref) {
-        makeSelection(dropdown, undefined); // toggle off
-      } else {
-        makeSelection(dropdown, pref);
-      }
-    });
-  }
 }
 
 installStyle(mainCss, "kink-switches", "main.css");
@@ -124,12 +135,6 @@ function main() {
     `Started. Applying switches to`,
     kinks.length,
     `kinks.`,
-  );
-
-  document.querySelector("#section-essential .card-header").appendChild(
-    template(`
-      <bbb-test-button>Click!</bbb-test-button>
-  `),
   );
 
   for (const kink of kinks) {
