@@ -36,8 +36,6 @@ Pin characters to the top of your dashboard. No matter what sort order you choos
 
 Introduces an unread indicator to your chat's sidebar, which will tell you if there's new messages out of view and whether any of them are mentions.
 
-Currently in beta testing.
-
 ## Quality of life
 
 _These scripts focus on positive adjustments to existing features._
@@ -65,13 +63,15 @@ Exact changes:
 
 In the character's kink editor, replace the kink dropdowns with a set of Fave/Yes/Maybe/No buttons. To clear your setting, click the kink that's active.
 
-This script is not color-blind friendly.
+🆕 **Bug fixed:** This script now works correctly even when you clone a kink.
 
 ### [Kink Contexts Revised](https://bbbonnibel.github.io/carrion-userscripts/script/kink-contexts-revised/kink-contexts-revised.user.js)
 
 Each kink gets a little cog icon beside it that can force contexts to show, even in “never show” mode.
 
 The cog icon will have an indicator telling you if there's hidden selected contexts.
+
+🆕 **Bug fixed:** This script now works correctly even when you clone a kink.
 
 ### [Shiny Character Page Border](https://bbbonnibel.github.io/carrion-userscripts/script/character-border/character-border.user.js)
 
