@@ -1,5 +1,7 @@
 const mainCss = $import("./main.scss");
+const LOG_PREFIX = "[Script name]";
 
+//#region Boilerplate
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -22,5 +24,6 @@ function installStyle(css, origin, filename) {
   e.innerText = css;
   document.head.appendChild(e);
 }
+//#endregion
 
 installStyle(mainCss, "$SCRIPTNAME", "main.css");

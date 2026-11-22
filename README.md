@@ -55,9 +55,9 @@ On your own character pages, this script adds a new “chat as this character”
 
 Exact changes:
 
-- *Dashboard:* Tucks away the “Import from F-List” button.
-- *Character page (yours):* Tucks away “Overwrite from F-List” and “Import Gallery”, and adds “Chat as this character” to the top of the list.
-- *Character page (others):* Tucks away the mute/block/report buttons.
+- *Dashboard:* Tucks away the “Create New Character” and “Import from F-List” buttons into a menu.
+- *Character page (yours):* Tucks away “Overwrite from F-List” and “Import Gallery” into a menu, and adds “Chat as this character” to the top of the list.
+- *Character page (others):* Tucks away the mute/block/report buttons into a menu.
 
 ### [Kink Switches](https://bbbonnibel.github.io/carrion-userscripts/script/kink-switches/kink-switches.user.js)
 
