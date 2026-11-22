@@ -126,18 +126,13 @@ function attachMenuEvents() {
 function embedYourCharacterMenu() {
   const characterControls = CharacterPage.editBtn?.parentElement;
   if (!characterControls) {
-    return;
+    throw Error("Couldn't embed compact character controls.");
   }
   characterControls.appendChild(compactControlsHost);
   menuBtn.appendChild(menuVellip);
 }
 
 function fillYourCharacterMenu() {
-  const editBtn = CharacterPage.editBtn;
-  if (!editBtn) {
-    return;
-  }
-
   // Create new controls in the context menu.
   const characterId = CharacterPage.cardBody.getAttribute("data-character-id");
   /** @type {HTMLAnchorElement} A new “chat as character” button */
@@ -173,7 +168,7 @@ function startYourCharacterPage() {
 function embedOtherCharacterMenu() {
   const characterControls = CharacterPage.reportBtn?.parentElement;
   if (!characterControls) {
-    return;
+    throw Error("Couldn't embed compact character controls.");
   }
 
   characterControls.appendChild(compactControlsHost);
@@ -214,8 +209,7 @@ function startCharacterPage() {
 function embedDashboardMenu() {
   const newCharacterBtn = DashboardPage.newCharacterBtn;
   if (!newCharacterBtn) {
-    // Mysteriously missing.
-    return;
+    throw Error("Couldn't embed compact character controls.");
   }
   newCharacterBtn.insertAdjacentElement("afterend", compactControlsHost);
   menuBtn.innerHTML = "Create&hellip;";
@@ -242,10 +236,14 @@ function startDashboardPage() {
 
 function main() {
   const pathname = window.location.pathname;
-  if (pathname.startsWith("/character")) {
-    startCharacterPage();
-  } else if (pathname.startsWith("/dashboard")) {
-    startDashboardPage();
+  try {
+    if (pathname.startsWith("/character")) {
+      startCharacterPage();
+    } else if (pathname.startsWith("/dashboard")) {
+      startDashboardPage();
+    }
+  } catch (ex) {
+    console.error(LOG_PREFIX, "Failed to embed.", ex);
   }
 }
 
