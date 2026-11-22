@@ -61,7 +61,7 @@ class KinkContextToggleElement extends HTMLElement {
       console.error("This button has no connected kink.");
     }
 
-    this.kink?.classList.toggle("bbb-show-contexts");
+    this.kink.classList.toggle("bbb-show-contexts");
   }
 }
 
