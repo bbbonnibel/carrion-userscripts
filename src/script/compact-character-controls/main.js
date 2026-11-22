@@ -32,7 +32,7 @@ installStyle(mainCss, "compact-character-controls", "main.css");
 //#region Compact menu elements
 const menuBtn = template(`
   <button type="button" class="btn btn-secondary bbb-compact-character-controls-btn">
-    <span>Create&hellip;</span>
+    Create&hellip;
   </button>
 `);
 
@@ -82,6 +82,7 @@ class DashboardPage {
 }
 
 function attachMenuEvents() {
+  console.debug(LOG_PREFIX, "Attaching menu events");
   const openClass = "open";
 
   menuBtn.addEventListener("click", () => {
@@ -196,7 +197,6 @@ function fillDashboardMenu() {
     DashboardPage.importFromFlistBtn,
   ];
 
-  attachMenuEvents();
   for (const button of buttonsToMove) {
     contextMenu.appendChild(button);
   }
@@ -206,6 +206,7 @@ function startDashboardPage() {
   console.debug(LOG_PREFIX, "Starting on dashboard page");
   embedDashboardMenu();
   fillDashboardMenu();
+  attachMenuEvents();
 }
 //#endregion
 
