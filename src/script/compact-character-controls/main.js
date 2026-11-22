@@ -35,6 +35,14 @@ class CharacterPage {
   static get editBtn() {
     return document.querySelector("a.btn[href^='/edit']");
   }
+  /** @type {HTMLButtonElement | null} The “Overwrite from F-List” button */
+  static get overwriteFromFlistBtn() {
+    return document.querySelector("a.btn[href^='/import/flist/overwrite']");
+  }
+  /** @type {HTMLButtonElement | null} The “Import Gallery” button */
+  static get importGalleryBtn() {
+    return document.querySelector("a.btn[href^='/import/flist/gallery']");
+  }
   /** @type {HTMLButtonElement | null} The Report button */
   static get reportBtn() {
     return document.querySelector("#report-btn");
@@ -115,59 +123,78 @@ function attachMenuEvents() {
 //#endregion
 
 //#region Character page (yours)
-function startYourCharacterPage() {
+function embedYourCharacterMenu() {
+  const characterControls = CharacterPage.editBtn?.parentElement;
+  if (!characterControls) {
+    return;
+  }
+  characterControls.appendChild(compactControlsHost);
+  menuBtn.appendChild(menuVellip);
+}
+
+function fillYourCharacterMenu() {
   const editBtn = CharacterPage.editBtn;
   if (!editBtn) {
     return;
   }
 
-  const characterControls = editBtn.parentElement;
-
-  /** the list of buttons to be moved. */
-  const importButtons = editBtn.parentElement.querySelectorAll(
-    ".btn[href^='/import']",
-  );
-
-  characterControls.appendChild(compactControlsHost);
-  menuBtn.appendChild(menuVellip);
-  attachMenuEvents();
-
   // Create new controls in the context menu.
   const characterId = CharacterPage.cardBody.getAttribute("data-character-id");
-  /** @type {HTMLAnchorElement} */
+  /** @type {HTMLAnchorElement} A new “chat as character” button */
   const chatAsCharacter = template(`
     <a target="_blank" class="btn btn-primary">
       <span>Chat as this character</span>
     </button>
   `);
   chatAsCharacter.setAttribute("href", `/chat/?character=${characterId}`);
-  contextMenu.appendChild(chatAsCharacter);
-  contextMenu.appendChild(template(`<hr>`));
+
+  /** the list of buttons to be moved. */
+  const menuContents = [
+    chatAsCharacter,
+    template(`<hr>`),
+    CharacterPage.overwriteFromFlistBtn,
+    CharacterPage.importGalleryBtn,
+  ];
 
   // Move existing buttons into the context menu.
-  for (const button of importButtons) {
+  for (const button of menuContents) {
     contextMenu.appendChild(button);
   }
+}
+
+function startYourCharacterPage() {
+  embedYourCharacterMenu();
+  fillYourCharacterMenu();
+  attachMenuEvents();
 }
 //#endregion
 
 //#region Character page (other)
-function startOtherCharacterPage() {
-  const reportBtn = CharacterPage.reportBtn;
-  const muteBtn = CharacterPage.muteBtn;
-  const blockBtn = CharacterPage.blockBtn;
-  if (!reportBtn) {
+function embedOtherCharacterMenu() {
+  const characterControls = CharacterPage.reportBtn?.parentElement;
+  if (!characterControls) {
     return;
   }
-  const characterControls = reportBtn.parentElement;
 
   characterControls.appendChild(compactControlsHost);
   menuBtn.appendChild(menuVellip);
-  attachMenuEvents();
+}
 
-  for (const button of [muteBtn, blockBtn, reportBtn].filter(Boolean)) {
+function fillOtherCharacterMenu() {
+  const menuContents = [
+    CharacterPage.reportBtn,
+    CharacterPage.muteBtn,
+    CharacterPage.blockBtn,
+  ];
+  for (const button of menuContents.filter(Boolean)) {
     contextMenu.appendChild(button);
   }
+}
+
+function startOtherCharacterPage() {
+  embedOtherCharacterMenu();
+  fillOtherCharacterMenu();
+  attachMenuEvents();
 }
 //#endregion
 
@@ -195,12 +222,12 @@ function embedDashboardMenu() {
 }
 
 function fillDashboardMenu() {
-  const buttonsToMove = [
+  const menuContents = [
     DashboardPage.newCharacterBtn,
     DashboardPage.importFromFlistBtn,
   ];
 
-  for (const button of buttonsToMove) {
+  for (const button of menuContents) {
     contextMenu.appendChild(button);
   }
 }
