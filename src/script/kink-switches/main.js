@@ -46,6 +46,10 @@ class KinkButtonElement extends HTMLElement {
   connectedCallback() {
     this.pref = this.getAttribute("pref");
     this.addEventListener("click", () => this.click());
+
+    const kinkSwitch = this.parentElement;
+    const dropdown = kinkSwitch.previousElementSibling;
+    dropdown.setAttribute("data-value", dropdown.value);
   }
 
   click() {
@@ -103,15 +107,11 @@ function getSelectValue(dropdown) {
 }
 
 /**
- * Put a switch down for a control.
- * @param {HTMLDivElement} control
+ * Put a switch down next to a kink-select dropdown.
+ * @param {HTMLSelectElement} control A `<select>` element with a kink-select class.
  */
-function putSwitch(control) {
+function putSwitch(dropdown) {
   /** @type {HTMLSelectElement} */
-  const dropdown = control.querySelector(".kink-select");
-  dropdown.setAttribute("data-value", dropdown.value);
-
-  /** @type {KinkSwitchElement} */
   const kinkSwitch = template(`
     <bbb-kink-switch>
       <bbb-kink-button pref="favorite"><span>Fave</span></bbb-kink-button>
@@ -120,31 +120,23 @@ function putSwitch(control) {
       <bbb-kink-button pref="no"><span>No</span></bbb-kink-button>
     </bbb-kink-switch>
   `);
-
   dropdown.insertAdjacentElement("afterend", kinkSwitch);
 }
 
 installStyle(mainCss, "kink-switches", "main.css");
 
-function main() {
+function applyKinks() {
   /** @type {HTMLDivElement[]} */
   const kinks = [...document.querySelectorAll(".kink-item:has(.kink-select)")];
-
-  console.debug(
-    LOG_PREFIX,
-    `Started. Applying switches to`,
-    kinks.length,
-    `kinks.`,
-  );
 
   for (const kink of kinks) {
     const label = kink
       .querySelector(".kink-item-name strong")
       ?.textContent?.trim();
-    const control = kink.querySelector(".kink-item-controls");
+    const dropdown = kink.querySelector(".kink-select");
 
     try {
-      putSwitch(control);
+      putSwitch(dropdown);
     } catch (ex) {
       console.error(
         LOG_PREFIX,
@@ -155,6 +147,47 @@ function main() {
         },
       );
     }
+  }
+}
+
+function applyPartnerPrefs() {
+  /** @type {HTMLDivElement[]} */
+  const prefs = [
+    ...document.querySelectorAll(".partner-pref-item:has(.kink-select)"),
+  ];
+
+  for (const pref of prefs) {
+    const label = pref.querySelector("strong")?.textContent?.trim();
+    const dropdown = pref.querySelector(".kink-select");
+
+    try {
+      putSwitch(dropdown);
+    } catch (ex) {
+      console.error(
+        LOG_PREFIX,
+        `Failed to set up the switches for a partner pref, "${label}".`,
+        {
+          target: pref,
+          ex,
+        },
+      );
+    }
+  }
+}
+
+function main() {
+  console.debug(LOG_PREFIX, `Started.`);
+
+  try {
+    applyKinks();
+  } catch (ex) {
+    console.error(LOG_PREFIX, "Failed to apply to kinks.", ex);
+  }
+
+  try {
+    applyPartnerPrefs();
+  } catch (ex) {
+    console.error(LOG_PREFIX, "Failed to apply to partner prefs.", ex);
   }
 }
 
