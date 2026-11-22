@@ -5,6 +5,10 @@
   z-index: 100; // deconflict with character list and other elements
 }
 
+.bbb-compact-character-controls-btn {
+  line-height: var(--line-height-base);
+}
+
 .bbb-compact-character-controls-menu {
   position: absolute;
   right: 0;
