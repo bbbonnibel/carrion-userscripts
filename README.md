@@ -63,7 +63,11 @@ Exact changes:
 
 In the character's kink editor, replace the kink dropdowns with a set of Fave/Yes/Maybe/No buttons. To clear your setting, click the kink that's active.
 
-🆕 **Bug fixed:** This script now works correctly even when you clone a kink.
+🆕 Updated 21 Nov 2026:
+
+- Bugfix: Kink switches now work correctly when you clone a kink.
+- Kink switches now apply to partner preferences too.
+- This script will now also apply in the character _creator,_ not just the character editor.
 
 ### [Kink Contexts Revised](https://bbbonnibel.github.io/carrion-userscripts/script/kink-contexts-revised/kink-contexts-revised.user.js)
 
@@ -71,7 +75,10 @@ Each kink gets a little cog icon beside it that can force contexts to show, even
 
 The cog icon will have an indicator telling you if there's hidden selected contexts.
 
-🆕 **Bug fixed:** This script now works correctly even when you clone a kink.
+🆕 Updated 21 Nov 2026:
+
+- Bugfix: The kink context toggle now works correctly when you clone a kink.
+- This script will now also apply in the character _creator,_ not just the character editor.
 
 ### [Shiny Character Page Border](https://bbbonnibel.github.io/carrion-userscripts/script/character-border/character-border.user.js)
 
