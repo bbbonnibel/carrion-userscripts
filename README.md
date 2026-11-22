@@ -32,7 +32,7 @@ Pin characters to the top of your dashboard. No matter what sort order you choos
 - Click a character's pin button to pin them to start.
 - Right-click that pin button to pin them to the end.
 
-### [Chat Unread Indicator](https://bbbonnibel.github.io/carrion-userscripts/script/chat-unread-indicator/chat-unread-indicator.user.js) (Beta)
+### [Chat Unread Indicator](https://bbbonnibel.github.io/carrion-userscripts/script/chat-unread-indicator/chat-unread-indicator.user.js)
 
 Introduces an unread indicator to your chat's sidebar, which will tell you if there's new messages out of view and whether any of them are mentions.
 
