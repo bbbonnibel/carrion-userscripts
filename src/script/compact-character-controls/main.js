@@ -68,8 +68,11 @@ class DashboardPage {
 //#region Compact menu
 const menuBtn = template(`
   <button type="button" class="btn btn-secondary bbb-compact-character-controls-btn">
-    <i class="fa-solid fa-ellipsis-vertical"></i>
   </button>
+`);
+
+const menuVellip = template(`
+  <i class="fa-solid fa-ellipsis-vertical"></i>
 `);
 
 const contextMenu = template(`
@@ -126,6 +129,7 @@ function startYourCharacterPage() {
   );
 
   characterControls.appendChild(compactControlsHost);
+  menuBtn.appendChild(menuVellip);
   attachMenuEvents();
 
   // Create new controls in the context menu.
@@ -158,7 +162,9 @@ function startOtherCharacterPage() {
   const characterControls = reportBtn.parentElement;
 
   characterControls.appendChild(compactControlsHost);
+  menuBtn.appendChild(menuVellip);
   attachMenuEvents();
+
   for (const button of [muteBtn, blockBtn, reportBtn].filter(Boolean)) {
     contextMenu.appendChild(button);
   }
@@ -185,6 +191,7 @@ function embedDashboardMenu() {
     return;
   }
   newCharacterBtn.insertAdjacentElement("afterend", compactControlsHost);
+  menuBtn.innerHTML = "Create&hellip;";
 }
 
 function fillDashboardMenu() {
