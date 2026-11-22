@@ -2,6 +2,7 @@ const mainCss = $import("./main.scss");
 
 const LOG_PREFIX = "[Compact Character Controls]";
 
+//#region Boilerplate
 /**
  * @param {string} html The template element. Must be only one root element.
  */
@@ -24,12 +25,14 @@ function installStyle(css, origin, filename) {
   e.innerText = css;
   document.head.appendChild(e);
 }
+//#endregion
 
 installStyle(mainCss, "compact-character-controls", "main.css");
 
+//#region Compact menu elements
 const menuBtn = template(`
   <button type="button" class="btn btn-secondary bbb-compact-character-controls-btn">
-    <i class="fa-solid fa-ellipsis-vertical"></i>
+    <span>Create&hellip;</span>
   </button>
 `);
 
@@ -39,27 +42,44 @@ const contextMenu = template(`
 
 const compactControlsHost = template(`
   <div class="bbb-compact-character-controls-host"></div>
-`); // boy these class names get long. good thing i only have to write them once!
+`);
 compactControlsHost.appendChild(menuBtn);
 compactControlsHost.appendChild(contextMenu);
+//#endregion
 
-const CharacterPage = Object.freeze({
-  /** @type {HTMLLinkElement} */
-  editBtn: () => document.querySelector("a.btn[href^='/edit']"),
-  /** @type {HTMLButtonElement} */
-  reportBtn: () => document.querySelector("#report-btn"),
-  /** @type {HTMLButtonElement} */
-  muteBtn: () => document.querySelector("#mute-btn"),
-  /** @type {HTMLButtonElement} */
-  blockBtn: () => document.querySelector("#block-btn"),
-  /** @type {HTMLDivElement} */
-  cardBody: () =>
-    document.querySelector("#filtered-profile-content .card-body"),
-});
+class CharacterPage {
+  /** @type {HTMLLinkElement | null} The Edit button */
+  static get editBtn() {
+    return document.querySelector("a.btn[href^='/edit']");
+  }
+  /** @type {HTMLButtonElement | null} The Report button */
+  static get reportBtn() {
+    return document.querySelector("#report-btn");
+  }
+  /** @type {HTMLButtonElement | null} The Mute button */
+  static get muteBtn() {
+    return document.querySelector("#mute-btn");
+  }
+  /** @type {HTMLButtonElement | null} The Block button */
+  static get blockBtn() {
+    return document.querySelector("#block-btn");
+  }
+  /** @type {HTMLDivElement | null} The character card body */
+  static get cardBody() {
+    return document.querySelector("#filtered-profile-content .card-body");
+  }
+}
 
-const DashboardPage = Object.freeze({
-  newCharacterBtn: () => document.querySelector("a.btn[href^='/create']"),
-});
+class DashboardPage {
+  /** @type {HTMLAnchorElement} The “Create New Character” button */
+  static get newCharacterBtn() {
+    return document.querySelector(`a.btn[href="/create/"]`);
+  }
+  /** @type {HTMLAnchorElement} The “Import from F-List” button */
+  static get importFromFlistBtn() {
+    return document.querySelector(`a.btn[href="/import/flist/"]`);
+  }
+}
 
 function attachMenuEvents() {
   const openClass = "open";
@@ -89,8 +109,9 @@ function attachMenuEvents() {
   });
 }
 
+//#region Character page (yours)
 function startYourCharacterPage() {
-  const editBtn = CharacterPage.editBtn();
+  const editBtn = CharacterPage.editBtn;
   if (!editBtn) {
     return;
   }
@@ -105,9 +126,8 @@ function startYourCharacterPage() {
   characterControls.appendChild(compactControlsHost);
   attachMenuEvents();
 
-  // Create new controls  in the context menu.
-  const characterId =
-    CharacterPage.cardBody().getAttribute("data-character-id");
+  // Create new controls in the context menu.
+  const characterId = CharacterPage.cardBody.getAttribute("data-character-id");
   /** @type {HTMLAnchorElement} */
   const chatAsCharacter = template(`
     <a target="_blank" class="btn btn-primary">
@@ -123,11 +143,13 @@ function startYourCharacterPage() {
     contextMenu.appendChild(button);
   }
 }
+//#endregion
 
+//#region Character page (other)
 function startOtherCharacterPage() {
-  const reportBtn = CharacterPage.reportBtn();
-  const muteBtn = CharacterPage.muteBtn();
-  const blockBtn = CharacterPage.blockBtn();
+  const reportBtn = CharacterPage.reportBtn;
+  const muteBtn = CharacterPage.muteBtn;
+  const blockBtn = CharacterPage.blockBtn;
   if (!reportBtn) {
     return;
   }
@@ -144,9 +166,11 @@ function startOtherCharacterPage() {
     contextMenu.appendChild(button);
   }
 }
+//#endregion
 
+//#region Character page (root)
 function startCharacterPage() {
-  if (CharacterPage.editBtn()) {
+  if (CharacterPage.editBtn) {
     console.debug(LOG_PREFIX, "Starting on your character page");
     startYourCharacterPage();
   } else {
@@ -154,26 +178,36 @@ function startCharacterPage() {
     startOtherCharacterPage();
   }
 }
+//#endregion
 
-function startDashboardPage() {
-  console.debug(LOG_PREFIX, "Starting on dashboard page");
-  const newCharacterBtn = DashboardPage.newCharacterBtn();
+//#region Dashboard
+function embedDashboardMenu() {
+  const newCharacterBtn = DashboardPage.newCharacterBtn;
   if (!newCharacterBtn) {
     // Mysteriously missing.
     return;
   }
-
-  /** the list of buttons to be moved. */
-  const importButtons = newCharacterBtn.parentElement.querySelectorAll(
-    ".btn[href^='/import']",
-  );
-
   newCharacterBtn.insertAdjacentElement("afterend", compactControlsHost);
+}
+
+function fillDashboardMenu() {
+  const buttonsToMove = [
+    DashboardPage.newCharacterBtn,
+    DashboardPage.importFromFlistBtn,
+  ];
+
   attachMenuEvents();
-  for (const button of importButtons) {
+  for (const button of buttonsToMove) {
     contextMenu.appendChild(button);
   }
 }
+
+function startDashboardPage() {
+  console.debug(LOG_PREFIX, "Starting on dashboard page");
+  embedDashboardMenu();
+  fillDashboardMenu();
+}
+//#endregion
 
 function main() {
   const pathname = window.location.pathname;
