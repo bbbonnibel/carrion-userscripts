@@ -68,7 +68,7 @@ class DashboardPage {
 //#region Compact menu
 const menuBtn = template(`
   <button type="button" class="btn btn-secondary bbb-compact-character-controls-btn">
-    Create&hellip;
+    <i class="fa-solid fa-ellipsis-vertical"></i>
   </button>
 `);
 
