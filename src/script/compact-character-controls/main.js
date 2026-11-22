@@ -83,7 +83,6 @@ compactControlsHost.appendChild(menuBtn);
 compactControlsHost.appendChild(contextMenu);
 
 function attachMenuEvents() {
-  console.debug(LOG_PREFIX, "Attaching menu events");
   const openClass = "open";
 
   menuBtn.addEventListener("click", () => {
@@ -160,11 +159,6 @@ function startOtherCharacterPage() {
 
   characterControls.appendChild(compactControlsHost);
   attachMenuEvents();
-  console.debug(LOG_PREFIX, "Moving buttons:", {
-    reportBtn,
-    muteBtn,
-    blockBtn,
-  });
   for (const button of [muteBtn, blockBtn, reportBtn].filter(Boolean)) {
     contextMenu.appendChild(button);
   }
