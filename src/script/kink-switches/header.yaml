@@ -4,6 +4,6 @@ namespace: bbbonnibel
 description: Replace the kink editor's dropdowns with switches.
 author: Bonnibel
 match:
+  - https://*.carrion.chat/create/
   - https://*.carrion.chat/edit/*
-  - https://*.carrion.chat/edit/*/
 run-at: document-idle
