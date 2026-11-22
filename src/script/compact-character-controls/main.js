@@ -29,24 +29,7 @@ function installStyle(css, origin, filename) {
 
 installStyle(mainCss, "compact-character-controls", "main.css");
 
-//#region Compact menu elements
-const menuBtn = template(`
-  <button type="button" class="btn btn-secondary bbb-compact-character-controls-btn">
-    Create&hellip;
-  </button>
-`);
-
-const contextMenu = template(`
-  <div class="bbb-compact-character-controls-menu"></div>
-`);
-
-const compactControlsHost = template(`
-  <div class="bbb-compact-character-controls-host"></div>
-`);
-compactControlsHost.appendChild(menuBtn);
-compactControlsHost.appendChild(contextMenu);
-//#endregion
-
+//#region Page
 class CharacterPage {
   /** @type {HTMLLinkElement | null} The Edit button */
   static get editBtn() {
@@ -80,6 +63,24 @@ class DashboardPage {
     return document.querySelector(`a.btn[href="/import/flist/"]`);
   }
 }
+//#endregion
+
+//#region Compact menu
+const menuBtn = template(`
+  <button type="button" class="btn btn-secondary bbb-compact-character-controls-btn">
+    Create&hellip;
+  </button>
+`);
+
+const contextMenu = template(`
+  <div class="bbb-compact-character-controls-menu"></div>
+`);
+
+const compactControlsHost = template(`
+  <div class="bbb-compact-character-controls-host"></div>
+`);
+compactControlsHost.appendChild(menuBtn);
+compactControlsHost.appendChild(contextMenu);
 
 function attachMenuEvents() {
   console.debug(LOG_PREFIX, "Attaching menu events");
@@ -109,6 +110,7 @@ function attachMenuEvents() {
     contextMenu.classList.remove(openClass);
   });
 }
+//#endregion
 
 //#region Character page (yours)
 function startYourCharacterPage() {
