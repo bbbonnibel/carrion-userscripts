@@ -1,0 +1,11 @@
+---
+name: reconnect-from-purgatory
+namespace: bbbonnibel
+description:
+author: Bonnibel
+grant:
+  - GM_getValue
+  - GM_setValue
+match:
+  - https://*.carrion.chat/chat/*
+run-at: document-ready
