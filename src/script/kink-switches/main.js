@@ -114,10 +114,10 @@ function putSwitch(dropdown) {
   /** @type {HTMLSelectElement} */
   const kinkSwitch = template(`
     <bbb-kink-switch>
-      <bbb-kink-button pref="favorite"><span>Fave</span></bbb-kink-button>
-      <bbb-kink-button pref="yes"><span>Yes</span></bbb-kink-button>
-      <bbb-kink-button pref="maybe"><span>Maybe</span></bbb-kink-button>
-      <bbb-kink-button pref="no"><span>No</span></bbb-kink-button>
+      <bbb-kink-button role="button" pref="favorite"><span>Fave</span></bbb-kink-button>
+      <bbb-kink-button role="button" pref="yes"><span>Yes</span></bbb-kink-button>
+      <bbb-kink-button role="button" pref="maybe"><span>Maybe</span></bbb-kink-button>
+      <bbb-kink-button role="button" pref="no"><span>No</span></bbb-kink-button>
     </bbb-kink-switch>
   `);
   dropdown.insertAdjacentElement("afterend", kinkSwitch);
